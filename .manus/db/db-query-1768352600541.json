@@ -1,0 +1,146 @@
+{
+  "query": "DESCRIBE generated_images;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2KCubjDFECbPXrv.26d969a55175 --database 5r9y8qTE5JLFf52GpXgNKZ --execute DESCRIBE generated_images;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "userId",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "taskId",
+      "Type": "varchar(128)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "prompt",
+      "Type": "text",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "enhancedPrompt",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "originalTopic",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "model",
+      "Type": "enum('nano-banana','nano-banana-pro','grok-imagine','openai-4o')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "nano-banana",
+      "Extra": ""
+    },
+    {
+      "Field": "aspectRatio",
+      "Type": "varchar(16)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "1:1",
+      "Extra": ""
+    },
+    {
+      "Field": "resolution",
+      "Type": "varchar(8)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "1K",
+      "Extra": ""
+    },
+    {
+      "Field": "imageUrl",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "s3Key",
+      "Type": "varchar(512)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "status",
+      "Type": "enum('pending','generating','completed','failed')",
+      "Null": "NO",
+      "Key": "",
+      "Default": "pending",
+      "Extra": ""
+    },
+    {
+      "Field": "failReason",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "isFavorite",
+      "Type": "tinyint(1)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "createdAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "updatedAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    },
+    {
+      "Field": "completedAt",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint(11)\tNO\tPRI\tNULL\tauto_increment\nuserId\tint(11)\tNO\t\tNULL\t\ntaskId\tvarchar(128)\tNO\t\tNULL\t\nprompt\ttext\tNO\t\tNULL\t\nenhancedPrompt\ttext\tYES\t\tNULL\t\noriginalTopic\ttext\tYES\t\tNULL\t\nmodel\tenum('nano-banana','nano-banana-pro','grok-imagine','openai-4o')\tNO\t\tnano-banana\t\naspectRatio\tvarchar(16)\tNO\t\t1:1\t\nresolution\tvarchar(8)\tNO\t\t1K\t\nimageUrl\ttext\tYES\t\tNULL\t\ns3Key\tvarchar(512)\tYES\t\tNULL\t\nstatus\tenum('pending','generating','completed','failed')\tNO\t\tpending\t\nfailReason\ttext\tYES\t\tNULL\t\nisFavorite\ttinyint(1)\tNO\t\t0\t\ncreatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nupdatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\ncompletedAt\ttimestamp\tYES\t\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

@@ -1,0 +1,22 @@
+CREATE TABLE `watermark_presets` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`userId` int NOT NULL,
+	`name` varchar(128) NOT NULL,
+	`type` enum('text','image') NOT NULL DEFAULT 'text',
+	`text` text,
+	`fontSize` int DEFAULT 24,
+	`fontFamily` varchar(64) DEFAULT 'Arial',
+	`color` varchar(16) DEFAULT '#ffffff',
+	`opacity` int DEFAULT 50,
+	`position` varchar(32) DEFAULT 'bottom-right',
+	`rotation` int DEFAULT 0,
+	`imageUrl` text,
+	`imageSize` int DEFAULT 100,
+	`customX` int DEFAULT 50,
+	`customY` int DEFAULT 50,
+	`sizePreset` varchar(16) DEFAULT 'medium',
+	`isDefault` boolean NOT NULL DEFAULT false,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `watermark_presets_id` PRIMARY KEY(`id`)
+);

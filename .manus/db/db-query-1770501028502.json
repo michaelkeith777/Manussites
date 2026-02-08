@@ -1,0 +1,35 @@
+{
+  "query": "SELECT id, imageUrl, s3Key FROM generated_images WHERE status = 'completed' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2KCubjDFECbPXrv.26d969a55175 --database 5r9y8qTE5JLFf52GpXgNKZ --execute SELECT id, imageUrl, s3Key FROM generated_images WHERE status = 'completed' LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/Wtd9cHNP7-gptjGTuN-2-.png",
+      "s3Key": "images/1/Wtd9cHNP7-gptjGTuN-2-.png"
+    },
+    {
+      "id": "2",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/Zsb0LbANX0jOSDToDk4uQ.png",
+      "s3Key": "images/1/Zsb0LbANX0jOSDToDk4uQ.png"
+    },
+    {
+      "id": "3",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/Y2VCrPhE04yII_jC_ONG5.png",
+      "s3Key": "images/1/Y2VCrPhE04yII_jC_ONG5.png"
+    },
+    {
+      "id": "4",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/bJ9ZtSCezcpLjZx2laHI9.png",
+      "s3Key": "images/1/bJ9ZtSCezcpLjZx2laHI9.png"
+    },
+    {
+      "id": "5",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/WqRlkOgJR4ZCUAa3PGrCY.png",
+      "s3Key": "images/1/WqRlkOgJR4ZCUAa3PGrCY.png"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\timageUrl\ts3Key\n1\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/Wtd9cHNP7-gptjGTuN-2-.png\timages/1/Wtd9cHNP7-gptjGTuN-2-.png\n2\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/Zsb0LbANX0jOSDToDk4uQ.png\timages/1/Zsb0LbANX0jOSDToDk4uQ.png\n3\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/Y2VCrPhE04yII_jC_ONG5.png\timages/1/Y2VCrPhE04yII_jC_ONG5.png\n4\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/bJ9ZtSCezcpLjZx2laHI9.png\timages/1/bJ9ZtSCezcpLjZx2laHI9.png\n5\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/WqRlkOgJR4ZCUAa3PGrCY.png\timages/1/WqRlkOgJR4ZCUAa3PGrCY.png\n",
+  "stderr": "",
+  "execution_time_ms": 228
+}

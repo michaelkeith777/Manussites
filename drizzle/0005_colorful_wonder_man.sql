@@ -1,0 +1,3 @@
+ALTER TABLE `generated_images` MODIFY COLUMN `model` enum('nano-banana','nano-banana-pro','grok-imagine','openai-4o') NOT NULL DEFAULT 'nano-banana';--> statement-breakpoint
+ALTER TABLE `generation_sessions` MODIFY COLUMN `model` enum('nano-banana','nano-banana-pro','grok-imagine','openai-4o') NOT NULL DEFAULT 'nano-banana';--> statement-breakpoint
+ALTER TABLE `prompt_history` MODIFY COLUMN `model` enum('nano-banana','nano-banana-pro','grok-imagine','openai-4o') NOT NULL DEFAULT 'nano-banana';

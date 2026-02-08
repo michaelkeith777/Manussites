@@ -1,0 +1,100 @@
+{
+  "query": "SELECT id, taskId, status, model, imageUrl, failReason, createdAt FROM generated_images ORDER BY createdAt DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2KCubjDFECbPXrv.26d969a55175 --database 5r9y8qTE5JLFf52GpXgNKZ --execute SELECT id, taskId, status, model, imageUrl, failReason, createdAt FROM generated_images ORDER BY createdAt DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "60006",
+      "taskId": "76f1a934e06e66bdadce5363cf75d879",
+      "status": "generating",
+      "model": "openai-4o",
+      "imageUrl": "NULL",
+      "failReason": "NULL",
+      "createdAt": "2026-01-14 00:58:35"
+    },
+    {
+      "id": "60005",
+      "taskId": "fddcb470c63cdb2a264da85331c21097",
+      "status": "generating",
+      "model": "openai-4o",
+      "imageUrl": "NULL",
+      "failReason": "NULL",
+      "createdAt": "2026-01-14 00:58:34"
+    },
+    {
+      "id": "60004",
+      "taskId": "db964229a8e89e19dc32558ad6ed3417",
+      "status": "generating",
+      "model": "openai-4o",
+      "imageUrl": "NULL",
+      "failReason": "NULL",
+      "createdAt": "2026-01-14 00:45:10"
+    },
+    {
+      "id": "60003",
+      "taskId": "4f66513d222c4eff70719a9723d3d60b",
+      "status": "generating",
+      "model": "openai-4o",
+      "imageUrl": "NULL",
+      "failReason": "NULL",
+      "createdAt": "2026-01-14 00:45:10"
+    },
+    {
+      "id": "60002",
+      "taskId": "6f50e184d6d00e07c5bcf65fbe4a00ec",
+      "status": "completed",
+      "model": "grok-imagine",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/2-84exIAWt_M7HsRGnpLP.png",
+      "failReason": "NULL",
+      "createdAt": "2026-01-14 00:13:25"
+    },
+    {
+      "id": "60001",
+      "taskId": "c8becf050a93c3e8ad75d5f2a56e41d9",
+      "status": "completed",
+      "model": "grok-imagine",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/GD9hjUznPdy7bhGDd645k.png",
+      "failReason": "NULL",
+      "createdAt": "2026-01-14 00:13:24"
+    },
+    {
+      "id": "30009",
+      "taskId": "7b484583fd5c2877e3441e8ee304381a",
+      "status": "completed",
+      "model": "nano-banana",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/q3qgJYAxCrqYF_YEb680Q.png",
+      "failReason": "NULL",
+      "createdAt": "2026-01-13 03:24:54"
+    },
+    {
+      "id": "30010",
+      "taskId": "4d0215c1c7f1f2f981b8d61032ec6209",
+      "status": "completed",
+      "model": "nano-banana",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/kuz_zVIwvFEWxIW95dI4G.png",
+      "failReason": "NULL",
+      "createdAt": "2026-01-13 03:24:54"
+    },
+    {
+      "id": "30007",
+      "taskId": "99807183302643383351e329828777cb",
+      "status": "completed",
+      "model": "nano-banana",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/YOnM3-5H6LugiVg6sfLcT.png",
+      "failReason": "NULL",
+      "createdAt": "2026-01-13 03:24:53"
+    },
+    {
+      "id": "30008",
+      "taskId": "61e054f757b57b7175b91d270e944013",
+      "status": "completed",
+      "model": "nano-banana",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/6gvuw_JBazpHkwAYeF_X0.png",
+      "failReason": "NULL",
+      "createdAt": "2026-01-13 03:24:53"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttaskId\tstatus\tmodel\timageUrl\tfailReason\tcreatedAt\n60006\t76f1a934e06e66bdadce5363cf75d879\tgenerating\topenai-4o\tNULL\tNULL\t2026-01-14 00:58:35\n60005\tfddcb470c63cdb2a264da85331c21097\tgenerating\topenai-4o\tNULL\tNULL\t2026-01-14 00:58:34\n60004\tdb964229a8e89e19dc32558ad6ed3417\tgenerating\topenai-4o\tNULL\tNULL\t2026-01-14 00:45:10\n60003\t4f66513d222c4eff70719a9723d3d60b\tgenerating\topenai-4o\tNULL\tNULL\t2026-01-14 00:45:10\n60002\t6f50e184d6d00e07c5bcf65fbe4a00ec\tcompleted\tgrok-imagine\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/2-84exIAWt_M7HsRGnpLP.png\tNULL\t2026-01-14 00:13:25\n60001\tc8becf050a93c3e8ad75d5f2a56e41d9\tcompleted\tgrok-imagine\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/GD9hjUznPdy7bhGDd645k.png\tNULL\t2026-01-14 00:13:24\n30009\t7b484583fd5c2877e3441e8ee304381a\tcompleted\tnano-banana\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/q3qgJYAxCrqYF_YEb680Q.png\tNULL\t2026-01-13 03:24:54\n30010\t4d0215c1c7f1f2f981b8d61032ec6209\tcompleted\tnano-banana\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/kuz_zVIwvFEWxIW95dI4G.png\tNULL\t2026-01-13 03:24:54\n30007\t99807183302643383351e329828777cb\tcompleted\tnano-banana\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/YOnM3-5H6LugiVg6sfLcT.png\tNULL\t2026-01-13 03:24:53\n30008\t61e054f757b57b7175b91d270e944013\tcompleted\tnano-banana\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/5r9y8qTE5JLFf52GpXgNKZ/images/1/6gvuw_JBazpHkwAYeF_X0.png\tNULL\t2026-01-13 03:24:53\n",
+  "stderr": "",
+  "execution_time_ms": 83
+}
