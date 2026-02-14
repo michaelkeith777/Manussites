@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1771048916732,
+      "tag": "0000_ambiguous_cassandra_nova",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1771049113341,
+      "tag": "0001_yielding_star_brand",
+      "breakpoints": true
+    }
+  ]
+}

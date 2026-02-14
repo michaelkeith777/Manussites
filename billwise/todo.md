@@ -1,0 +1,27 @@
+# BillWise - Project TODO
+
+- [x] Database schema (bills, payments, categories, chat messages)
+- [x] Backend API routes for bill CRUD operations
+- [x] Backend API routes for payment tracking
+- [x] Backend API routes for category management
+- [x] Backend API routes for budget analytics
+- [x] Backend API for recurring bill automation
+- [x] Backend API for AI chat assistant
+- [x] Design system and global theming (elegant light theme with purple primary)
+- [x] Dashboard layout with sidebar navigation
+- [x] Dashboard page with upcoming bills, overdue items, payment summary
+- [x] Bill management page (add, edit, delete bills)
+- [x] Payment tracking and history page
+- [x] Calendar view with color-coded bill status
+- [x] Budget analytics page with charts (spending by category, monthly trends, budget vs actual)
+- [x] Category management UI
+- [x] Search and filter functionality
+- [x] AI chat assistant UI with full conversation interface
+- [x] AI assistant: create bills from natural language
+- [x] AI assistant: mark bills as paid
+- [x] AI assistant: search bill history
+- [x] AI assistant: generate spending reports
+- [x] AI assistant: suggest budget optimizations
+- [x] AI assistant: answer financial questions
+- [x] Recurring bill automation logic
+- [x] Vitest tests for backend routes (30 tests passing)
