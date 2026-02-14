@@ -44,6 +44,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 type BillFormData = {
   name: string;
@@ -218,7 +219,7 @@ export default function Bills() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight font-serif">Bills</h1>
+          <h1 className="text-2xl font-display font-bold gradient-text">Bills</h1>
           <p className="text-muted-foreground text-sm mt-1">
             Manage and track all your bills
           </p>
@@ -229,7 +230,7 @@ export default function Bills() {
             setForm(defaultForm);
             setDialogOpen(true);
           }}
-          className="shadow-sm"
+          className="bg-gradient-to-r from-primary to-chart-2 text-white border-0 hover:opacity-90 transition-all"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Bill
@@ -277,7 +278,9 @@ export default function Bills() {
       {!bills || bills.length === 0 ? (
         <Card className="border-0 shadow-sm">
           <CardContent className="flex flex-col items-center justify-center py-16">
-            <Receipt className="h-12 w-12 text-muted-foreground/30 mb-4" />
+            <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 2, repeat: Infinity }}>
+              <Receipt className="h-12 w-12 text-muted-foreground/20 mb-4" />
+            </motion.div>
             <p className="text-muted-foreground text-sm">No bills found</p>
             <Button
               variant="outline"
@@ -296,8 +299,10 @@ export default function Bills() {
         </Card>
       ) : (
         <div className="space-y-2">
-          {bills.map((bill) => (
-            <Card key={bill.id} className="border-0 shadow-sm hover:shadow-md transition-shadow">
+          <AnimatePresence>
+          {bills.map((bill, index) => (
+            <motion.div key={bill.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ delay: index * 0.03 }}>
+            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -364,15 +369,17 @@ export default function Bills() {
                 </div>
               </CardContent>
             </Card>
+            </motion.div>
           ))}
+          </AnimatePresence>
         </div>
       )}
 
       {/* Add/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg glass-strong">
           <DialogHeader>
-            <DialogTitle className="font-serif">
+            <DialogTitle className="font-display">
               {editingBill ? "Edit Bill" : "Add New Bill"}
             </DialogTitle>
           </DialogHeader>
@@ -473,6 +480,7 @@ export default function Bills() {
             <Button
               onClick={handleSubmit}
               disabled={createBill.isPending || updateBill.isPending}
+              className="bg-gradient-to-r from-primary to-chart-2 text-white border-0"
             >
               {editingBill ? "Save Changes" : "Add Bill"}
             </Button>
@@ -482,9 +490,9 @@ export default function Bills() {
 
       {/* Pay Dialog */}
       <Dialog open={payDialogOpen} onOpenChange={setPayDialogOpen}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent className="sm:max-w-sm glass-strong">
           <DialogHeader>
-            <DialogTitle className="font-serif">Record Payment</DialogTitle>
+            <DialogTitle className="font-display">Record Payment</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">

@@ -33,6 +33,7 @@ import {
   AreaChart,
 } from "recharts";
 import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
+import { motion } from "framer-motion";
 
 const COLORS = [
   "#7c3aed", "#10b981", "#f59e0b", "#ef4444", "#3b82f6",
@@ -116,7 +117,7 @@ export default function Analytics() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight font-serif">Analytics</h1>
+        <h1 className="text-2xl font-display font-bold gradient-text">Analytics</h1>
         <p className="text-muted-foreground text-sm mt-1">
           Insights into your spending patterns and budget
         </p>
@@ -129,7 +130,7 @@ export default function Analytics() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Spent</p>
-                <p className="text-2xl font-semibold mt-1">
+                <p className="text-2xl font-display font-bold mt-1">
                   ${totalSpent.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 </p>
               </div>
@@ -144,7 +145,7 @@ export default function Analytics() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Avg Monthly</p>
-                <p className="text-2xl font-semibold mt-1">
+                <p className="text-2xl font-display font-bold mt-1">
                   ${barData.length > 0
                     ? (barData.reduce((s, d) => s + d.amount, 0) / barData.length).toLocaleString("en-US", { minimumFractionDigits: 2 })
                     : "0.00"
@@ -162,7 +163,7 @@ export default function Analytics() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Categories</p>
-                <p className="text-2xl font-semibold mt-1">{pieData.length}</p>
+                <p className="text-2xl font-display font-bold mt-1">{pieData.length}</p>
               </div>
               <div className="h-10 w-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
                 <PieChart className="h-5 w-5 text-amber-600" />
@@ -177,7 +178,7 @@ export default function Analytics() {
         {/* Spending by Category */}
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium flex items-center gap-2">
+            <CardTitle className="text-base font-display font-semibold flex items-center gap-2">
               <PieChart className="h-4 w-4 text-primary" />
               Spending by Category
             </CardTitle>
@@ -207,8 +208,10 @@ export default function Analytics() {
                     formatter={(value: number) => [`$${value.toFixed(2)}`, "Amount"]}
                     contentStyle={{
                       borderRadius: "8px",
-                      border: "1px solid var(--border)",
-                      boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                      border: "1px solid oklch(0.25 0.03 280)",
+                      backgroundColor: "oklch(0.17 0.025 280)",
+                      boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.3)",
+                      color: "oklch(0.93 0.01 280)",
                     }}
                   />
                   <Legend />
@@ -221,7 +224,7 @@ export default function Analytics() {
         {/* Monthly Spending Trend */}
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium flex items-center gap-2">
+            <CardTitle className="text-base font-display font-semibold flex items-center gap-2">
               <BarChart3 className="h-4 w-4 text-primary" />
               Monthly Spending
             </CardTitle>
@@ -267,7 +270,7 @@ export default function Analytics() {
         {/* Budget vs Actual */}
         <Card className="border-0 shadow-sm lg:col-span-2">
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium flex items-center gap-2">
+            <CardTitle className="text-base font-display font-semibold flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-primary" />
               Budget vs Actual (Bills Due vs Paid)
             </CardTitle>

@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Plus, Pencil, Trash2, Tag, Palette } from "lucide-react";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 const PRESET_COLORS = [
   "#7c3aed", "#6366f1", "#3b82f6", "#06b6d4", "#10b981",
@@ -111,7 +112,7 @@ export default function Categories() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight font-serif">Categories</h1>
+          <h1 className="text-2xl font-display font-bold gradient-text">Categories</h1>
           <p className="text-muted-foreground text-sm mt-1">
             Organize your bills into custom categories
           </p>
@@ -121,7 +122,7 @@ export default function Categories() {
             resetForm();
             setDialogOpen(true);
           }}
-          className="shadow-sm"
+          className="bg-gradient-to-r from-primary to-chart-2 text-white border-0 hover:opacity-90 transition-all"
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Category
@@ -132,7 +133,9 @@ export default function Categories() {
       {!categories || categories.length === 0 ? (
         <Card className="border-0 shadow-sm">
           <CardContent className="flex flex-col items-center justify-center py-16">
-            <Tag className="h-12 w-12 text-muted-foreground/30 mb-4" />
+            <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 2, repeat: Infinity }}>
+              <Tag className="h-12 w-12 text-muted-foreground/20 mb-4" />
+            </motion.div>
             <p className="text-muted-foreground text-sm">No categories yet</p>
             <p className="text-xs text-muted-foreground mt-1">
               Create categories to organize your bills
@@ -153,8 +156,9 @@ export default function Categories() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {categories.map((cat) => (
-            <Card key={cat.id} className="border-0 shadow-sm hover:shadow-md transition-shadow group">
+          {categories.map((cat, index) => (
+            <motion.div key={cat.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}>
+            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow group">
               <CardContent className="p-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -196,15 +200,16 @@ export default function Categories() {
                 </div>
               </CardContent>
             </Card>
+            </motion.div>
           ))}
         </div>
       )}
 
       {/* Add/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md glass-strong">
           <DialogHeader>
-            <DialogTitle className="font-serif">
+            <DialogTitle className="font-display">
               {editingId ? "Edit Category" : "New Category"}
             </DialogTitle>
           </DialogHeader>
@@ -257,6 +262,7 @@ export default function Categories() {
             <Button
               onClick={handleSubmit}
               disabled={createCategory.isPending || updateCategory.isPending}
+              className="bg-gradient-to-r from-primary to-chart-2 text-white border-0"
             >
               {editingId ? "Save Changes" : "Create Category"}
             </Button>

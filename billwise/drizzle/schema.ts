@@ -7,6 +7,7 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  vaultPasscode: varchar("vaultPasscode", { length: 6 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -48,6 +49,39 @@ export const bills = mysqlTable("bills", {
 
 export type Bill = typeof bills.$inferSelect;
 export type InsertBill = typeof bills.$inferInsert;
+
+// Income sources table
+export const incomes = mysqlTable("incomes", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  name: varchar("name", { length: 200 }).notNull(),
+  amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
+  frequency: mysqlEnum("frequency", ["weekly", "biweekly", "monthly", "quarterly", "yearly"]).default("monthly").notNull(),
+  source: varchar("source", { length: 100 }),
+  isActive: boolean("isActive").default(true).notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Income = typeof incomes.$inferSelect;
+export type InsertIncome = typeof incomes.$inferInsert;
+
+// AI-generated budgets
+export const budgets = mysqlTable("budgets", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  name: varchar("name", { length: 200 }).notNull(),
+  totalIncome: decimal("totalIncome", { precision: 12, scale: 2 }).notNull(),
+  totalBills: decimal("totalBills", { precision: 12, scale: 2 }).notNull(),
+  totalSavings: decimal("totalSavings", { precision: 12, scale: 2 }).notNull(),
+  suggestions: text("suggestions"),
+  breakdown: text("breakdown"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Budget = typeof budgets.$inferSelect;
+export type InsertBudget = typeof budgets.$inferInsert;
 
 // Payments table
 export const payments = mysqlTable("payments", {

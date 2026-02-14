@@ -39,6 +39,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Payments() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -108,12 +109,12 @@ export default function Payments() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight font-serif">Payments</h1>
+          <h1 className="text-2xl font-display font-bold gradient-text">Payments</h1>
           <p className="text-muted-foreground text-sm mt-1">
             Track and manage your payment history
           </p>
         </div>
-        <Button onClick={() => setDialogOpen(true)} className="shadow-sm">
+        <Button onClick={() => setDialogOpen(true)} className="bg-gradient-to-r from-primary to-chart-2 text-white border-0 hover:opacity-90 transition-all">
           <Plus className="h-4 w-4 mr-2" />
           Record Payment
         </Button>
@@ -126,7 +127,7 @@ export default function Payments() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Payments</p>
-                <p className="text-2xl font-semibold mt-1">{payments?.length ?? 0}</p>
+                <p className="text-2xl font-display font-bold mt-1">{payments?.length ?? 0}</p>
               </div>
               <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
                 <CreditCard className="h-5 w-5 text-emerald-600" />
@@ -139,7 +140,7 @@ export default function Payments() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Amount Paid</p>
-                <p className="text-2xl font-semibold mt-1">
+                <p className="text-2xl font-display font-bold mt-1">
                   ${totalPaid.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 </p>
               </div>
@@ -155,7 +156,9 @@ export default function Payments() {
       {!payments || payments.length === 0 ? (
         <Card className="border-0 shadow-sm">
           <CardContent className="flex flex-col items-center justify-center py-16">
-            <CreditCard className="h-12 w-12 text-muted-foreground/30 mb-4" />
+            <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 2, repeat: Infinity }}>
+              <CreditCard className="h-12 w-12 text-muted-foreground/20 mb-4" />
+            </motion.div>
             <p className="text-muted-foreground text-sm">No payments recorded yet</p>
             <Button variant="outline" size="sm" className="mt-4" onClick={() => setDialogOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
@@ -165,8 +168,10 @@ export default function Payments() {
         </Card>
       ) : (
         <div className="space-y-2">
-          {payments.map((payment) => (
-            <Card key={payment.id} className="border-0 shadow-sm hover:shadow-md transition-shadow">
+          <AnimatePresence>
+          {payments.map((payment, index) => (
+            <motion.div key={payment.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03 }}>
+            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -203,15 +208,17 @@ export default function Payments() {
                 </div>
               </CardContent>
             </Card>
+            </motion.div>
           ))}
+          </AnimatePresence>
         </div>
       )}
 
       {/* Record Payment Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md glass-strong">
           <DialogHeader>
-            <DialogTitle className="font-serif">Record Payment</DialogTitle>
+            <DialogTitle className="font-display">Record Payment</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
@@ -286,7 +293,7 @@ export default function Payments() {
                 });
               }}
               disabled={createPayment.isPending}
-              className="bg-emerald-600 hover:bg-emerald-700"
+              className="bg-gradient-to-r from-chart-5 to-chart-2 text-white border-0"
             >
               Record Payment
             </Button>

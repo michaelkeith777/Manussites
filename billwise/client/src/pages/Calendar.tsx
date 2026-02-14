@@ -9,6 +9,7 @@ import {
   ChevronRight,
   CalendarDays,
 } from "lucide-react";
+import { motion } from "framer-motion";
 import {
   format,
   startOfMonth,
@@ -90,7 +91,7 @@ export default function Calendar() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight font-serif">Calendar</h1>
+        <h1 className="text-2xl font-display font-bold gradient-text">Calendar</h1>
         <p className="text-muted-foreground text-sm mt-1">
           View your bills by due date
         </p>
@@ -108,7 +109,7 @@ export default function Calendar() {
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <h2 className="text-lg font-semibold font-serif">
+              <h2 className="text-lg font-display font-semibold">
                 {format(currentMonth, "MMMM yyyy")}
               </h2>
               <Button
@@ -200,7 +201,7 @@ export default function Calendar() {
         {/* Selected Day Detail */}
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base font-medium flex items-center gap-2">
+            <CardTitle className="text-base font-display font-semibold flex items-center gap-2">
               <CalendarDays className="h-4 w-4 text-primary" />
               {selectedDate ? format(selectedDate, "EEEE, MMMM d") : "Select a date"}
             </CardTitle>
@@ -228,7 +229,7 @@ export default function Calendar() {
                       <p className="text-sm font-medium">{bill.name}</p>
                       {statusBadge(bill.status)}
                     </div>
-                    <p className="text-lg font-semibold">${parseFloat(bill.amount).toFixed(2)}</p>
+                    <p className="text-lg font-display font-bold">${parseFloat(bill.amount).toFixed(2)}</p>
                     {getCategoryName(bill.categoryId) && (
                       <Badge variant="secondary" className="text-[10px] px-1.5 py-0 mt-1">
                         {getCategoryName(bill.categoryId)}
@@ -242,7 +243,7 @@ export default function Calendar() {
                 <div className="pt-2 border-t">
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-muted-foreground">Total</span>
-                    <span className="text-sm font-semibold">
+                    <span className="text-sm font-display font-bold">
                       ${selectedBills.reduce((sum, b) => sum + parseFloat(b.amount), 0).toFixed(2)}
                     </span>
                   </div>

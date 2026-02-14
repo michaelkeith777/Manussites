@@ -1,6 +1,6 @@
 import { eq, and, desc, asc, gte, lte, like, sql, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, bills, payments, categories, chatMessages, type InsertBill, type InsertPayment, type InsertCategory, type InsertChatMessage } from "../drizzle/schema";
+import { InsertUser, users, bills, payments, categories, chatMessages, incomes, budgets, type InsertBill, type InsertPayment, type InsertCategory, type InsertChatMessage, type InsertIncome, type InsertBudget } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -70,6 +70,21 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+// ==================== VAULT PASSCODE ====================
+
+export async function getVaultPasscode(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select({ vaultPasscode: users.vaultPasscode }).from(users).where(eq(users.id, userId)).limit(1);
+  return result[0]?.vaultPasscode ?? null;
+}
+
+export async function setVaultPasscode(userId: number, passcode: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(users).set({ vaultPasscode: passcode }).where(eq(users.id, userId));
+}
+
 // ==================== CATEGORIES ====================
 
 export async function getCategories(userId: number) {
@@ -94,7 +109,6 @@ export async function updateCategory(id: number, userId: number, data: Partial<I
 export async function deleteCategory(id: number, userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  // Set bills in this category to null
   await db.update(bills).set({ categoryId: null }).where(and(eq(bills.categoryId, id), eq(bills.userId, userId)));
   await db.delete(categories).where(and(eq(categories.id, id), eq(categories.userId, userId)));
 }
@@ -110,9 +124,7 @@ export async function getBills(userId: number, filters?: {
 }) {
   const db = await getDb();
   if (!db) return [];
-
   const conditions = [eq(bills.userId, userId)];
-
   if (filters?.status && filters.status !== "all") {
     conditions.push(eq(bills.status, filters.status as "pending" | "paid" | "overdue"));
   }
@@ -128,7 +140,6 @@ export async function getBills(userId: number, filters?: {
   if (filters?.endDate) {
     conditions.push(lte(bills.dueDate, filters.endDate));
   }
-
   return db.select().from(bills).where(and(...conditions)).orderBy(asc(bills.dueDate));
 }
 
@@ -168,17 +179,81 @@ export async function markBillOverdue(userId: number) {
   );
 }
 
+// ==================== INCOME ====================
+
+export async function getIncomes(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(incomes).where(eq(incomes.userId, userId)).orderBy(desc(incomes.createdAt));
+}
+
+export async function createIncome(data: InsertIncome) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(incomes).values(data);
+  return { id: result[0].insertId, ...data };
+}
+
+export async function updateIncome(id: number, userId: number, data: Partial<InsertIncome>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(incomes).set(data).where(and(eq(incomes.id, id), eq(incomes.userId, userId)));
+}
+
+export async function deleteIncome(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(incomes).where(and(eq(incomes.id, id), eq(incomes.userId, userId)));
+}
+
+export async function getMonthlyIncomeTotal(userId: number) {
+  const db = await getDb();
+  if (!db) return "0";
+  const allIncomes = await db.select().from(incomes).where(and(eq(incomes.userId, userId), eq(incomes.isActive, true)));
+  let monthlyTotal = 0;
+  for (const inc of allIncomes) {
+    const amt = parseFloat(inc.amount);
+    switch (inc.frequency) {
+      case "weekly": monthlyTotal += amt * 4.33; break;
+      case "biweekly": monthlyTotal += amt * 2.17; break;
+      case "monthly": monthlyTotal += amt; break;
+      case "quarterly": monthlyTotal += amt / 3; break;
+      case "yearly": monthlyTotal += amt / 12; break;
+    }
+  }
+  return monthlyTotal.toFixed(2);
+}
+
+// ==================== BUDGETS ====================
+
+export async function getBudgets(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(budgets).where(eq(budgets.userId, userId)).orderBy(desc(budgets.createdAt)).limit(10);
+}
+
+export async function createBudget(data: InsertBudget) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(budgets).values(data);
+  return { id: result[0].insertId, ...data };
+}
+
+export async function deleteBudget(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(budgets).where(and(eq(budgets.id, id), eq(budgets.userId, userId)));
+}
+
 // ==================== PAYMENTS ====================
 
 export async function getPayments(userId: number, filters?: { billId?: number; startDate?: Date; endDate?: Date }) {
   const db = await getDb();
   if (!db) return [];
-
   const conditions = [eq(payments.userId, userId)];
   if (filters?.billId) conditions.push(eq(payments.billId, filters.billId));
   if (filters?.startDate) conditions.push(gte(payments.paidAt, filters.startDate));
   if (filters?.endDate) conditions.push(lte(payments.paidAt, filters.endDate));
-
   return db.select().from(payments).where(and(...conditions)).orderBy(desc(payments.paidAt));
 }
 
@@ -186,7 +261,6 @@ export async function createPayment(data: InsertPayment) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   const result = await db.insert(payments).values(data);
-  // Mark bill as paid
   await db.update(bills).set({ status: "paid" }).where(eq(bills.id, data.billId));
   return { id: result[0].insertId, ...data };
 }
@@ -194,11 +268,9 @@ export async function createPayment(data: InsertPayment) {
 export async function deletePayment(id: number, userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  // Get the payment to find the bill
   const payment = await db.select().from(payments).where(and(eq(payments.id, id), eq(payments.userId, userId))).limit(1);
   if (payment[0]) {
     await db.delete(payments).where(eq(payments.id, id));
-    // Check if there are remaining payments for this bill
     const remaining = await db.select().from(payments).where(eq(payments.billId, payment[0].billId));
     if (remaining.length === 0) {
       await db.update(bills).set({ status: "pending" }).where(eq(bills.id, payment[0].billId));
@@ -222,13 +294,7 @@ export async function getSpendingByCategory(userId: number, startDate: Date, end
     .from(payments)
     .innerJoin(bills, eq(payments.billId, bills.id))
     .leftJoin(categories, eq(bills.categoryId, categories.id))
-    .where(
-      and(
-        eq(payments.userId, userId),
-        gte(payments.paidAt, startDate),
-        lte(payments.paidAt, endDate)
-      )
-    )
+    .where(and(eq(payments.userId, userId), gte(payments.paidAt, startDate), lte(payments.paidAt, endDate)))
     .groupBy(bills.categoryId, categories.name, categories.color);
   return result;
 }
@@ -253,24 +319,23 @@ export async function getMonthlySpending(userId: number, months: number = 6) {
 
 export async function getDashboardStats(userId: number) {
   const db = await getDb();
-  if (!db) return { totalBills: 0, pendingBills: 0, overdueBills: 0, paidThisMonth: "0", totalDue: "0" };
-
+  if (!db) return { totalBills: 0, pendingBills: 0, overdueBills: 0, paidThisMonth: "0", totalDue: "0", monthlyIncome: "0" };
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-
   const [totalResult] = await db.select({ count: sql<number>`COUNT(*)` }).from(bills).where(eq(bills.userId, userId));
   const [pendingResult] = await db.select({ count: sql<number>`COUNT(*)` }).from(bills).where(and(eq(bills.userId, userId), eq(bills.status, "pending")));
   const [overdueResult] = await db.select({ count: sql<number>`COUNT(*)` }).from(bills).where(and(eq(bills.userId, userId), eq(bills.status, "overdue")));
   const [paidResult] = await db.select({ total: sql<string>`COALESCE(SUM(${payments.amount}), 0)` }).from(payments).where(and(eq(payments.userId, userId), gte(payments.paidAt, monthStart), lte(payments.paidAt, monthEnd)));
   const [dueResult] = await db.select({ total: sql<string>`COALESCE(SUM(${bills.amount}), 0)` }).from(bills).where(and(eq(bills.userId, userId), or(eq(bills.status, "pending"), eq(bills.status, "overdue"))));
-
+  const monthlyIncome = await getMonthlyIncomeTotal(userId);
   return {
     totalBills: totalResult?.count ?? 0,
     pendingBills: pendingResult?.count ?? 0,
     overdueBills: overdueResult?.count ?? 0,
     paidThisMonth: paidResult?.total ?? "0",
     totalDue: dueResult?.total ?? "0",
+    monthlyIncome,
   };
 }
 
@@ -300,18 +365,10 @@ export async function clearChatMessages(userId: number) {
 export async function processRecurringBills(userId: number) {
   const db = await getDb();
   if (!db) return [];
-
   const now = new Date();
-  // Find paid recurring bills whose due date has passed
   const recurringBills = await db.select().from(bills).where(
-    and(
-      eq(bills.userId, userId),
-      eq(bills.isRecurring, true),
-      eq(bills.status, "paid"),
-      lte(bills.dueDate, now)
-    )
+    and(eq(bills.userId, userId), eq(bills.isRecurring, true), eq(bills.status, "paid"), lte(bills.dueDate, now))
   );
-
   const newBills = [];
   for (const bill of recurringBills) {
     const nextDue = new Date(bill.dueDate);
@@ -322,20 +379,11 @@ export async function processRecurringBills(userId: number) {
       case "quarterly": nextDue.setMonth(nextDue.getMonth() + 3); break;
       case "yearly": nextDue.setFullYear(nextDue.getFullYear() + 1); break;
     }
-    // Only create if next due is in the future
     if (nextDue > now) {
       const newBill = await createBill({
-        userId: bill.userId,
-        categoryId: bill.categoryId,
-        name: bill.name,
-        description: bill.description,
-        amount: bill.amount,
-        dueDate: nextDue,
-        status: "pending",
-        isRecurring: true,
-        recurringInterval: bill.recurringInterval,
-        autopay: bill.autopay,
-        notes: bill.notes,
+        userId: bill.userId, categoryId: bill.categoryId, name: bill.name, description: bill.description,
+        amount: bill.amount, dueDate: nextDue, status: "pending", isRecurring: true,
+        recurringInterval: bill.recurringInterval, autopay: bill.autopay, notes: bill.notes,
       });
       newBills.push(newBill);
     }

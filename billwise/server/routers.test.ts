@@ -76,6 +76,7 @@ vi.mock("./db", () => ({
     overdueBills: 1,
     paidThisMonth: "1350.00",
     totalDue: "429.99",
+    monthlyIncome: "5000.00",
   }),
   getSpendingByCategory: vi.fn().mockResolvedValue([
     { categoryId: 1, categoryName: "Utilities", categoryColor: "#3b82f6", total: "450.00", count: 3 },
@@ -88,6 +89,24 @@ vi.mock("./db", () => ({
   getChatMessages: vi.fn().mockResolvedValue([]),
   saveChatMessage: vi.fn().mockResolvedValue({ id: 1 }),
   clearChatMessages: vi.fn().mockResolvedValue(undefined),
+  // Income mocks
+  getIncomes: vi.fn().mockResolvedValue([
+    { id: 1, userId: 1, name: "Salary", amount: "5000.00", frequency: "monthly", source: "Work", isActive: true, notes: null, createdAt: new Date(), updatedAt: new Date() },
+    { id: 2, userId: 1, name: "Freelance", amount: "1500.00", frequency: "monthly", source: "Side gig", isActive: true, notes: null, createdAt: new Date(), updatedAt: new Date() },
+  ]),
+  createIncome: vi.fn().mockResolvedValue({ id: 3, name: "Dividends", amount: "200.00", frequency: "quarterly" }),
+  updateIncome: vi.fn().mockResolvedValue(undefined),
+  deleteIncome: vi.fn().mockResolvedValue(undefined),
+  getMonthlyIncomeTotal: vi.fn().mockResolvedValue({ total: "6500.00" }),
+  // Budget mocks
+  getBudgets: vi.fn().mockResolvedValue([
+    { id: 1, userId: 1, name: "February Budget", totalIncome: "5000.00", totalBills: "1350.00", totalSavings: "1000.00", suggestions: "[]", breakdown: "[]", createdAt: new Date() },
+  ]),
+  createBudget: vi.fn().mockResolvedValue({ id: 2, name: "AI Budget Plan", totalIncome: "5000.00", totalBills: "1350.00", totalSavings: "800.00" }),
+  deleteBudget: vi.fn().mockResolvedValue(undefined),
+  // Vault mocks
+  getVaultPasscode: vi.fn().mockResolvedValue("1234"),
+  setVaultPasscode: vi.fn().mockResolvedValue(undefined),
 }));
 
 // Mock the LLM module
@@ -95,7 +114,13 @@ vi.mock("./_core/llm", () => ({
   invokeLLM: vi.fn().mockResolvedValue({
     choices: [{
       message: {
-        content: "I can see you have 5 bills. Your total amount due is $429.99. You have 1 overdue bill that needs attention.",
+        content: JSON.stringify({
+          name: "Smart Budget Plan",
+          totalSavings: 1000,
+          breakdown: [{ category: "Housing", allocated: 1200, percentage: 24, notes: "Rent" }],
+          suggestions: ["Cut subscriptions", "Cook at home more"],
+          summary: "Great budget plan!",
+        }),
       },
     }],
   }),
@@ -281,6 +306,7 @@ describe("analytics router", () => {
     expect(result.overdueBills).toBe(1);
     expect(result.paidThisMonth).toBe("1350.00");
     expect(result.totalDue).toBe("429.99");
+    expect(result.monthlyIncome).toBe("5000.00");
   });
 
   it("returns spending by category", async () => {
@@ -306,6 +332,155 @@ describe("analytics router", () => {
     const { ctx } = createUnauthContext();
     const caller = appRouter.createCaller(ctx);
     await expect(caller.analytics.dashboard()).rejects.toThrow();
+  });
+});
+
+describe("income router", () => {
+  it("lists income sources for authenticated user", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.income.list();
+    expect(result).toHaveLength(2);
+    expect(result[0].name).toBe("Salary");
+    expect(result[1].name).toBe("Freelance");
+  });
+
+  it("creates a new income source", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.income.create({
+      name: "Dividends",
+      amount: "200.00",
+      frequency: "quarterly",
+      source: "Investments",
+    });
+    expect(result).toBeDefined();
+    expect(result.name).toBe("Dividends");
+    expect(result.amount).toBe("200.00");
+  });
+
+  it("creates income with minimal fields", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.income.create({
+      name: "Side gig",
+      amount: "500.00",
+    });
+    expect(result).toBeDefined();
+  });
+
+  it("updates an income source", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(
+      caller.income.update({ id: 1, amount: "5500.00" })
+    ).resolves.not.toThrow();
+  });
+
+  it("deletes an income source", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(
+      caller.income.delete({ id: 1 })
+    ).resolves.not.toThrow();
+  });
+
+  it("returns monthly income total", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.income.monthlyTotal();
+    expect(result.total).toBe("6500.00");
+  });
+
+  it("rejects unauthenticated access to income", async () => {
+    const { ctx } = createUnauthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(caller.income.list()).rejects.toThrow();
+  });
+
+  it("validates income name is required", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(
+      caller.income.create({ name: "", amount: "100.00" })
+    ).rejects.toThrow();
+  });
+});
+
+describe("budget router", () => {
+  it("lists budgets for authenticated user", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.budget.list();
+    expect(result).toHaveLength(1);
+    expect(result[0].name).toBe("February Budget");
+  });
+
+  it("generates an AI budget", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.budget.generate();
+    expect(result).toBeDefined();
+    expect(result.name).toBeTruthy();
+  });
+
+  it("deletes a budget", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(
+      caller.budget.delete({ id: 1 })
+    ).resolves.not.toThrow();
+  });
+
+  it("rejects unauthenticated access to budgets", async () => {
+    const { ctx } = createUnauthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(caller.budget.list()).rejects.toThrow();
+  });
+});
+
+describe("vault router", () => {
+  it("checks if user has a passcode", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.vault.hasPasscode();
+    expect(result.hasPasscode).toBe(true);
+  });
+
+  it("sets a vault passcode", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(
+      caller.vault.setPasscode({ passcode: "5678" })
+    ).resolves.not.toThrow();
+  });
+
+  it("verifies correct passcode", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.vault.verify({ passcode: "1234" });
+    expect(result.valid).toBe(true);
+  });
+
+  it("rejects incorrect passcode", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.vault.verify({ passcode: "0000" });
+    expect(result.valid).toBe(false);
+  });
+
+  it("validates passcode length", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(
+      caller.vault.setPasscode({ passcode: "12" })
+    ).rejects.toThrow();
+  });
+
+  it("rejects unauthenticated access to vault", async () => {
+    const { ctx } = createUnauthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(caller.vault.hasPasscode()).rejects.toThrow();
   });
 });
 

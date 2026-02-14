@@ -32,20 +32,27 @@ import {
   LogOut,
   PanelLeft,
   Sparkles,
+  Wallet,
+  DollarSign,
+  Brain,
+  PiggyBank,
 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 import { Button } from "./ui/button";
+import { motion } from "framer-motion";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
+  { icon: Brain, label: "AI Assistant", path: "/assistant", highlight: true },
   { icon: Receipt, label: "Bills", path: "/bills" },
+  { icon: DollarSign, label: "Income", path: "/income" },
   { icon: CreditCard, label: "Payments", path: "/payments" },
   { icon: CalendarDays, label: "Calendar", path: "/calendar" },
   { icon: BarChart3, label: "Analytics", path: "/analytics" },
+  { icon: PiggyBank, label: "Budgets", path: "/budgets" },
   { icon: Tag, label: "Categories", path: "/categories" },
-  { icon: MessageSquareText, label: "AI Assistant", path: "/assistant" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -74,19 +81,32 @@ export default function DashboardLayout({
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <div className="flex flex-col items-center gap-8 p-8 max-w-md w-full">
+      <div className="flex items-center justify-center min-h-screen bg-background relative overflow-hidden">
+        {/* Background effects */}
+        <div className="absolute top-1/4 -left-32 w-64 h-64 rounded-full bg-primary/10 blur-[100px]" />
+        <div className="absolute bottom-1/4 -right-32 w-64 h-64 rounded-full bg-chart-2/10 blur-[100px]" />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="flex flex-col items-center gap-8 p-8 max-w-md w-full relative z-10"
+        >
           <div className="flex flex-col items-center gap-4">
-            <div className="flex items-center gap-2.5">
-              <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center">
-                <Sparkles className="h-5 w-5 text-primary-foreground" />
+            <motion.div
+              className="flex items-center gap-3"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+            >
+              <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary to-chart-2 flex items-center justify-center neon-purple">
+                <Sparkles className="h-6 w-6 text-white" />
               </div>
-              <span className="text-2xl font-semibold tracking-tight font-serif">
-                BillWise
+              <span className="text-3xl font-display font-bold gradient-text">
+                ZelvariWise
               </span>
-            </div>
+            </motion.div>
             <p className="text-sm text-muted-foreground text-center max-w-sm leading-relaxed">
-              Your intelligent billing and budget management platform. Sign in to manage your finances.
+              Your AI-powered financial vault. Smart billing, intelligent budgets, and a personal finance assistant.
             </p>
           </div>
           <Button
@@ -94,11 +114,12 @@ export default function DashboardLayout({
               window.location.href = getLoginUrl();
             }}
             size="lg"
-            className="w-full shadow-lg hover:shadow-xl transition-all"
+            className="w-full bg-gradient-to-r from-primary to-chart-2 hover:opacity-90 transition-all shadow-lg neon-purple text-white border-0"
           >
-            Sign in to continue
+            <Sparkles className="h-4 w-4 mr-2" />
+            Enter the Vault
           </Button>
-        </div>
+        </motion.div>
       </div>
     );
   }
@@ -191,11 +212,11 @@ function DashboardLayoutContent({
               </button>
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
-                  <div className="h-7 w-7 rounded-lg bg-primary flex items-center justify-center shrink-0">
-                    <Sparkles className="h-3.5 w-3.5 text-primary-foreground" />
+                  <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-primary to-chart-2 flex items-center justify-center shrink-0">
+                    <Sparkles className="h-3.5 w-3.5 text-white" />
                   </div>
-                  <span className="font-semibold tracking-tight truncate font-serif text-base">
-                    BillWise
+                  <span className="font-display font-bold tracking-tight truncate text-base gradient-text">
+                    ZelvariWise
                   </span>
                 </div>
               ) : null}
@@ -206,18 +227,36 @@ function DashboardLayoutContent({
             <SidebarMenu className="px-2 py-1">
               {menuItems.map((item) => {
                 const isActive = location === item.path;
+                const isHighlight = (item as any).highlight;
                 return (
                   <SidebarMenuItem key={item.path}>
                     <SidebarMenuButton
                       isActive={isActive}
                       onClick={() => setLocation(item.path)}
                       tooltip={item.label}
-                      className="h-10 transition-all font-normal"
+                      className={`h-10 transition-all font-normal ${
+                        isHighlight && !isActive
+                          ? "text-primary hover:text-primary"
+                          : ""
+                      } ${isActive ? "bg-primary/10" : ""}`}
                     >
                       <item.icon
-                        className={`h-4 w-4 ${isActive ? "text-primary" : ""}`}
+                        className={`h-4 w-4 ${
+                          isActive
+                            ? "text-primary"
+                            : isHighlight
+                            ? "text-primary"
+                            : ""
+                        }`}
                       />
-                      <span>{item.label}</span>
+                      <span className={isHighlight && !isActive ? "font-medium" : ""}>
+                        {item.label}
+                      </span>
+                      {isHighlight && !isCollapsed && (
+                        <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-primary/20 text-primary font-medium">
+                          AI
+                        </span>
+                      )}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
@@ -229,8 +268,8 @@ function DashboardLayoutContent({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-3 rounded-lg px-1 py-1 hover:bg-accent/50 transition-colors w-full text-left group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                  <Avatar className="h-9 w-9 border shrink-0">
-                    <AvatarFallback className="text-xs font-medium bg-primary/10 text-primary">
+                  <Avatar className="h-9 w-9 border border-primary/20 shrink-0">
+                    <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-primary/20 to-chart-2/20 text-primary">
                       {user?.name?.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>

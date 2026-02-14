@@ -1,4 +1,4 @@
-# BillWise - Project TODO
+# ZelvariWise - Project TODO
 
 - [x] Database schema (bills, payments, categories, chat messages)
 - [x] Backend API routes for bill CRUD operations
@@ -25,3 +25,18 @@
 - [x] AI assistant: answer financial questions
 - [x] Recurring bill automation logic
 - [x] Vitest tests for backend routes (30 tests passing)
+- [x] Rename app to ZelvariWise throughout
+- [x] Add income tracking (schema + API + UI)
+- [x] AI-powered budget generation from bills and income
+- [x] Animated vault entry screen with passcode
+- [x] Vault passcode storage in database per user
+- [x] Beautiful new color scheme (vibrant purples, gradients, neon accents)
+- [x] Fun animations on all pages (framer-motion)
+- [x] Animated buttons, cards, and micro-interactions
+- [x] Fun graphics and icons throughout
+- [x] Make AI assistant the central focus/hero of the app
+- [x] Enhanced AI assistant with budget generation capabilities
+- [x] AI suggestions for spending optimization
+- [x] Redesign dashboard with animated stats and charts
+- [x] Redesign sidebar with animated nav items
+- [x] Update tests for new features (48 tests passing)
