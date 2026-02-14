@@ -1,0 +1,11 @@
+Screenshot: Vault screen in light mode, looking clean with spinning dial.
+No TypeScript errors. All features compiling correctly.
+Features added:
+- Change passcode route in vault router
+- Export routes for payments, bills, budgets CSV
+- Export action types in AI chat system prompt
+- ExportBillsButton on Bills page
+- ExportPaymentsButton on Payments page
+- ExportBudgetButton on Budgets page
+- Export triggers in AI assistant
+- Change passcode section in Notifications/Settings page

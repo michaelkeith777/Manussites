@@ -35,6 +35,16 @@ export const appRouter = router({
         const stored = await db.getVaultPasscode(ctx.user.id);
         return { valid: stored === input.passcode };
       }),
+    changePasscode: protectedProcedure
+      .input(z.object({ currentPasscode: z.string().length(4), newPasscode: z.string().length(4) }))
+      .mutation(async ({ ctx, input }) => {
+        const stored = await db.getVaultPasscode(ctx.user.id);
+        if (stored && stored !== input.currentPasscode) {
+          throw new Error("Current passcode is incorrect");
+        }
+        await db.setVaultPasscode(ctx.user.id, input.newPasscode);
+        return { success: true };
+      }),
   }),
 
   // ==================== CATEGORIES ====================
@@ -307,6 +317,63 @@ Return your response as JSON with this exact structure:
     }),
   }),
 
+  // ==================== EXPORTS ====================
+  exports: router({
+    paymentsCSV: protectedProcedure.query(async ({ ctx }) => {
+      const allPayments = await db.getPayments(ctx.user.id);
+      const allBills = await db.getBills(ctx.user.id);
+      const billMap = new Map(allBills.map(b => [b.id, b.name]));
+      const headers = "Date,Bill Name,Amount,Method,Notes";
+      const rows = allPayments.map(p => {
+        const billName = billMap.get(p.billId) || `Bill #${p.billId}`;
+        const date = new Date(p.paidAt).toLocaleDateString();
+        const amount = parseFloat(p.amount).toFixed(2);
+        const method = (p.method || "").replace(/,/g, " ");
+        const notes = (p.notes || "").replace(/,/g, " ").replace(/\n/g, " ");
+        return `${date},"${billName}",${amount},${method},"${notes}"`;
+      });
+      return { csv: [headers, ...rows].join("\n"), filename: `payments-export-${new Date().toISOString().split('T')[0]}.csv` };
+    }),
+    budgetCSV: protectedProcedure
+      .input(z.object({ budgetId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const allBudgets = await db.getBudgets(ctx.user.id);
+        const budget = allBudgets.find(b => b.id === input.budgetId);
+        if (!budget) throw new Error("Budget not found");
+        let breakdown: { category: string; allocated: number; percentage: number; notes: string }[] = [];
+        let suggestions: string[] = [];
+        try { breakdown = JSON.parse(budget.breakdown || "[]"); } catch {}
+        try { suggestions = JSON.parse(budget.suggestions || "[]"); } catch {}
+        const lines: string[] = [
+          `Budget Report: ${budget.name}`,
+          `Generated: ${new Date(budget.createdAt).toLocaleDateString()}`,
+          ``,
+          `Total Income,$${parseFloat(budget.totalIncome).toFixed(2)}`,
+          `Total Bills,$${parseFloat(budget.totalBills).toFixed(2)}`,
+          `Total Savings,$${parseFloat(budget.totalSavings).toFixed(2)}`,
+          ``,
+          `Category,Allocated,Percentage,Notes`,
+          ...breakdown.map(b => `"${b.category}",$${b.allocated.toFixed(2)},${b.percentage}%,"${b.notes}"`),
+          ``,
+          `Suggestions`,
+          ...suggestions.map((s, i) => `${i + 1}. "${s.replace(/"/g, '""')}"`),
+        ];
+        return { csv: lines.join("\n"), filename: `budget-${budget.name.replace(/[^a-zA-Z0-9]/g, '-')}-${new Date().toISOString().split('T')[0]}.csv` };
+      }),
+    billsCSV: protectedProcedure.query(async ({ ctx }) => {
+      const allBills = await db.getBills(ctx.user.id);
+      const allCategories = await db.getCategories(ctx.user.id);
+      const catMap = new Map(allCategories.map(c => [c.id, c.name]));
+      const headers = "Name,Amount,Due Date,Status,Category,Recurring,Interval,Autopay";
+      const rows = allBills.map(b => {
+        const cat = b.categoryId ? catMap.get(b.categoryId) || "" : "Uncategorized";
+        const date = new Date(b.dueDate).toLocaleDateString();
+        return `"${b.name}",${parseFloat(b.amount).toFixed(2)},${date},${b.status},"${cat}",${b.isRecurring},${b.recurringInterval || ""},${b.autopay}`;
+      });
+      return { csv: [headers, ...rows].join("\n"), filename: `bills-export-${new Date().toISOString().split('T')[0]}.csv` };
+    }),
+  }),
+
   // ==================== AI CHAT ====================
   chat: router({
     messages: protectedProcedure.query(({ ctx }) => db.getChatMessages(ctx.user.id)),
@@ -407,6 +474,17 @@ When performing actions, include JSON action blocks:
 \`\`\`action
 {"type": "delete_income", "data": {"incomeId": <number>}}
 \`\`\`
+\`\`\`action
+{"type": "export_payments"}
+\`\`\`
+\`\`\`action
+{"type": "export_bills"}
+\`\`\`
+
+📤 EXPORT:
+- Export payment history as CSV
+- Export bills list as CSV
+- When user asks to export or download data, use the appropriate export action
 
 Be proactive! If you notice issues (overdue bills, no income tracked, no budget), mention them helpfully. Use markdown formatting with headers, bold, and lists. Keep responses concise but thorough.`;
 
@@ -485,6 +563,14 @@ Be proactive! If you notice issues (overdue bills, no income tracked, no budget)
                   case "delete_income": {
                     await db.deleteIncome(action.data.incomeId, userId);
                     executedActions.push(`🗑️ Deleted income #${action.data.incomeId}`);
+                    break;
+                  }
+                  case "export_payments": {
+                    executedActions.push(`📤 EXPORT_PAYMENTS`);
+                    break;
+                  }
+                  case "export_bills": {
+                    executedActions.push(`📤 EXPORT_BILLS`);
                     break;
                   }
                 }

@@ -4,10 +4,149 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Bell, BellRing, AlertTriangle, CheckCircle, Loader2, Send, Shield, Clock } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Bell, BellRing, AlertTriangle, CheckCircle, Loader2, Send, Shield, Clock, Lock, KeyRound, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { useState } from "react";
+
+function ChangePasscodeSection() {
+  const [currentCode, setCurrentCode] = useState("");
+  const [newCode, setNewCode] = useState("");
+  const [confirmCode, setConfirmCode] = useState("");
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+
+  const { data: vaultInfo } = trpc.vault.hasPasscode.useQuery();
+  const changePasscode = trpc.vault.changePasscode.useMutation({
+    onSuccess: () => {
+      toast.success("Vault passcode changed successfully! 🔐");
+      setCurrentCode("");
+      setNewCode("");
+      setConfirmCode("");
+    },
+    onError: (err) => toast.error(err.message || "Failed to change passcode"),
+  });
+
+  const handleChange = () => {
+    if (!vaultInfo?.hasPasscode) {
+      toast.error("No passcode set yet. Set one from the vault screen.");
+      return;
+    }
+    if (currentCode.length !== 4) {
+      toast.error("Current passcode must be 4 digits");
+      return;
+    }
+    if (newCode.length !== 4) {
+      toast.error("New passcode must be 4 digits");
+      return;
+    }
+    if (newCode !== confirmCode) {
+      toast.error("New passcodes don't match");
+      return;
+    }
+    if (currentCode === newCode) {
+      toast.error("New passcode must be different from current");
+      return;
+    }
+    changePasscode.mutate({ currentPasscode: currentCode, newPasscode: newCode });
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.35 }}
+    >
+      <Card className="border-border/50 bg-card">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-card-foreground">
+            <Lock className="h-5 w-5 text-primary" />
+            Vault Passcode
+          </CardTitle>
+          <CardDescription>Change your vault entry passcode</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {!vaultInfo?.hasPasscode ? (
+            <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/30 border border-border/50">
+              <KeyRound className="h-5 w-5 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">No passcode set yet. Open the app to set your first passcode.</p>
+            </div>
+          ) : (
+            <>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-foreground">Current Passcode</Label>
+                <div className="relative">
+                  <Input
+                    type={showCurrent ? "text" : "password"}
+                    maxLength={4}
+                    placeholder="••••"
+                    value={currentCode}
+                    onChange={(e) => setCurrentCode(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                    className="pr-10 text-center text-lg tracking-[0.5em] font-mono bg-background"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCurrent(!showCurrent)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showCurrent ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-foreground">New Passcode</Label>
+                <div className="relative">
+                  <Input
+                    type={showNew ? "text" : "password"}
+                    maxLength={4}
+                    placeholder="••••"
+                    value={newCode}
+                    onChange={(e) => setNewCode(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                    className="pr-10 text-center text-lg tracking-[0.5em] font-mono bg-background"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNew(!showNew)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showNew ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-foreground">Confirm New Passcode</Label>
+                <Input
+                  type="password"
+                  maxLength={4}
+                  placeholder="••••"
+                  value={confirmCode}
+                  onChange={(e) => setConfirmCode(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                  className="text-center text-lg tracking-[0.5em] font-mono bg-background"
+                />
+              </div>
+
+              <Button
+                onClick={handleChange}
+                disabled={changePasscode.isPending || currentCode.length !== 4 || newCode.length !== 4 || confirmCode.length !== 4}
+                className="w-full bg-gradient-to-r from-primary to-chart-2 text-white border-0 hover:opacity-90"
+              >
+                {changePasscode.isPending ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <KeyRound className="h-4 w-4 mr-2" />
+                )}
+                Change Passcode
+              </Button>
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}
 
 export default function Notifications() {
   const { data: prefs, isLoading } = trpc.notifications.getPrefs.useQuery();
@@ -64,8 +203,8 @@ export default function Notifications() {
             <Bell className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-display font-bold text-foreground">Notifications</h1>
-            <p className="text-sm text-muted-foreground">Configure bill reminders and overdue alerts</p>
+            <h1 className="text-2xl font-display font-bold text-foreground">Settings</h1>
+            <p className="text-sm text-muted-foreground">Notifications, vault passcode, and preferences</p>
           </div>
         </div>
       </motion.div>
@@ -184,6 +323,9 @@ export default function Notifications() {
           Check & Send Now
         </Button>
       </motion.div>
+
+      {/* Change Passcode Section */}
+      <ChangePasscodeSection />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}

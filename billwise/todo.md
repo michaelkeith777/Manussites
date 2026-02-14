@@ -55,3 +55,14 @@
 - [x] S3 upload API endpoint for receipts/invoices
 - [x] Attachment UI on bill detail/edit (upload, view, delete)
 - [x] Update tests for new features (58 tests passing)
+
+- [x] Change passcode option in settings/notifications area
+- [x] Verify old passcode before allowing change
+- [x] Recurring bill auto-generation when a recurring bill is paid
+- [x] Auto-create next bill instance based on recurring interval
+- [x] Export payment history as CSV
+- [x] Export budget reports as CSV
+- [x] AI assistant can trigger exports through conversation
+- [x] Export button on Payments page
+- [x] Export button on Budgets page
+- [x] Update tests for new features (67 tests passing)

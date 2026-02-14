@@ -36,10 +36,47 @@ import {
   Trash2,
   DollarSign,
   Calendar,
+  Download,
+  Loader2 as Loader2Icon,
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+
+function ExportPaymentsButton() {
+  const [exporting, setExporting] = useState(false);
+  const { data, refetch } = trpc.exports.paymentsCSV.useQuery(undefined, { enabled: false });
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const result = await refetch();
+      if (result.data) {
+        const blob = new Blob([result.data.csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = result.data.filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        toast.success("Payment history exported!");
+      }
+    } catch {
+      toast.error("Failed to export payments");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  return (
+    <Button variant="outline" onClick={handleExport} disabled={exporting} className="border-primary/30 text-primary hover:bg-primary/10">
+      {exporting ? <Loader2Icon className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />}
+      Export CSV
+    </Button>
+  );
+}
 
 export default function Payments() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -114,10 +151,13 @@ export default function Payments() {
             Track and manage your payment history
           </p>
         </div>
-        <Button onClick={() => setDialogOpen(true)} className="bg-gradient-to-r from-primary to-chart-2 text-white border-0 hover:opacity-90 transition-all">
-          <Plus className="h-4 w-4 mr-2" />
-          Record Payment
-        </Button>
+        <div className="flex gap-2">
+          <ExportPaymentsButton />
+          <Button onClick={() => setDialogOpen(true)} className="bg-gradient-to-r from-primary to-chart-2 text-white border-0 hover:opacity-90 transition-all">
+            <Plus className="h-4 w-4 mr-2" />
+            Record Payment
+          </Button>
+        </div>
       </div>
 
       {/* Summary */}

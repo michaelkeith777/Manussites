@@ -16,10 +16,52 @@ import {
   Brain,
   Zap,
   ArrowRight,
+  Download,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { format } from "date-fns";
+
+function ExportBudgetButton({ budgetId, budgetName }: { budgetId: number; budgetName: string }) {
+  const [exporting, setExporting] = useState(false);
+  const { refetch } = trpc.exports.budgetCSV.useQuery({ budgetId }, { enabled: false });
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const result = await refetch();
+      if (result.data) {
+        const blob = new Blob([result.data.csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = result.data.filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        toast.success(`Budget "${budgetName}" exported!`);
+      }
+    } catch {
+      toast.error("Failed to export budget");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="h-8 w-8 text-primary hover:text-primary"
+      onClick={handleExport}
+      disabled={exporting}
+      title="Export budget as CSV"
+    >
+      {exporting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
+    </Button>
+  );
+}
 
 export default function Budgets() {
   const [generating, setGenerating] = useState(false);
@@ -287,6 +329,7 @@ export default function Budgets() {
                         <Badge variant="secondary" className="text-xs">
                           Savings: ${parseFloat(budget.totalSavings).toFixed(2)}
                         </Badge>
+                        <ExportBudgetButton budgetId={budget.id} budgetName={budget.name} />
                         <Button
                           variant="ghost"
                           size="icon"

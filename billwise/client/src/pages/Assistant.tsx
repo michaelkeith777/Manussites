@@ -25,6 +25,8 @@ import {
   TrendingUp,
   MessageCircle,
   Wallet,
+  Download,
+  FileDown,
 } from "lucide-react";
 import { Streamdown } from "streamdown";
 import { toast } from "sonner";
@@ -43,6 +45,7 @@ const SUGGESTED_PROMPTS = [
   { icon: TrendingUp, label: "Financial health", prompt: "Give me a financial health score and tips to improve it", color: "text-chart-2" },
   { icon: Wallet, label: "Track income", prompt: "Show me a breakdown of all my income sources", color: "text-primary" },
   { icon: Zap, label: "Quick optimize", prompt: "What are the top 3 things I can do right now to improve my finances?", color: "text-chart-3" },
+  { icon: Download, label: "Export data", prompt: "Export my payment history as a CSV file", color: "text-primary" },
 ];
 
 export default function Assistant() {
@@ -52,6 +55,28 @@ export default function Assistant() {
 
   const utils = trpc.useUtils();
   const { data: messages, isLoading: messagesLoading } = trpc.chat.messages.useQuery();
+  const { refetch: refetchPaymentsCSV } = trpc.exports.paymentsCSV.useQuery(undefined, { enabled: false });
+  const { refetch: refetchBillsCSV } = trpc.exports.billsCSV.useQuery(undefined, { enabled: false });
+
+  const triggerExport = async (type: "payments" | "bills") => {
+    try {
+      const result = type === "payments" ? await refetchPaymentsCSV() : await refetchBillsCSV();
+      if (result.data) {
+        const blob = new Blob([result.data.csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = result.data.filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        toast.success(`${type === "payments" ? "Payment history" : "Bills"} exported as CSV!`);
+      }
+    } catch {
+      toast.error(`Failed to export ${type}`);
+    }
+  };
 
   const sendMessage = trpc.chat.send.useMutation({
     onSuccess: (result) => {
@@ -64,7 +89,13 @@ export default function Assistant() {
         utils.income.list.invalidate();
         utils.income.monthlyTotal.invalidate();
         result.actions.forEach((action) => {
-          toast.success(action);
+          if (action.includes("EXPORT_PAYMENTS")) {
+            triggerExport("payments");
+          } else if (action.includes("EXPORT_BILLS")) {
+            triggerExport("bills");
+          } else {
+            toast.success(action);
+          }
         });
       }
     },
@@ -281,6 +312,7 @@ export default function Assistant() {
                 { label: "Summary", prompt: "Give me a spending summary", icon: BarChart3 },
                 { label: "Budget", prompt: "Generate a budget plan for me", icon: PiggyBank },
                 { label: "What's due?", prompt: "What bills are due soon?", icon: CalendarDays },
+                { label: "Export", prompt: "Export my payment history as CSV", icon: Download },
               ].map((chip, i) => (
                 <motion.button
                   key={i}

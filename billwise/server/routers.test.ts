@@ -649,6 +649,97 @@ describe("notifications router", () => {
   });
 });
 
+describe("vault.changePasscode", () => {
+  it("changes passcode when current passcode is correct", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.vault.changePasscode({
+      currentPasscode: "1234",
+      newPasscode: "5678",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects change when current passcode is wrong", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(
+      caller.vault.changePasscode({
+        currentPasscode: "9999",
+        newPasscode: "5678",
+      })
+    ).rejects.toThrow("Current passcode is incorrect");
+  });
+
+  it("validates passcode length for change", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(
+      caller.vault.changePasscode({
+        currentPasscode: "12",
+        newPasscode: "5678",
+      })
+    ).rejects.toThrow();
+  });
+
+  it("rejects unauthenticated passcode change", async () => {
+    const { ctx } = createUnauthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(
+      caller.vault.changePasscode({
+        currentPasscode: "1234",
+        newPasscode: "5678",
+      })
+    ).rejects.toThrow();
+  });
+});
+
+describe("exports router", () => {
+  it("exports payments as CSV", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.exports.paymentsCSV();
+    expect(result.csv).toBeDefined();
+    expect(result.csv).toContain("Date,Bill Name,Amount,Method,Notes");
+    expect(result.filename).toContain("payments-export-");
+    expect(result.filename).toContain(".csv");
+  });
+
+  it("exports bills as CSV", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.exports.billsCSV();
+    expect(result.csv).toBeDefined();
+    expect(result.csv).toContain("Name,Amount,Due Date,Status,Category,Recurring,Interval,Autopay");
+    expect(result.filename).toContain("bills-export-");
+    expect(result.filename).toContain(".csv");
+  });
+
+  it("exports budget as CSV", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.exports.budgetCSV({ budgetId: 1 });
+    expect(result.csv).toBeDefined();
+    expect(result.csv).toContain("Budget Report:");
+    expect(result.filename).toContain(".csv");
+  });
+
+  it("throws error for non-existent budget export", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(
+      caller.exports.budgetCSV({ budgetId: 999 })
+    ).rejects.toThrow("Budget not found");
+  });
+
+  it("rejects unauthenticated access to exports", async () => {
+    const { ctx } = createUnauthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(caller.exports.paymentsCSV()).rejects.toThrow();
+    await expect(caller.exports.billsCSV()).rejects.toThrow();
+  });
+});
+
 describe("auth router", () => {
   it("returns user for authenticated request", async () => {
     const { ctx } = createAuthContext();
