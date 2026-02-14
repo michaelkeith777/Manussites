@@ -50,6 +50,22 @@ export const bills = mysqlTable("bills", {
 export type Bill = typeof bills.$inferSelect;
 export type InsertBill = typeof bills.$inferInsert;
 
+// Bill attachments (receipts, invoices stored in S3)
+export const billAttachments = mysqlTable("billAttachments", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  billId: int("billId").notNull(),
+  fileName: varchar("fileName", { length: 255 }).notNull(),
+  fileKey: varchar("fileKey", { length: 500 }).notNull(),
+  url: text("url").notNull(),
+  mimeType: varchar("mimeType", { length: 100 }).notNull(),
+  fileSize: int("fileSize").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type BillAttachment = typeof billAttachments.$inferSelect;
+export type InsertBillAttachment = typeof billAttachments.$inferInsert;
+
 // Income sources table
 export const incomes = mysqlTable("incomes", {
   id: int("id").autoincrement().primaryKey(),
@@ -109,3 +125,18 @@ export const chatMessages = mysqlTable("chatMessages", {
 
 export type ChatMessage = typeof chatMessages.$inferSelect;
 export type InsertChatMessage = typeof chatMessages.$inferInsert;
+
+// Notification preferences
+export const notificationPrefs = mysqlTable("notificationPrefs", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(),
+  enableReminders: boolean("enableReminders").default(true).notNull(),
+  reminderDaysBefore: int("reminderDaysBefore").default(3).notNull(),
+  enableOverdueAlerts: boolean("enableOverdueAlerts").default(true).notNull(),
+  lastNotifiedAt: timestamp("lastNotifiedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type NotificationPref = typeof notificationPrefs.$inferSelect;
+export type InsertNotificationPref = typeof notificationPrefs.$inferInsert;

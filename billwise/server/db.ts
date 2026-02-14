@@ -1,6 +1,6 @@
 import { eq, and, desc, asc, gte, lte, like, sql, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, bills, payments, categories, chatMessages, incomes, budgets, type InsertBill, type InsertPayment, type InsertCategory, type InsertChatMessage, type InsertIncome, type InsertBudget } from "../drizzle/schema";
+import { InsertUser, users, bills, payments, categories, chatMessages, incomes, budgets, billAttachments, notificationPrefs, type InsertBill, type InsertPayment, type InsertCategory, type InsertChatMessage, type InsertIncome, type InsertBudget, type InsertBillAttachment, type InsertNotificationPref } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -389,4 +389,80 @@ export async function processRecurringBills(userId: number) {
     }
   }
   return newBills;
+}
+
+// ==================== BILL ATTACHMENTS ====================
+
+export async function getBillAttachments(billId: number, userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(billAttachments).where(and(eq(billAttachments.billId, billId), eq(billAttachments.userId, userId))).orderBy(desc(billAttachments.createdAt));
+}
+
+export async function createBillAttachment(data: InsertBillAttachment) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(billAttachments).values(data);
+  return { id: result[0].insertId, ...data };
+}
+
+export async function deleteBillAttachment(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const attachment = await db.select().from(billAttachments).where(and(eq(billAttachments.id, id), eq(billAttachments.userId, userId))).limit(1);
+  if (attachment[0]) {
+    await db.delete(billAttachments).where(eq(billAttachments.id, id));
+  }
+  return attachment[0] || null;
+}
+
+export async function getAttachmentCountForBill(billId: number, userId: number) {
+  const db = await getDb();
+  if (!db) return 0;
+  const [result] = await db.select({ count: sql<number>`COUNT(*)` }).from(billAttachments).where(and(eq(billAttachments.billId, billId), eq(billAttachments.userId, userId)));
+  return result?.count ?? 0;
+}
+
+// ==================== NOTIFICATION PREFERENCES ====================
+
+export async function getNotificationPrefs(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(notificationPrefs).where(eq(notificationPrefs.userId, userId)).limit(1);
+  return result[0] || null;
+}
+
+export async function upsertNotificationPrefs(userId: number, data: Partial<InsertNotificationPref>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const existing = await getNotificationPrefs(userId);
+  if (existing) {
+    await db.update(notificationPrefs).set(data).where(eq(notificationPrefs.userId, userId));
+  } else {
+    await db.insert(notificationPrefs).values({ userId, ...data });
+  }
+}
+
+export async function getUpcomingBillsForNotification(userId: number, daysBefore: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const now = new Date();
+  const futureDate = new Date();
+  futureDate.setDate(futureDate.getDate() + daysBefore);
+  return db.select().from(bills).where(
+    and(
+      eq(bills.userId, userId),
+      eq(bills.status, "pending"),
+      gte(bills.dueDate, now),
+      lte(bills.dueDate, futureDate)
+    )
+  ).orderBy(asc(bills.dueDate));
+}
+
+export async function getOverdueBillsForNotification(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(bills).where(
+    and(eq(bills.userId, userId), eq(bills.status, "overdue"))
+  ).orderBy(asc(bills.dueDate));
 }

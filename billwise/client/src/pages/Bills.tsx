@@ -41,6 +41,14 @@ import {
   CheckCircle2,
   Filter,
   RefreshCw,
+  Paperclip,
+  Upload,
+  FileText,
+  Image,
+  X,
+  Loader2,
+  Download,
+  Eye,
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -81,6 +89,9 @@ export default function Bills() {
   const [payDialogOpen, setPayDialogOpen] = useState(false);
   const [payBillId, setPayBillId] = useState<number | null>(null);
   const [payAmount, setPayAmount] = useState("");
+  const [attachDialogOpen, setAttachDialogOpen] = useState(false);
+  const [attachBillId, setAttachBillId] = useState<number | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const utils = trpc.useUtils();
   const { data: bills, isLoading } = trpc.bills.list.useQuery({
@@ -135,6 +146,66 @@ export default function Bills() {
     },
     onError: (err) => toast.error(err.message),
   });
+
+  const { data: attachments, isLoading: attachmentsLoading } = trpc.attachments.list.useQuery(
+    { billId: attachBillId! },
+    { enabled: !!attachBillId && attachDialogOpen }
+  );
+
+  const uploadAttachment = trpc.attachments.upload.useMutation({
+    onSuccess: () => {
+      utils.attachments.list.invalidate();
+      toast.success("File uploaded successfully!");
+    },
+    onError: (err) => toast.error(err.message),
+  });
+
+  const deleteAttachment = trpc.attachments.delete.useMutation({
+    onSuccess: () => {
+      utils.attachments.list.invalidate();
+      toast.success("Attachment removed");
+    },
+    onError: (err) => toast.error(err.message),
+  });
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !attachBillId) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File size must be under 10MB");
+      return;
+    }
+    setUploading(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64 = (reader.result as string).split(",")[1];
+        await uploadAttachment.mutateAsync({
+          billId: attachBillId,
+          fileName: file.name,
+          mimeType: file.type,
+          fileSize: file.size,
+          fileData: base64,
+        });
+        setUploading(false);
+      };
+      reader.readAsDataURL(file);
+    } catch {
+      setUploading(false);
+    }
+    e.target.value = "";
+  };
+
+  const getFileIcon = (mimeType: string) => {
+    if (mimeType.startsWith("image/")) return <Image className="h-4 w-4 text-blue-500" />;
+    return <FileText className="h-4 w-4 text-amber-500" />;
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
 
   const handleSubmit = () => {
     if (!form.name || !form.amount || !form.dueDate) {
@@ -351,6 +422,15 @@ export default function Bills() {
                       <Button
                         variant="ghost"
                         size="icon"
+                        className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10"
+                        onClick={() => { setAttachBillId(bill.id); setAttachDialogOpen(true); }}
+                        title="Attachments"
+                      >
+                        <Paperclip className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         className="h-8 w-8"
                         onClick={() => openEdit(bill)}
                       >
@@ -522,6 +602,83 @@ export default function Bills() {
               Mark as Paid
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Attachments Dialog */}
+      <Dialog open={attachDialogOpen} onOpenChange={setAttachDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display flex items-center gap-2">
+              <Paperclip className="h-5 w-5 text-primary" />
+              Bill Attachments
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            {/* Upload area */}
+            <label className="flex flex-col items-center justify-center border-2 border-dashed border-border rounded-xl p-6 cursor-pointer hover:border-primary/50 hover:bg-accent/30 transition-all">
+              <input
+                type="file"
+                className="hidden"
+                accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+                onChange={handleFileUpload}
+                disabled={uploading}
+              />
+              {uploading ? (
+                <>
+                  <Loader2 className="h-8 w-8 text-primary animate-spin mb-2" />
+                  <p className="text-sm text-muted-foreground">Uploading...</p>
+                </>
+              ) : (
+                <>
+                  <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground">Click to upload receipt or invoice</p>
+                  <p className="text-xs text-muted-foreground/60 mt-1">Max 10MB - Images, PDFs, Documents</p>
+                </>
+              )}
+            </label>
+
+            {/* Attachments list */}
+            {attachmentsLoading ? (
+              <div className="flex justify-center py-4">
+                <Loader2 className="h-5 w-5 animate-spin text-primary" />
+              </div>
+            ) : attachments && attachments.length > 0 ? (
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {attachments.map((att) => (
+                  <div key={att.id} className="flex items-center gap-3 p-3 rounded-lg bg-accent/30 border border-border/50">
+                    {getFileIcon(att.mimeType)}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate text-foreground">{att.fileName}</p>
+                      <p className="text-xs text-muted-foreground">{formatFileSize(att.fileSize)}</p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => window.open(att.url, "_blank")}
+                        title="View"
+                      >
+                        <Eye className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-destructive hover:text-destructive"
+                        onClick={() => deleteAttachment.mutate({ id: att.id })}
+                        title="Delete"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-sm text-muted-foreground py-4">No attachments yet</p>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
 

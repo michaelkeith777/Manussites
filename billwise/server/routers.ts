@@ -5,6 +5,9 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
 import { invokeLLM } from "./_core/llm";
+import { storagePut } from "./storage";
+import { notifyOwner } from "./_core/notification";
+import { nanoid } from "nanoid";
 
 export const appRouter = router({
   system: systemRouter,
@@ -65,6 +68,46 @@ export const appRouter = router({
       .input(z.object({ id: z.number(), name: z.string().min(1).max(200).optional(), description: z.string().optional(), amount: z.string().optional(), dueDate: z.date().optional(), categoryId: z.number().nullable().optional(), status: z.enum(["pending", "paid", "overdue"]).optional(), isRecurring: z.boolean().optional(), recurringInterval: z.enum(["weekly", "biweekly", "monthly", "quarterly", "yearly"]).nullable().optional(), autopay: z.boolean().optional(), notes: z.string().optional() }))
       .mutation(({ ctx, input }) => { const { id, ...data } = input; return db.updateBill(id, ctx.user.id, data); }),
     delete: protectedProcedure.input(z.object({ id: z.number() })).mutation(({ ctx, input }) => db.deleteBill(input.id, ctx.user.id)),
+  }),
+
+  // ==================== BILL ATTACHMENTS ====================
+  attachments: router({
+    list: protectedProcedure
+      .input(z.object({ billId: z.number() }))
+      .query(({ ctx, input }) => db.getBillAttachments(input.billId, ctx.user.id)),
+    upload: protectedProcedure
+      .input(z.object({
+        billId: z.number(),
+        fileName: z.string().min(1).max(255),
+        mimeType: z.string().min(1).max(100),
+        fileSize: z.number().max(10 * 1024 * 1024), // 10MB max
+        fileData: z.string(), // base64 encoded
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const userId = ctx.user.id;
+        // Verify bill belongs to user
+        const bill = await db.getBillById(input.billId, userId);
+        if (!bill) throw new Error("Bill not found");
+
+        const buffer = Buffer.from(input.fileData, "base64");
+        const ext = input.fileName.split(".").pop() || "bin";
+        const fileKey = `attachments/${userId}/${input.billId}/${nanoid()}.${ext}`;
+
+        const { url } = await storagePut(fileKey, buffer, input.mimeType);
+
+        return db.createBillAttachment({
+          userId,
+          billId: input.billId,
+          fileName: input.fileName,
+          fileKey,
+          url,
+          mimeType: input.mimeType,
+          fileSize: input.fileSize,
+        });
+      }),
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(({ ctx, input }) => db.deleteBillAttachment(input.id, ctx.user.id)),
   }),
 
   // ==================== INCOME ====================
@@ -202,6 +245,66 @@ Return your response as JSON with this exact structure:
     monthlySpending: protectedProcedure
       .input(z.object({ months: z.number().default(6) }).optional())
       .query(({ ctx, input }) => db.getMonthlySpending(ctx.user.id, input?.months ?? 6)),
+  }),
+
+  // ==================== NOTIFICATIONS ====================
+  notifications: router({
+    getPrefs: protectedProcedure.query(async ({ ctx }) => {
+      const prefs = await db.getNotificationPrefs(ctx.user.id);
+      return prefs || { enableReminders: true, reminderDaysBefore: 3, enableOverdueAlerts: true };
+    }),
+    updatePrefs: protectedProcedure
+      .input(z.object({
+        enableReminders: z.boolean().optional(),
+        reminderDaysBefore: z.number().min(1).max(14).optional(),
+        enableOverdueAlerts: z.boolean().optional(),
+      }))
+      .mutation(({ ctx, input }) => db.upsertNotificationPrefs(ctx.user.id, input)),
+    checkAndNotify: protectedProcedure.mutation(async ({ ctx }) => {
+      const userId = ctx.user.id;
+      const prefs = await db.getNotificationPrefs(userId);
+      const settings = prefs || { enableReminders: true, reminderDaysBefore: 3, enableOverdueAlerts: true };
+      const notifications: string[] = [];
+
+      if (settings.enableReminders) {
+        const upcomingBills = await db.getUpcomingBillsForNotification(userId, settings.reminderDaysBefore);
+        if (upcomingBills.length > 0) {
+          const billList = upcomingBills.map(b => {
+            const daysUntil = Math.ceil((new Date(b.dueDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+            return `• ${b.name}: $${b.amount} due in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}`;
+          }).join("\n");
+          const title = `📅 ${upcomingBills.length} Bill${upcomingBills.length > 1 ? 's' : ''} Due Soon`;
+          const content = `You have upcoming bills:\n${billList}`;
+          try {
+            await notifyOwner({ title, content });
+            notifications.push(title);
+          } catch (e) {
+            console.warn("Failed to send upcoming bill notification:", e);
+          }
+        }
+      }
+
+      if (settings.enableOverdueAlerts) {
+        const overdueBills = await db.getOverdueBillsForNotification(userId);
+        if (overdueBills.length > 0) {
+          const billList = overdueBills.map(b => {
+            const daysOverdue = Math.ceil((Date.now() - new Date(b.dueDate).getTime()) / (1000 * 60 * 60 * 24));
+            return `• ${b.name}: $${b.amount} (${daysOverdue} day${daysOverdue !== 1 ? 's' : ''} overdue)`;
+          }).join("\n");
+          const title = `🚨 ${overdueBills.length} Overdue Bill${overdueBills.length > 1 ? 's' : ''}!`;
+          const content = `These bills are overdue:\n${billList}\n\nPlease make payments as soon as possible.`;
+          try {
+            await notifyOwner({ title, content });
+            notifications.push(title);
+          } catch (e) {
+            console.warn("Failed to send overdue bill notification:", e);
+          }
+        }
+      }
+
+      await db.upsertNotificationPrefs(userId, { lastNotifiedAt: new Date() });
+      return { sent: notifications.length, notifications };
+    }),
   }),
 
   // ==================== AI CHAT ====================

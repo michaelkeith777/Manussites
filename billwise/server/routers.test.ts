@@ -89,6 +89,21 @@ vi.mock("./db", () => ({
   getChatMessages: vi.fn().mockResolvedValue([]),
   saveChatMessage: vi.fn().mockResolvedValue({ id: 1 }),
   clearChatMessages: vi.fn().mockResolvedValue(undefined),
+  // Attachment mocks
+  getBillAttachments: vi.fn().mockResolvedValue([
+    { id: 1, userId: 1, billId: 1, fileName: "receipt.pdf", fileKey: "attachments/1/1/abc.pdf", url: "https://s3.example.com/receipt.pdf", mimeType: "application/pdf", fileSize: 102400, createdAt: new Date() },
+  ]),
+  createBillAttachment: vi.fn().mockResolvedValue({ id: 2, fileName: "invoice.png", url: "https://s3.example.com/invoice.png" }),
+  deleteBillAttachment: vi.fn().mockResolvedValue(undefined),
+  // Notification mocks
+  getNotificationPrefs: vi.fn().mockResolvedValue({ enableReminders: true, reminderDaysBefore: 3, enableOverdueAlerts: true }),
+  upsertNotificationPrefs: vi.fn().mockResolvedValue(undefined),
+  getUpcomingBillsForNotification: vi.fn().mockResolvedValue([
+    { name: "Electric Bill", amount: "150.00", dueDate: new Date(Date.now() + 2 * 86400000) },
+  ]),
+  getOverdueBillsForNotification: vi.fn().mockResolvedValue([
+    { name: "Water Bill", amount: "45.00", dueDate: new Date(Date.now() - 3 * 86400000) },
+  ]),
   // Income mocks
   getIncomes: vi.fn().mockResolvedValue([
     { id: 1, userId: 1, name: "Salary", amount: "5000.00", frequency: "monthly", source: "Work", isActive: true, notes: null, createdAt: new Date(), updatedAt: new Date() },
@@ -107,6 +122,16 @@ vi.mock("./db", () => ({
   // Vault mocks
   getVaultPasscode: vi.fn().mockResolvedValue("1234"),
   setVaultPasscode: vi.fn().mockResolvedValue(undefined),
+}));
+
+// Mock the storage module
+vi.mock("./storage", () => ({
+  storagePut: vi.fn().mockResolvedValue({ key: "attachments/1/1/abc.pdf", url: "https://s3.example.com/uploaded.pdf" }),
+}));
+
+// Mock the notification module
+vi.mock("./_core/notification", () => ({
+  notifyOwner: vi.fn().mockResolvedValue(true),
 }));
 
 // Mock the LLM module
@@ -522,6 +547,105 @@ describe("chat router", () => {
     await expect(
       caller.chat.send({ message: "" })
     ).rejects.toThrow();
+  });
+});
+
+describe("attachments router", () => {
+  it("lists attachments for a bill", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.attachments.list({ billId: 1 });
+    expect(result).toHaveLength(1);
+    expect(result[0].fileName).toBe("receipt.pdf");
+  });
+
+  it("uploads an attachment", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.attachments.upload({
+      billId: 1,
+      fileName: "invoice.png",
+      mimeType: "image/png",
+      fileSize: 50000,
+      fileData: "aGVsbG8=", // base64 for "hello"
+    });
+    expect(result).toBeDefined();
+    expect(result.fileName).toBe("invoice.png");
+  });
+
+  it("deletes an attachment", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(
+      caller.attachments.delete({ id: 1 })
+    ).resolves.not.toThrow();
+  });
+
+  it("rejects file over 10MB", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(
+      caller.attachments.upload({
+        billId: 1,
+        fileName: "huge.pdf",
+        mimeType: "application/pdf",
+        fileSize: 11 * 1024 * 1024,
+        fileData: "aGVsbG8=",
+      })
+    ).rejects.toThrow();
+  });
+
+  it("rejects unauthenticated access to attachments", async () => {
+    const { ctx } = createUnauthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(caller.attachments.list({ billId: 1 })).rejects.toThrow();
+  });
+});
+
+describe("notifications router", () => {
+  it("gets notification preferences", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.notifications.getPrefs();
+    expect(result.enableReminders).toBe(true);
+    expect(result.reminderDaysBefore).toBe(3);
+    expect(result.enableOverdueAlerts).toBe(true);
+  });
+
+  it("updates notification preferences", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(
+      caller.notifications.updatePrefs({
+        enableReminders: false,
+        reminderDaysBefore: 7,
+      })
+    ).resolves.not.toThrow();
+  });
+
+  it("checks and sends notifications", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    const result = await caller.notifications.checkAndNotify();
+    expect(result.sent).toBeGreaterThanOrEqual(0);
+    expect(Array.isArray(result.notifications)).toBe(true);
+  });
+
+  it("validates reminderDaysBefore range", async () => {
+    const { ctx } = createAuthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(
+      caller.notifications.updatePrefs({ reminderDaysBefore: 0 })
+    ).rejects.toThrow();
+    await expect(
+      caller.notifications.updatePrefs({ reminderDaysBefore: 15 })
+    ).rejects.toThrow();
+  });
+
+  it("rejects unauthenticated access to notifications", async () => {
+    const { ctx } = createUnauthContext();
+    const caller = appRouter.createCaller(ctx);
+    await expect(caller.notifications.getPrefs()).rejects.toThrow();
   });
 });
 

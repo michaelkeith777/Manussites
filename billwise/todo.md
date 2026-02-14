@@ -40,3 +40,18 @@
 - [x] Redesign dashboard with animated stats and charts
 - [x] Redesign sidebar with animated nav items
 - [x] Update tests for new features (48 tests passing)
+
+- [x] BUG: Vault number pad not accepting input / entering numbers
+- [x] Spinning vault door animation on open
+- [x] Sound effects on vault interactions (key press, unlock, error)
+- [x] Automated vault opening sequence after correct passcode
+
+- [x] Push notifications for upcoming bill due dates (1 day, 3 days before)
+- [x] Push notifications for overdue bill reminders
+- [x] Notification preferences/settings in sidebar or settings
+- [x] Dark/light mode toggle in sidebar
+- [x] Light theme CSS variables
+- [x] Bill attachments schema (new table for attachments)
+- [x] S3 upload API endpoint for receipts/invoices
+- [x] Attachment UI on bill detail/edit (upload, view, delete)
+- [x] Update tests for new features (58 tests passing)

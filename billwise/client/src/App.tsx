@@ -15,6 +15,7 @@ import Assistant from "./pages/Assistant";
 import Income from "./pages/Income";
 import Budgets from "./pages/Budgets";
 import Vault from "./pages/Vault";
+import Notifications from "./pages/Notifications";
 import { useAuth } from "./_core/hooks/useAuth";
 import { useState, useEffect } from "react";
 
@@ -31,6 +32,7 @@ function AppRoutes() {
         <Route path="/assistant" component={Assistant} />
         <Route path="/income" component={Income} />
         <Route path="/budgets" component={Budgets} />
+        <Route path="/notifications" component={Notifications} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>
@@ -68,18 +70,9 @@ function VaultGate() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="dark">
+      <ThemeProvider defaultTheme="dark" switchable>
         <TooltipProvider>
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              style: {
-                background: "oklch(0.17 0.025 280)",
-                border: "1px solid oklch(0.25 0.03 280)",
-                color: "oklch(0.93 0.01 280)",
-              },
-            }}
-          />
+          <Toaster position="top-right" />
           <VaultGate />
         </TooltipProvider>
       </ThemeProvider>

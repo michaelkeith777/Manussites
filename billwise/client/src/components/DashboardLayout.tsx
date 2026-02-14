@@ -42,6 +42,10 @@ import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 import { Button } from "./ui/button";
 import { motion } from "framer-motion";
+import { useTheme } from "@/contexts/ThemeContext";
+import { Sun, Moon, Bell } from "lucide-react";
+import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
@@ -53,7 +57,30 @@ const menuItems = [
   { icon: BarChart3, label: "Analytics", path: "/analytics" },
   { icon: PiggyBank, label: "Budgets", path: "/budgets" },
   { icon: Tag, label: "Categories", path: "/categories" },
+  { icon: Bell, label: "Notifications", path: "/notifications" },
 ];
+
+function ThemeToggle({ isCollapsed }: { isCollapsed: boolean }) {
+  const { theme, toggleTheme, switchable } = useTheme();
+  if (!switchable || !toggleTheme) return null;
+  const isDark = theme === "dark";
+  return (
+    <button
+      onClick={toggleTheme}
+      className="flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-accent/50 transition-all w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+    >
+      <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary/20 to-chart-2/20 flex items-center justify-center shrink-0 transition-all">
+        {isDark ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-primary" />}
+      </div>
+      {!isCollapsed && (
+        <span className="text-sm text-muted-foreground">
+          {isDark ? 'Light Mode' : 'Dark Mode'}
+        </span>
+      )}
+    </button>
+  );
+}
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
 const DEFAULT_WIDTH = 260;
@@ -265,6 +292,7 @@ function DashboardLayoutContent({
           </SidebarContent>
 
           <SidebarFooter className="p-3">
+            <ThemeToggle isCollapsed={isCollapsed} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-3 rounded-lg px-1 py-1 hover:bg-accent/50 transition-colors w-full text-left group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
