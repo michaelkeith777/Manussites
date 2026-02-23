@@ -634,6 +634,7 @@
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script>
     if (typeof pdfjsLib !== 'undefined') {
       pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -667,13 +668,9 @@
     <span class="save-indicator" id="save-indicator" title="Click Save File to download — then open that file next time">Open saved file to resume</span>
   </div>
   <div class="toolbar-sep"></div>
-  <button class="tb-btn accent" onclick="prepareForPrint()" title="Opens a clean, perfectly aligned print preview">
-    <svg viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7a1 1 0 110-2 1 1 0 010 2zm-1-9H6v4h12V3z"></path></svg>
-    Prepare for Print
-  </button>
-  <button class="tb-btn" onclick="window.print()" title="Direct browser print (use Prepare for Print for best results)">
-    <svg viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7a1 1 0 110-2 1 1 0 010 2zm-1-9H6v4h12V3z"></path></svg>
-    Print
+  <button class="tb-btn accent" id="pdfBtn" onclick="downloadPDF()" title="Generate and download a clean PDF of this document">
+    <svg viewBox="0 0 24 24"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"></path></svg>
+    Download PDF
   </button>
   <button class="tb-btn" onclick="resetTemplate()" title="Reload the original blank template">
     <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"></path></svg>
@@ -1697,11 +1694,11 @@ function addCustomSection() {
 }
 
 /* ══════════════════════════════════════════════════════════
-   PREPARE FOR PRINT
-   Opens a new window with a clean, pixel-perfect print layout
-   that bypasses all browser CSS print quirks.
+   DOWNLOAD PDF
+   Builds a clean off-screen div and uses html2pdf.js to render
+   it directly to a .pdf file — no browser print dialog at all.
 ══════════════════════════════════════════════════════════ */
-function prepareForPrint() {
+function downloadPDF() {
   // Collect all images/canvases as data-URLs so they survive the new window
   document.querySelectorAll('.file-item-content img').forEach(img => {
     if (img.src && !img.dataset.printSrc) img.dataset.printSrc = img.src;
@@ -1802,50 +1799,15 @@ function prepareForPrint() {
       </div>`;
   });
 
-  // ── Print window CSS (screen + print both identical) ─────────
+  // ── CSS for the off-screen PDF element ────────────────────────
   const css = `
-    /* ── Force colour in both screen and print ── */
-    *, *::before, *::after {
-      box-sizing: border-box;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-    }
-
-    @page { margin: 0.55in 0.5in; size: letter portrait; }
-
-    html, body {
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
       margin: 0; padding: 0;
       font-family: 'Segoe UI', Arial, sans-serif;
       font-size: 10pt;
       color: #1a1a2e;
       background: #fff;
-      width: 100%;
-    }
-
-    /* ── Print bar (screen only) ── */
-    .print-bar {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-      background: linear-gradient(90deg, #12122a, #1e1e3f);
-      padding: 8px 20px; display: flex; align-items: center; gap: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.4);
-    }
-    .print-bar span { color: #aaa; font-size: 0.82rem; flex: 1; }
-    .print-bar button {
-      background: #f5a623; color: #12122a; border: none;
-      border-radius: 6px; padding: 7px 20px; font-size: 0.88rem;
-      font-weight: 800; cursor: pointer; letter-spacing: 0.3px;
-    }
-    .print-bar button:hover { background: #e09200; }
-    .print-bar .close-btn {
-      background: rgba(255,255,255,0.1); color: #fff;
-      border: 1px solid rgba(255,255,255,0.2);
-    }
-    .print-bar .close-btn:hover { background: rgba(255,255,255,0.2); }
-
-    /* ── Content wrapper ── */
-    .print-content {
-      margin-top: 52px; /* clear the fixed bar on screen */
-      padding: 0;
       width: 100%;
     }
 
@@ -1950,36 +1912,78 @@ function prepareForPrint() {
     }
   `;
 
-  // ── Assemble and open ────────────────────────────────────────
-  const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>${title}</title>
-  <style>${css}</style>
-</head>
-<body>
-  <div class="print-bar">
-    <span>Your document is ready. Click <strong style="color:#f5a623">Print / Save as PDF</strong> when ready.</span>
-    <button onclick="window.print()">&#128438; Print / Save as PDF</button>
-    <button class="close-btn" onclick="window.close()">&#10005; Close</button>
-  </div>
-  <div class="print-content">
-    <div class="p-header"><h1>${title}</h1></div>
-    <div class="p-meta">${metaHtml}</div>
-    ${sectionsHtml}
-  </div>
-</body>
-</html>`;
+  // ── Build off-screen container and render to PDF ────────────
+  if (typeof html2pdf === 'undefined') {
+    showToast('PDF library not loaded yet — please wait a moment and try again', 'error');
+    return;
+  }
 
-  const pw = window.open('', '_blank', 'width=960,height=800');
-  if (!pw) { showToast('Pop-up blocked \u2014 allow pop-ups and try again', 'error'); return; }
-  pw.document.open();
-  pw.document.write(html);
-  pw.document.close();
-  pw.focus();
+  // Disable button while generating
+  const pdfBtn = document.getElementById('pdfBtn');
+  if (pdfBtn) { pdfBtn.disabled = true; pdfBtn.textContent = 'Generating…'; }
+  showToast('Generating PDF — please wait…', 'info');
 
-  showToast('Print preview ready \u2014 click Print / Save as PDF in the new window', 'info');
+  // Build the container div with inline styles (html2pdf ignores external stylesheets)
+  const container = document.createElement('div');
+  container.style.cssText = 'width:750px;font-family:Segoe UI,Arial,sans-serif;font-size:10pt;color:#1a1a2e;background:#fff;padding:0;margin:0;';
+
+  // Inject a <style> block so html2pdf picks up our rules
+  const styleEl = document.createElement('style');
+  styleEl.textContent = css;
+  container.appendChild(styleEl);
+
+  // Header
+  const hdr = document.createElement('div');
+  hdr.className = 'p-header';
+  hdr.innerHTML = `<h1 style="font-size:16pt;font-weight:800;color:#fff;margin:0;">${title}</h1>`;
+  hdr.style.cssText = 'background:linear-gradient(135deg,#f5a623 0%,#e07b00 100%);padding:12px 18px 10px;width:100%;';
+  container.appendChild(hdr);
+
+  // Meta bar
+  const meta = document.createElement('div');
+  meta.className = 'p-meta';
+  meta.innerHTML = metaHtml;
+  meta.style.cssText = 'background:#fff8ee;border-left:5px solid #f5a623;padding:7px 18px;display:flex;flex-wrap:wrap;gap:18px;align-items:center;';
+  container.appendChild(meta);
+
+  // Sections
+  const sectDiv = document.createElement('div');
+  sectDiv.innerHTML = sectionsHtml;
+  container.appendChild(sectDiv);
+
+  // Append off-screen (must be in DOM for html2pdf to measure)
+  container.style.position = 'absolute';
+  container.style.left = '-9999px';
+  container.style.top = '0';
+  document.body.appendChild(container);
+
+  // File name from title
+  const safeTitle = title.replace(/[^a-z0-9\s\-_]/gi, '').trim().replace(/\s+/g, '_') || 'DLC_Notes';
+  const today = new Date().toISOString().slice(0,10);
+  const fileName = safeTitle + '_' + today + '.pdf';
+
+  html2pdf()
+    .set({
+      margin:       [0.55, 0.5, 0.55, 0.5],
+      filename:     fileName,
+      image:        { type: 'jpeg', quality: 0.97 },
+      html2canvas:  { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' },
+      pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+    })
+    .from(container)
+    .save()
+    .then(() => {
+      document.body.removeChild(container);
+      if (pdfBtn) { pdfBtn.disabled = false; pdfBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"></path></svg> Download PDF'; }
+      showToast('\u2705 PDF downloaded: ' + fileName);
+    })
+    .catch(err => {
+      document.body.removeChild(container);
+      if (pdfBtn) { pdfBtn.disabled = false; pdfBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"></path></svg> Download PDF'; }
+      showToast('PDF error: ' + err.message, 'error');
+      console.error('html2pdf error:', err);
+    });
 }
 
 /* ══════════════════════════════════════════════════════════
