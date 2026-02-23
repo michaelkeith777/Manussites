@@ -3,264 +3,270 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>District Leadership Call Notes Template</title>
+  <title>District Leadership Call Notes</title>
   <style>
-    /* ===== RESET & BASE ===== */
+    /* ── RESET ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── BASE ── */
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
-      background: #f4f6f9;
-      color: #222;
+      background: #eef0f5;
+      color: #1a1a2e;
       min-height: 100vh;
     }
 
-    /* ===== PRINT STYLES ===== */
+    /* ── PRINT ── */
     @media print {
-      * {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-        color-adjust: exact !important;
-      }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       .no-print { display: none !important; }
       body { background: #fff; }
-      .page { box-shadow: none; margin: 0; padding: 20px; }
-      [contenteditable] { border: none !important; }
-      .add-btn, .remove-btn, .toolbar, .format-bar { display: none !important; }
+      .page { box-shadow: none; margin: 0; padding: 20px; max-width: 100%; }
+      [contenteditable] { border: none !important; outline: none !important; }
+      .section-card { box-shadow: none !important; border: 1px solid #e0e0e0 !important; page-break-inside: avoid; }
+      .section-body { overflow: visible !important; height: auto !important; min-height: 0 !important; resize: none !important; }
       .header-banner { background: linear-gradient(135deg, #f5a623 0%, #e07b00 100%) !important; }
       .header-sub { background: #fff8ee !important; }
       .recap-table th, .store-table th { background: #1a1a2e !important; color: #f5a623 !important; }
-      .recap-table tr:nth-child(even) td { background: #fafafa !important; }
-      .store-table tr:nth-child(even) td { background: #fafafa !important; }
       .doc-footer { background: #1a1a2e !important; }
-      .section-title { color: #1a1a2e !important; }
       .highlight { background: #ffe066 !important; }
+      .img-applied { display: block !important; }
+      .img-dropzone, .img-preview-panel, .img-applied-controls { display: none !important; }
+      .section-img-block { border: none !important; background: transparent !important; }
     }
 
-    /* ===== TOP TOOLBAR ===== */
+    /* ══════════════════════════════════════════════
+       TOP TOOLBAR
+    ══════════════════════════════════════════════ */
     .toolbar {
       position: sticky;
       top: 0;
-      z-index: 200;
-      background: #1a1a2e;
-      color: #fff;
+      z-index: 300;
+      background: linear-gradient(90deg, #12122a 0%, #1e1e3f 100%);
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 8px 20px;
-      flex-wrap: wrap;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      gap: 8px;
+      padding: 0 20px;
+      height: 48px;
+      flex-wrap: nowrap;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.4);
+      overflow-x: auto;
     }
-    .toolbar h1 {
-      font-size: 0.95rem;
-      font-weight: 700;
+    .toolbar::-webkit-scrollbar { height: 3px; }
+    .toolbar::-webkit-scrollbar-thumb { background: #f5a623; border-radius: 2px; }
+
+    .toolbar-brand {
+      font-size: 0.9rem;
+      font-weight: 800;
       color: #f5a623;
-      margin-right: auto;
-      letter-spacing: 1px;
-    }
-    .toolbar button {
-      background: #f5a623;
-      color: #1a1a2e;
-      border: none;
-      border-radius: 6px;
-      padding: 6px 14px;
-      font-weight: 700;
-      font-size: 0.82rem;
-      cursor: pointer;
-      transition: background 0.2s;
+      letter-spacing: 1.5px;
       white-space: nowrap;
+      margin-right: 8px;
+      flex-shrink: 0;
     }
-    .toolbar button:hover { background: #e09200; }
-    .toolbar button.secondary {
-      background: #2e2e50;
-      color: #f5a623;
-      border: 1px solid #f5a623;
+    .toolbar-sep {
+      width: 1px;
+      height: 28px;
+      background: rgba(255,255,255,0.12);
+      flex-shrink: 0;
     }
-    .toolbar button.secondary:hover { background: #3a3a6e; }
-    .toolbar .tip {
-      font-size: 0.72rem;
-      color: #aaa;
-      font-style: italic;
-    }
-    .toolbar-group {
+    .tb-group {
       display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .tb-btn {
+      display: inline-flex;
       align-items: center;
       gap: 5px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 8px;
-      padding: 3px 7px;
-      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.07);
+      color: #e0e0f0;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 6px;
+      padding: 5px 11px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.18s, border-color 0.18s, color 0.18s;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
-    .btn-undo, .btn-redo {
-      background: #3a3a6e !important;
-      color: #fff !important;
-      border: 1px solid #5a5aae !important;
-    }
-    .btn-undo:hover, .btn-redo:hover { background: #5a5aae !important; }
-    .btn-undo:disabled, .btn-redo:disabled {
-      background: #2a2a3e !important;
-      color: #555 !important;
-      cursor: not-allowed !important;
-      border-color: #333 !important;
-    }
-    .undo-count {
-      font-size: 0.7rem;
+    .tb-btn:hover { background: rgba(245,166,35,0.18); border-color: #f5a623; color: #f5a623; }
+    .tb-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .tb-btn.accent { background: #f5a623; color: #12122a; border-color: #f5a623; font-weight: 700; }
+    .tb-btn.accent:hover { background: #e09200; border-color: #e09200; }
+    .tb-btn.green  { background: #27ae60; color: #fff; border-color: #27ae60; }
+    .tb-btn.green:hover  { background: #1e8449; }
+    .tb-btn.red    { background: #c0392b; color: #fff; border-color: #c0392b; }
+    .tb-btn.red:hover    { background: #a93226; }
+    .tb-btn.slate  { background: #5a5a8a; color: #fff; border-color: #5a5a8a; }
+    .tb-btn.slate:hover  { background: #7a7aae; }
+    .tb-count {
+      font-size: 0.65rem;
       color: #7a7aae;
-      min-width: 18px;
+      min-width: 14px;
+      text-align: center;
     }
-    .btn-save { background: #27ae60 !important; color: #fff !important; }
-    .btn-save:hover { background: #1e8449 !important; }
-    .btn-load { background: #2980b9 !important; color: #fff !important; }
-    .btn-load:hover { background: #1a6a9a !important; }
-    .btn-clear { background: #c0392b !important; color: #fff !important; }
-    .btn-clear:hover { background: #a93226 !important; }
-    .btn-reset { background: #7f8c8d !important; color: #fff !important; }
-    .btn-reset:hover { background: #636e72 !important; }
     .save-indicator {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       color: #7acea0;
       font-style: italic;
       white-space: nowrap;
-      max-width: 160px;
+      max-width: 140px;
       overflow: hidden;
       text-overflow: ellipsis;
+      flex-shrink: 0;
     }
+    .toolbar-spacer { flex: 1; }
 
-    /* ===== FORMATTING BAR ===== */
+    /* ══════════════════════════════════════════════
+       FORMAT BAR
+    ══════════════════════════════════════════════ */
     .format-bar {
       position: sticky;
-      top: 46px;
-      z-index: 190;
-      background: #23234a;
-      border-bottom: 1px solid #333;
+      top: 48px;
+      z-index: 290;
+      background: #1e1e3a;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
       display: flex;
       align-items: center;
       gap: 6px;
       padding: 5px 20px;
-      flex-wrap: wrap;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
     }
-    .format-bar label {
-      font-size: 0.72rem;
-      color: #aaa;
-      font-weight: 600;
+    .format-bar::-webkit-scrollbar { height: 3px; }
+    .format-bar::-webkit-scrollbar-thumb { background: #f5a623; border-radius: 2px; }
+    .fmt-label {
+      font-size: 0.65rem;
+      color: #888;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.4px;
-      margin-right: 2px;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
-    .format-bar select {
-      background: #2e2e50;
-      color: #fff;
-      border: 1px solid #5a5aae;
+    .fmt-select {
+      background: #2a2a4a;
+      color: #e0e0f0;
+      border: 1px solid rgba(255,255,255,0.15);
       border-radius: 5px;
-      padding: 3px 6px;
-      font-size: 0.82rem;
+      padding: 3px 7px;
+      font-size: 0.78rem;
       cursor: pointer;
       outline: none;
+      flex-shrink: 0;
+      transition: border-color 0.15s;
     }
-    .format-bar select:hover { border-color: #f5a623; }
-    .format-bar input[type="color"] {
-      width: 28px;
-      height: 26px;
-      border: 1px solid #5a5aae;
+    .fmt-select:hover, .fmt-select:focus { border-color: #f5a623; }
+    .fmt-color {
+      width: 26px;
+      height: 24px;
+      border: 1px solid rgba(255,255,255,0.2);
       border-radius: 5px;
-      background: #2e2e50;
+      background: #2a2a4a;
       cursor: pointer;
       padding: 1px;
+      flex-shrink: 0;
     }
     .fmt-btn {
-      background: #2e2e50;
-      color: #fff;
-      border: 1px solid #5a5aae;
+      background: #2a2a4a;
+      color: #e0e0f0;
+      border: 1px solid rgba(255,255,255,0.15);
       border-radius: 5px;
-      padding: 3px 10px;
-      font-size: 0.82rem;
+      padding: 3px 9px;
+      font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
-      transition: background 0.15s, border-color 0.15s;
-      line-height: 1.4;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      white-space: nowrap;
+      flex-shrink: 0;
+      line-height: 1.5;
     }
-    .fmt-btn:hover { background: #5a5aae; border-color: #f5a623; }
-    .fmt-btn.active { background: #f5a623; color: #1a1a2e; border-color: #f5a623; }
-    .fmt-sep {
-      width: 1px;
-      height: 22px;
-      background: rgba(255,255,255,0.15);
-      margin: 0 4px;
-    }
-    .fmt-tip {
-      font-size: 0.68rem;
-      color: #666;
-      font-style: italic;
-      margin-left: auto;
-    }
+    .fmt-btn:hover { background: #3a3a6a; border-color: #f5a623; color: #f5a623; }
+    .fmt-btn.active { background: #f5a623; color: #12122a; border-color: #f5a623; }
+    .fmt-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.1); flex-shrink: 0; margin: 0 3px; }
+    .fmt-tip { font-size: 0.65rem; color: #555; font-style: italic; white-space: nowrap; flex-shrink: 0; margin-left: auto; }
 
-    /* ===== TOAST NOTIFICATION ===== */
+    /* ══════════════════════════════════════════════
+       TOAST
+    ══════════════════════════════════════════════ */
     .toast {
       position: fixed;
-      bottom: 30px;
+      bottom: 28px;
       left: 50%;
-      transform: translateX(-50%) translateY(20px);
+      transform: translateX(-50%) translateY(16px);
       background: #27ae60;
       color: #fff;
-      padding: 12px 28px;
+      padding: 10px 26px;
       border-radius: 30px;
-      font-size: 0.95rem;
+      font-size: 0.88rem;
       font-weight: 700;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.3);
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.3s, transform 0.3s;
+      transition: opacity 0.28s, transform 0.28s;
       z-index: 9999;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     .toast.error { background: #c0392b; }
+    .toast.info  { background: #2980b9; }
 
-    /* ===== PAGE CONTAINER ===== */
+    /* ══════════════════════════════════════════════
+       PAGE
+    ══════════════════════════════════════════════ */
     .page {
-      max-width: 900px;
-      margin: 24px auto;
+      max-width: 940px;
+      margin: 28px auto 60px;
       background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+      border-radius: 14px;
+      box-shadow: 0 6px 32px rgba(0,0,0,0.12);
       overflow: hidden;
-      padding-bottom: 40px;
     }
 
-    /* ===== HEADER SECTION ===== */
+    /* ══════════════════════════════════════════════
+       DOCUMENT HEADER
+    ══════════════════════════════════════════════ */
     .header-banner {
       background: linear-gradient(135deg, #f5a623 0%, #e07b00 100%);
-      padding: 18px 32px 14px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
+      padding: 20px 32px 16px;
+      position: relative;
     }
-    .header-banner .title-block { flex: 1; }
     .header-banner h2 {
-      font-size: 1.6rem;
+      font-size: 1.65rem;
       font-weight: 800;
       color: #fff;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      text-shadow: 0 1px 6px rgba(0,0,0,0.22);
       outline: none;
+      border-radius: 4px;
+      padding: 2px 6px;
+      transition: background 0.15s;
+      display: inline-block;
+      min-width: 200px;
     }
-    .header-banner h2:focus { background: rgba(255,255,255,0.15); border-radius: 4px; }
+    .header-banner h2:hover { background: rgba(255,255,255,0.12); }
+    .header-banner h2:focus { background: rgba(255,255,255,0.2); }
+    .header-banner h2[data-empty]:empty::before {
+      content: attr(data-empty);
+      color: rgba(255,255,255,0.5);
+      font-style: italic;
+    }
     .header-sub {
       background: #fff8ee;
       border-left: 5px solid #f5a623;
       padding: 10px 32px;
       display: flex;
-      gap: 32px;
+      gap: 28px;
       align-items: center;
       flex-wrap: wrap;
     }
-    .header-sub .field-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .header-sub label {
-      font-size: 0.8rem;
+    .field-group { display: flex; align-items: center; gap: 8px; }
+    .field-group label {
+      font-size: 0.75rem;
       font-weight: 700;
-      color: #888;
+      color: #999;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       white-space: nowrap;
@@ -269,230 +275,290 @@
       outline: none;
       border-bottom: 2px dashed #f5a623;
       padding: 2px 6px;
-      min-width: 120px;
-      font-size: 0.95rem;
+      min-width: 110px;
+      font-size: 0.92rem;
       font-weight: 600;
       color: #333;
       background: transparent;
-      transition: border-color 0.2s, background 0.2s;
       border-radius: 3px 3px 0 0;
+      transition: border-color 0.18s, background 0.18s;
     }
-    .editable-field:focus {
-      border-bottom-color: #e07b00;
-      background: #fff3d6;
+    .editable-field:focus { border-bottom-color: #e07b00; background: #fff3d6; }
+    .editable-field[data-empty]:empty::before {
+      content: attr(data-empty);
+      color: #ccc;
+      font-style: italic;
+      font-weight: 400;
     }
 
-    /* ===== SECTION WRAPPER ===== */
-    .section {
-      padding: 22px 32px 10px;
-      border-bottom: 1px solid #f0f0f0;
-      position: relative;
+    /* ══════════════════════════════════════════════
+       SECTION CARD  (the main unit)
+    ══════════════════════════════════════════════ */
+    .section-card {
+      margin: 18px 24px;
+      border-radius: 10px;
+      border: 1px solid #e8e8f0;
+      background: #fff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      transition: box-shadow 0.2s;
+      overflow: hidden;
     }
-    .section:last-child { border-bottom: none; }
+    .section-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.09); }
 
-    /* Section header row: title + clear button */
-    .section-header {
+    /* ── Section Header Bar ── */
+    .section-head {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
+      gap: 0;
+      background: linear-gradient(90deg, #1e1e3f 0%, #2a2a52 100%);
+      padding: 0 0 0 14px;
+      min-height: 42px;
+      cursor: default;
+      user-select: none;
     }
-    .section-title {
-      font-size: 1.05rem;
-      font-weight: 800;
-      color: #1a1a2e;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex: 1;
-    }
-    .section-title::before {
-      content: '';
-      display: inline-block;
+    .section-head-accent {
       width: 4px;
-      height: 18px;
+      height: 100%;
+      min-height: 42px;
       background: #f5a623;
       border-radius: 2px;
       flex-shrink: 0;
+      margin-right: 12px;
     }
-    /* Per-section clear button */
-    .btn-section-clear {
-      background: none;
-      border: 1px solid #ddd;
-      color: #bbb;
+    .section-head-title {
+      flex: 1;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #f0f0ff;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      outline: none;
+      padding: 10px 6px;
+      border-radius: 4px;
+      transition: background 0.15s;
+      cursor: text;
+      min-width: 60px;
+    }
+    .section-head-title:hover { background: rgba(255,255,255,0.06); }
+    .section-head-title:focus {
+      background: rgba(245,166,35,0.12);
+      color: #f5a623;
+      letter-spacing: 0.5px;
+    }
+    .section-head-title[data-empty]:empty::before {
+      content: attr(data-empty);
+      color: rgba(255,255,255,0.3);
+      font-style: italic;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    /* Header action buttons */
+    .section-head-actions {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 0 8px;
+      opacity: 0;
+      transition: opacity 0.18s;
+    }
+    .section-card:hover .section-head-actions,
+    .section-head:focus-within .section-head-actions { opacity: 1; }
+    .sh-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.45);
       border-radius: 5px;
-      padding: 3px 10px;
-      font-size: 0.75rem;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
       cursor: pointer;
-      transition: all 0.15s;
-      white-space: nowrap;
+      transition: background 0.15s, color 0.15s;
       flex-shrink: 0;
     }
-    .btn-section-clear:hover {
-      background: #fff0ee;
-      border-color: #e05252;
-      color: #e05252;
-    }
+    .sh-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .sh-btn.sh-clear:hover { background: rgba(245,166,35,0.2); color: #f5a623; }
+    .sh-btn.sh-delete:hover { background: rgba(192,57,43,0.3); color: #ff6b6b; }
+    .sh-btn svg { width: 14px; height: 14px; fill: currentColor; }
 
-    /* ===== RESIZABLE SECTION BODY ===== */
+    /* ── Section Body ── */
     .section-body {
-      resize: vertical;
-      overflow: auto;
-      min-height: 60px;
-      border: 1px solid transparent;
-      border-radius: 6px;
-      padding: 4px;
-      transition: border-color 0.2s;
-    }
-    .section-body:hover {
-      border-color: #e8e8e8;
-    }
-    /* Resize handle hint */
-    .resize-hint {
-      font-size: 0.65rem;
-      color: #ccc;
-      text-align: right;
-      padding: 2px 6px 0;
-      user-select: none;
-    }
-    .resize-hint::after {
-      content: '⇕ drag to resize';
+      padding: 16px 18px 12px;
+      position: relative;
+      /* JS-driven resize */
     }
 
-    /* ===== BULLET LIST ===== */
-    .bullet-list {
-      list-style: none;
-      padding: 0;
-      margin: 0 0 8px;
+    /* ── Resize Handle ── */
+    .resize-handle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 14px;
+      background: #f7f7fb;
+      border-top: 1px solid #ebebf5;
+      cursor: ns-resize;
+      user-select: none;
+      transition: background 0.15s;
     }
+    .resize-handle:hover { background: #ede8ff; }
+    .resize-handle::before {
+      content: '';
+      display: block;
+      width: 36px;
+      height: 3px;
+      background: #c8c8e0;
+      border-radius: 2px;
+      transition: background 0.15s, width 0.15s;
+    }
+    .resize-handle:hover::before { background: #7b2fbe; width: 52px; }
+    .resize-handle.dragging { background: #ede8ff; }
+    .resize-handle.dragging::before { background: #f5a623; width: 60px; }
+
+    /* ══════════════════════════════════════════════
+       BULLET LIST
+    ══════════════════════════════════════════════ */
+    .bullet-list { list-style: none; padding: 0; margin: 0 0 8px; }
     .bullet-list li {
       display: flex;
       align-items: flex-start;
       gap: 10px;
-      margin-bottom: 8px;
-      padding: 6px 8px;
+      margin-bottom: 6px;
+      padding: 5px 8px;
       border-radius: 6px;
-      transition: background 0.15s;
+      transition: background 0.12s;
     }
     .bullet-list li:hover { background: #fafafa; }
     .bullet-list li::before {
       content: '•';
       color: #f5a623;
-      font-size: 1.2rem;
-      line-height: 1.4;
+      font-size: 1.15rem;
+      line-height: 1.45;
       flex-shrink: 0;
     }
-    .bullet-list li .item-text {
+    .item-text {
       flex: 1;
       outline: none;
       min-height: 22px;
-      font-size: 0.95rem;
-      line-height: 1.5;
+      font-size: 0.92rem;
+      line-height: 1.55;
       padding: 1px 4px;
       border-radius: 4px;
-      transition: background 0.15s;
+      transition: background 0.12s;
     }
-    .bullet-list li .item-text:focus { background: #fff8ee; }
-    .bullet-list li .remove-btn {
+    .item-text:focus { background: #fff8ee; }
+    .item-text[data-empty]:empty::before {
+      content: attr(data-empty);
+      color: #ccc;
+      font-style: italic;
+    }
+    .remove-btn {
       background: none;
       border: none;
-      color: #ccc;
-      font-size: 1.1rem;
+      color: #ddd;
+      font-size: 1rem;
       cursor: pointer;
       padding: 0 4px;
       line-height: 1;
-      transition: color 0.15s;
+      transition: color 0.12s;
       flex-shrink: 0;
     }
-    .bullet-list li .remove-btn:hover { color: #e05252; }
+    .remove-btn:hover { color: #e05252; }
     .add-btn {
       background: none;
       border: 2px dashed #ddd;
-      color: #aaa;
+      color: #bbb;
       border-radius: 6px;
       padding: 5px 14px;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.18s;
       margin-top: 4px;
     }
     .add-btn:hover { border-color: #f5a623; color: #f5a623; background: #fff8ee; }
 
-    /* ===== HIGHLIGHTED TEXT ===== */
+    /* ══════════════════════════════════════════════
+       HIGHLIGHT
+    ══════════════════════════════════════════════ */
     .highlight { background: #ffe066; padding: 1px 3px; border-radius: 2px; }
 
-    /* ===== RECAP TABLE ===== */
-    .recap-table-wrapper { overflow-x: auto; }
-    .recap-table {
+    /* ══════════════════════════════════════════════
+       TABLES  (Recap + Store)
+    ══════════════════════════════════════════════ */
+    .table-wrapper { overflow-x: auto; margin-top: 6px; }
+    .data-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.9rem;
+      font-size: 0.82rem;
     }
-    .recap-table th {
+    .data-table th {
       background: #1a1a2e;
       color: #f5a623;
-      padding: 10px 14px;
+      padding: 9px 12px;
       text-align: left;
-      font-size: 0.8rem;
+      font-size: 0.72rem;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      white-space: nowrap;
     }
-    .recap-table td {
-      padding: 10px 14px;
+    .data-table td {
+      padding: 8px 12px;
       border-bottom: 1px solid #f0f0f0;
       vertical-align: top;
     }
-    .recap-table tr:nth-child(even) td { background: #fafafa; }
-    .recap-table tr:hover td { background: #fff8ee; }
-    .recap-table td[contenteditable] {
-      outline: none;
-      min-width: 80px;
-    }
-    .recap-table td[contenteditable]:focus {
+    .data-table tr:nth-child(even) td { background: #fafafa; }
+    .data-table tr:hover td { background: #fff8ee; }
+    .data-table td[contenteditable] { outline: none; }
+    .data-table td[contenteditable]:focus {
       background: #fff8ee !important;
       box-shadow: inset 0 0 0 2px #f5a623;
+      border-radius: 2px;
     }
-    .recap-table .date-cell {
-      font-weight: 700;
-      color: #4a1a7a;
-      white-space: nowrap;
-      min-width: 80px;
+    .store-table th { text-align: center; }
+    .store-table td { text-align: center; }
+    .store-table .store-name-cell { text-align: left; font-weight: 600; }
+    .date-cell { font-weight: 700; color: #4a1a7a; white-space: nowrap; min-width: 80px; }
+    .topic-cell { font-weight: 700; color: #1a1a2e; min-width: 120px; }
+    .remove-row-btn {
+      background: none; border: none; color: #ddd;
+      cursor: pointer; font-size: 0.9rem; padding: 2px 5px;
+      transition: color 0.12s; border-radius: 4px;
     }
-    .recap-table .topic-cell { font-weight: 700; color: #1a1a2e; }
-    .recap-table .remove-row-btn {
-      background: none;
-      border: none;
-      color: #ddd;
-      cursor: pointer;
-      font-size: 1rem;
-      padding: 2px 6px;
-      transition: color 0.15s;
-    }
-    .recap-table .remove-row-btn:hover { color: #e05252; }
+    .remove-row-btn:hover { color: #e05252; background: #fff0f0; }
     .add-row-btn {
       background: none;
       border: 2px dashed #ddd;
-      color: #aaa;
+      color: #bbb;
       border-radius: 6px;
-      padding: 6px 18px;
-      font-size: 0.85rem;
+      padding: 5px 16px;
+      font-size: 0.82rem;
       cursor: pointer;
-      transition: all 0.2s;
-      margin-top: 10px;
-      display: block;
+      transition: all 0.18s;
+      margin-top: 8px;
+      display: inline-block;
     }
     .add-row-btn:hover { border-color: #f5a623; color: #f5a623; background: #fff8ee; }
 
-    /* ===== SECTION IMAGE UPLOADER ===== */
+    /* Week-of row */
+    .week-of-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .week-of-row span:first-child { font-weight: 700; color: #1a1a2e; font-size: 0.88rem; }
+
+    /* ══════════════════════════════════════════════
+       IMAGE UPLOADER
+    ══════════════════════════════════════════════ */
     .section-img-block {
       margin-top: 14px;
-      border-radius: 10px;
+      border-radius: 8px;
       overflow: visible;
       border: 2px dashed #e0d0f5;
       background: #faf6ff;
-      transition: border-color 0.2s;
+      transition: border-color 0.18s;
     }
     .section-img-block:hover { border-color: #7b2fbe; }
     .img-dropzone {
@@ -500,220 +566,100 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      padding: 22px 16px;
+      gap: 5px;
+      padding: 18px 16px;
       cursor: pointer;
       position: relative;
     }
     .img-dropzone input[type="file"] {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
-      width: 100%;
-      height: 100%;
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
     }
-    .img-dropzone .dz-icon { font-size: 2rem; color: #c9a8f0; }
-    .img-dropzone .dz-label { font-size: 0.88rem; color: #aaa; font-weight: 600; }
-    .img-dropzone .dz-sub   { font-size: 0.75rem; color: #ccc; }
+    .dz-icon { font-size: 1.8rem; color: #c9a8f0; }
+    .dz-label { font-size: 0.82rem; color: #aaa; font-weight: 600; }
+    .dz-sub   { font-size: 0.72rem; color: #ccc; }
     .img-preview-panel {
-      display: none;
-      padding: 12px;
-      background: #f0e8ff;
-      border-top: 1px solid #d9c0f5;
+      display: none; padding: 12px;
+      background: #f0e8ff; border-top: 1px solid #d9c0f5;
     }
-    .img-preview-panel .preview-label {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: #7b2fbe;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .img-preview-panel .preview-thumb {
-      width: 100%;
-      max-height: 220px;
-      object-fit: contain;
-      border-radius: 6px;
-      border: 1px solid #d0b8f0;
-      background: #fff;
-      display: block;
-      margin-bottom: 10px;
-    }
-    .img-preview-panel .pdf-preview-label {
-      background: #fff;
-      border: 1px solid #d0b8f0;
-      border-radius: 6px;
-      padding: 14px;
-      text-align: center;
-      color: #7b2fbe;
-      font-weight: 700;
-      font-size: 0.9rem;
-      margin-bottom: 10px;
-    }
-    .img-preview-panel .preview-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
+    .preview-label { font-size: 0.75rem; font-weight: 700; color: #7b2fbe; margin-bottom: 8px; text-transform: uppercase; }
+    .preview-thumb { width: 100%; max-height: 200px; object-fit: contain; border-radius: 6px; border: 1px solid #d0b8f0; background: #fff; display: block; margin-bottom: 10px; }
+    .pdf-preview-label { background: #fff; border: 1px solid #d0b8f0; border-radius: 6px; padding: 12px; text-align: center; color: #7b2fbe; font-weight: 700; font-size: 0.88rem; margin-bottom: 10px; }
+    .preview-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
     .btn-apply {
       background: linear-gradient(135deg, #2ecc71, #27ae60);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 9px 22px;
-      font-size: 0.88rem;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 3px 10px rgba(46,204,113,0.4);
-      transition: transform 0.15s, box-shadow 0.15s;
+      color: #fff; border: none; border-radius: 7px; padding: 8px 20px;
+      font-size: 0.84rem; font-weight: 700; cursor: pointer;
+      box-shadow: 0 3px 10px rgba(46,204,113,0.35); transition: transform 0.12s;
     }
-    .btn-apply:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(46,204,113,0.55); }
-    .btn-cancel-preview {
-      background: #eee;
-      color: #555;
-      border: none;
-      border-radius: 8px;
-      padding: 9px 16px;
-      font-size: 0.88rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
+    .btn-apply:hover { transform: translateY(-1px); }
+    .btn-cancel-preview { background: #eee; color: #555; border: none; border-radius: 7px; padding: 8px 14px; font-size: 0.84rem; font-weight: 600; cursor: pointer; }
     .btn-cancel-preview:hover { background: #ddd; }
-    .img-applied {
-      display: none;
-      width: 100%;
-      position: relative;
-    }
-    .img-applied img {
-      width: 100%;
-      height: auto;
-      display: block;
-      object-fit: contain;
-      page-break-inside: avoid;
-    }
-    .img-applied .pdf-page-img {
-      width: 100%;
-      height: auto;
-      display: block;
-      margin-bottom: 2px;
-    }
+    .img-applied { display: none; width: 100%; position: relative; }
+    .img-applied img { width: 100%; height: auto; display: block; object-fit: contain; }
+    .img-applied .pdf-page-img { width: 100%; height: auto; display: block; margin-bottom: 2px; }
     .img-applied-controls {
-      display: flex;
-      gap: 8px;
-      padding: 6px 10px;
-      background: rgba(26,26,46,0.85);
-      flex-wrap: wrap;
-      align-items: center;
+      display: flex; gap: 8px; padding: 6px 10px;
+      background: rgba(26,26,46,0.85); flex-wrap: wrap; align-items: center;
     }
     .img-applied-controls button {
-      background: rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 5px; padding: 4px 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: background 0.12s;
+    }
+    .img-applied-controls button:hover { background: rgba(245,166,35,0.85); color: #1a1a2e; }
+    .img-applied-controls label { font-size: 0.72rem; color: #f5a623; font-weight: 700; white-space: nowrap; }
+    .img-applied-controls input[type="range"] { flex: 1; min-width: 70px; accent-color: #f5a623; cursor: pointer; }
+    .img-applied-controls .size-val { font-size: 0.72rem; color: #fff; min-width: 34px; }
+
+    /* ══════════════════════════════════════════════
+       ADD SECTION BUTTON
+    ══════════════════════════════════════════════ */
+    .add-section-wrap {
+      text-align: center;
+      padding: 20px 0 10px;
+    }
+    .add-section-btn {
+      background: linear-gradient(135deg, #7b2fbe, #4a90d9);
       color: #fff;
-      border: 1px solid rgba(255,255,255,0.25);
-      border-radius: 6px;
-      padding: 5px 12px;
-      font-size: 0.78rem;
+      border: none;
+      border-radius: 30px;
+      padding: 11px 30px;
+      font-size: 0.92rem;
       font-weight: 700;
       cursor: pointer;
-      transition: background 0.15s;
+      box-shadow: 0 4px 16px rgba(123,47,190,0.3);
+      letter-spacing: 0.4px;
+      transition: transform 0.15s, box-shadow 0.15s;
     }
-    .img-applied-controls button:hover { background: rgba(245,166,35,0.85); color: #1a1a2e; border-color: transparent; }
-    .img-applied-controls label {
-      font-size: 0.75rem;
-      color: #f5a623;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-    .img-applied-controls input[type="range"] {
-      flex: 1;
-      min-width: 80px;
-      accent-color: #f5a623;
-      cursor: pointer;
-    }
-    .img-applied-controls .size-val {
-      font-size: 0.75rem;
-      color: #fff;
-      min-width: 36px;
-    }
+    .add-section-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(123,47,190,0.45); }
 
-    @media print {
-      .img-dropzone        { display: none !important; }
-      .img-preview-panel   { display: none !important; }
-      .img-applied-controls{ display: none !important; }
-      .section-img-block   { border: none !important; background: transparent !important; overflow: visible !important; }
-      .img-applied         { display: block !important; page-break-inside: avoid; width: 100% !important; }
-      .img-applied img,
-      .img-applied canvas,
-      .img-applied .pdf-page-img {
-        width: 100% !important;
-        max-width: 100% !important;
-        height: auto !important;
-        display: block !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
-      [id^="img-content-"] { display: block !important; width: 100% !important; }
-    }
-
-    /* ===== STORE TABLE ===== */
-    .store-table-wrapper { overflow-x: auto; margin-top: 10px; }
-    .store-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.78rem;
-      min-width: 700px;
-    }
-    .store-table th {
-      background: #1a1a2e;
-      color: #f5a623;
-      padding: 8px 10px;
-      text-align: center;
-      font-size: 0.72rem;
-      white-space: nowrap;
-    }
-    .store-table td {
-      padding: 7px 10px;
-      border-bottom: 1px solid #f0f0f0;
-      text-align: center;
-      vertical-align: middle;
-    }
-    .store-table tr:nth-child(even) td { background: #fafafa; }
-    .store-table tr:hover td { background: #fff8ee; }
-    .store-table td[contenteditable] { outline: none; }
-    .store-table td[contenteditable]:focus {
-      background: #fff8ee !important;
-      box-shadow: inset 0 0 0 2px #f5a623;
-    }
-    .store-table .store-name-cell { text-align: left; font-weight: 600; }
-
-    /* ===== FOOTER ===== */
+    /* ══════════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════════ */
     .doc-footer {
       background: #1a1a2e;
-      color: #888;
+      color: #777;
       text-align: center;
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       padding: 14px 32px;
       margin-top: 10px;
     }
     .doc-footer span[contenteditable] {
-      color: #f5a623;
-      outline: none;
-      border-bottom: 1px dashed #f5a623;
-      padding: 1px 4px;
+      color: #f5a623; outline: none;
+      border-bottom: 1px dashed #f5a623; padding: 1px 4px;
     }
     .doc-footer span[contenteditable]:focus { background: rgba(245,166,35,0.1); }
 
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 600px) {
-      .page { margin: 10px; border-radius: 8px; }
-      .section { padding: 16px 16px 8px; }
-      .header-banner { padding: 14px 16px 10px; }
+    /* ══════════════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════════════ */
+    @media (max-width: 640px) {
+      .page { margin: 10px; border-radius: 10px; }
+      .section-card { margin: 12px 10px; }
+      .header-banner { padding: 14px 16px 12px; }
       .header-sub { padding: 8px 16px; gap: 12px; }
       .format-bar { top: 40px; }
     }
   </style>
-  <!-- PDF.js for rendering PDF pages to canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>
     if (typeof pdfjsLib !== 'undefined') {
@@ -723,33 +669,58 @@
 </head>
 <body>
 
-<!-- TOP TOOLBAR -->
+<!-- ══ TOP TOOLBAR ══ -->
 <div class="toolbar no-print">
-  <h1>DLC Notes Template</h1>
-  <span class="tip">Click any field to edit</span>
+  <span class="toolbar-brand">DLC NOTES</span>
+  <div class="toolbar-sep"></div>
 
   <!-- Undo / Redo -->
-  <div class="toolbar-group">
-    <button class="btn-undo" id="undoBtn" onclick="doUndo()" title="Undo (Ctrl+Z)" disabled>&#8630; Undo</button>
-    <span class="undo-count" id="undoCount"></span>
-    <button class="btn-redo" id="redoBtn" onclick="doRedo()" title="Redo (Ctrl+Y)" disabled>&#8631; Redo</button>
-    <span class="undo-count" id="redoCount"></span>
+  <div class="tb-group">
+    <button class="tb-btn slate" id="undoBtn" onclick="doUndo()" title="Undo (Ctrl+Z)" disabled>
+      <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05 1-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
+      Undo
+    </button>
+    <span class="tb-count" id="undoCount"></span>
+    <button class="tb-btn slate" id="redoBtn" onclick="doRedo()" title="Redo (Ctrl+Y)" disabled>
+      Redo
+      <svg viewBox="0 0 24 24"><path d="M18.4 10.6C16.55 9 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 15.7c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 15.5h9v-9l-3.6 4.1z"/></svg>
+    </button>
+    <span class="tb-count" id="redoCount"></span>
   </div>
 
-  <!-- Save / Reset -->
-  <div class="toolbar-group">
-    <button class="btn-save" onclick="saveTemplate()">&#128190; Save</button>
+  <div class="toolbar-sep"></div>
+
+  <!-- Save -->
+  <div class="tb-group">
+    <button class="tb-btn green" onclick="saveTemplate()">
+      <svg viewBox="0 0 24 24"><path d="M17 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4zm-5 16a3 3 0 110-6 3 3 0 010 6zm3-10H5V5h10v4z"/></svg>
+      Save
+    </button>
     <span class="save-indicator" id="save-indicator">Not saved yet</span>
   </div>
-  <button class="btn-reset" onclick="resetTemplate()" title="Erase saved data and restore blank template">&#8635; Reset</button>
-  <button class="secondary" onclick="window.print()">&#128438; Print / PDF</button>
-  <button class="btn-clear" onclick="clearAll()">&#128465; Clear All</button>
+
+  <div class="toolbar-sep"></div>
+
+  <button class="tb-btn accent" onclick="window.print()">
+    <svg viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7a1 1 0 110-2 1 1 0 010 2zm-1-9H6v4h12V3z"/></svg>
+    Print / PDF
+  </button>
+
+  <button class="tb-btn" onclick="resetTemplate()" title="Erase saved data and restore blank template">
+    <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+    Reset
+  </button>
+
+  <button class="tb-btn red" onclick="clearAll()">
+    <svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 002 2h8a2 2 0 002-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+    Clear All
+  </button>
 </div>
 
-<!-- FORMATTING BAR -->
+<!-- ══ FORMAT BAR ══ -->
 <div class="format-bar no-print">
-  <label>Font</label>
-  <select id="fmt-font" onchange="applyFont(this.value)" title="Font family">
+  <span class="fmt-label">Font</span>
+  <select class="fmt-select" id="fmt-font" onchange="applyFont(this.value)" title="Font family">
     <option value="">— Default —</option>
     <option value="'Segoe UI', Arial, sans-serif">Segoe UI</option>
     <option value="Arial, sans-serif">Arial</option>
@@ -764,8 +735,8 @@
 
   <div class="fmt-sep"></div>
 
-  <label>Size</label>
-  <select id="fmt-size" onchange="applyFontSize(this.value)" title="Font size">
+  <span class="fmt-label">Size</span>
+  <select class="fmt-select" id="fmt-size" onchange="applyFontSize(this.value)" title="Font size">
     <option value="">— Size —</option>
     <option value="10px">10</option>
     <option value="11px">11</option>
@@ -783,1251 +754,821 @@
 
   <div class="fmt-sep"></div>
 
-  <button class="fmt-btn" id="btn-bold" onclick="applyBold()" title="Bold (Ctrl+B)"><b>B</b></button>
-  <button class="fmt-btn" id="btn-italic" onclick="applyItalic()" title="Italic (Ctrl+I)"><i>I</i></button>
+  <button class="fmt-btn" id="btn-bold"      onclick="applyBold()"      title="Bold (Ctrl+B)"><b>B</b></button>
+  <button class="fmt-btn" id="btn-italic"    onclick="applyItalic()"    title="Italic (Ctrl+I)"><i>I</i></button>
   <button class="fmt-btn" id="btn-underline" onclick="applyUnderline()" title="Underline (Ctrl+U)"><u>U</u></button>
 
   <div class="fmt-sep"></div>
 
-  <label>Highlight</label>
-  <input type="color" id="fmt-highlight-color" value="#ffe066" title="Pick highlight color" onchange="updateHighlightPreview(this.value)" />
-  <button class="fmt-btn" id="btn-highlight" onclick="applyHighlight()" title="Highlight selected text">&#9632; Highlight</button>
-  <button class="fmt-btn" id="btn-remove-highlight" onclick="removeHighlight()" title="Remove highlight" style="font-size:0.75rem;">&#10005; Highlight</button>
+  <span class="fmt-label">Highlight</span>
+  <input class="fmt-color" type="color" id="fmt-hl-color" value="#ffe066" title="Highlight color" />
+  <button class="fmt-btn" onclick="applyHighlight()" title="Highlight selected text">&#9646; Apply</button>
+  <button class="fmt-btn" onclick="removeHighlight()" title="Remove highlight" style="font-size:0.72rem;">&#10005; Remove</button>
 
   <div class="fmt-sep"></div>
 
-  <label>Text Color</label>
-  <input type="color" id="fmt-text-color" value="#222222" title="Text color" onchange="applyTextColor(this.value)" />
+  <span class="fmt-label">Color</span>
+  <input class="fmt-color" type="color" id="fmt-text-color" value="#222222" title="Text color" onchange="applyTextColor(this.value)" />
 
-  <span class="fmt-tip">Select text first, then apply formatting</span>
+  <span class="fmt-tip">Select text first, then format</span>
 </div>
 
-<!-- SAVE SUCCESS TOAST -->
+<!-- TOAST -->
 <div id="toast" class="toast no-print"></div>
 
-<!-- PAGE -->
+<!-- ══ PAGE ══ -->
 <div id="page-content">
 <div class="page">
 
-  <!-- ===== HEADER ===== -->
+  <!-- ══ DOCUMENT HEADER ══ -->
   <div class="header-banner">
-    <div class="title-block">
-      <h2 contenteditable="true" spellcheck="false">District Leadership Call D99</h2>
-    </div>
+    <h2 contenteditable="true" spellcheck="false" data-empty="Document Title">District Leadership Call D99</h2>
   </div>
   <div class="header-sub">
     <div class="field-group">
-      <label>District Manager:</label>
-      <span class="editable-field" contenteditable="true" spellcheck="false">Amy Conliff</span>
+      <label>District Manager</label>
+      <span class="editable-field" contenteditable="true" spellcheck="false" data-empty="Name">Amy Conliff</span>
     </div>
     <div class="field-group">
-      <label>Date:</label>
-      <span class="editable-field" contenteditable="true" spellcheck="false">Tuesday 2/27</span>
+      <label>Date</label>
+      <span class="editable-field" contenteditable="true" spellcheck="false" data-empty="Date">Tuesday 2/27</span>
     </div>
     <div class="field-group">
-      <label>District #:</label>
-      <span class="editable-field" contenteditable="true" spellcheck="false">D99</span>
+      <label>District #</label>
+      <span class="editable-field" contenteditable="true" spellcheck="false" data-empty="District">D99</span>
     </div>
     <div class="field-group">
-      <label>Call Time:</label>
-      <span class="editable-field" contenteditable="true" spellcheck="false">11:00 AM Eastern</span>
+      <label>Call Time</label>
+      <span class="editable-field" contenteditable="true" spellcheck="false" data-empty="Time">11:00 AM Eastern</span>
     </div>
   </div>
 
-  <!-- ===== ANNOUNCEMENTS ===== -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-title">Announcements &amp; General Updates</div>
-      <button class="btn-section-clear no-print" onclick="clearSection('announcements-list')" title="Clear all items in this section">&#128465; Clear</button>
+  <!-- ══ ANNOUNCEMENTS ══ -->
+  <div class="section-card" id="sc-announcements">
+    <div class="section-head">
+      <div class="section-head-accent"></div>
+      <div class="section-head-title" contenteditable="true" spellcheck="false" data-empty="Section Title">Announcements &amp; General Updates</div>
+      <div class="section-head-actions no-print">
+        <button class="sh-btn sh-clear" onclick="clearSectionCard('sc-announcements')" title="Clear section content">
+          <svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 002 2h8a2 2 0 002-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+        </button>
+        <button class="sh-btn sh-delete" onclick="deleteSectionCard('sc-announcements')" title="Delete this section">
+          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
     </div>
     <div class="section-body" id="body-announcements">
       <ul class="bullet-list" id="announcements-list">
-        <li>
-          <span class="item-text" contenteditable="true" spellcheck="false">All AM call 1/29 11 Eastern</span>
-          <button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button>
-        </li>
-        <li>
-          <span class="item-text" contenteditable="true" spellcheck="false">Overdue Map tasks – continue to work these</span>
-          <button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button>
-        </li>
-        <li>
-          <span class="item-text" contenteditable="true" spellcheck="false">2 TXCRTs in Miami – 1 finding and 4 findings (missing antiseptic wipes and the other were focus questions)</span>
-          <button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button>
-        </li>
-        <li>
-          <span class="item-text" contenteditable="true" spellcheck="false">PEPs due by Feb 28th – complete between this week and next week; invites will be coming to you and I will be doing some in person</span>
-          <button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button>
-        </li>
-        <li>
-          <span class="item-text" contenteditable="true" spellcheck="false">Keith visiting Jville 2/17 to 2/19 – lets be prepped and ready for Amazon!</span>
-          <button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button>
-        </li>
-        <li>
-          <span class="item-text" contenteditable="true" spellcheck="false">SAVE – viewing your income statement</span>
-          <button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button>
-        </li>
-        <li>
-          <span class="item-text" contenteditable="true" spellcheck="false">OSP – can't miss; lets tighten up GHals</span>
-          <button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button>
-        </li>
-        <li>
-          <span class="item-text" contenteditable="true" spellcheck="false">Consumables – Make sure accurate due to so many stores being in SAVE</span>
-          <button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button>
-        </li>
+        <li><span class="item-text" contenteditable="true" spellcheck="false">All AM call 1/29 11 Eastern</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
+        <li><span class="item-text" contenteditable="true" spellcheck="false">Overdue Map tasks – continue to work these</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
+        <li><span class="item-text" contenteditable="true" spellcheck="false">2 TXCRTs in Miami – 1 finding and 4 findings (missing antiseptic wipes and the other were focus questions)</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
+        <li><span class="item-text" contenteditable="true" spellcheck="false">PEPs due by Feb 28th – complete between this week and next week; invites will be coming to you and I will be doing some in person</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
+        <li><span class="item-text" contenteditable="true" spellcheck="false">Keith visiting Jville 2/17 to 2/19 – lets be prepped and ready for Amazon!</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
+        <li><span class="item-text" contenteditable="true" spellcheck="false">SAVE – viewing your income statement</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
+        <li><span class="item-text" contenteditable="true" spellcheck="false">OSP – can't miss; lets tighten up GHals</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
+        <li><span class="item-text" contenteditable="true" spellcheck="false">Consumables – Make sure accurate due to so many stores being in SAVE</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
       </ul>
       <button class="add-btn no-print" onclick="addItem('announcements-list')">+ Add Item</button>
-    </div>
-    <div class="resize-hint no-print"></div>
-    <!-- Section Image Uploader -->
-    <div class="section-img-block" id="img-block-announcements">
-      <div class="img-dropzone" id="img-dropzone-announcements">
-        <span class="dz-icon">&#128247;</span>
-        <span class="dz-label">Click or drag an image or PDF here</span>
-        <span class="dz-sub">Select file &rarr; preview &rarr; click Apply to embed into template</span>
-        <input type="file" id="img-input-announcements" accept="image/*,application/pdf" onchange="handleImgSelect(this,'announcements')" />
-      </div>
-      <div class="img-preview-panel" id="img-preview-announcements">
-        <div class="preview-label">&#128247; Preview &mdash; click Apply to embed into the template</div>
-        <img class="preview-thumb" id="img-thumb-announcements" src="" alt="preview" style="display:none;" />
-        <div class="pdf-preview-label" id="pdf-label-announcements" style="display:none;">&#128196; PDF selected &mdash; all pages will be embedded as images</div>
-        <div class="preview-actions">
-          <button class="btn-apply" onclick="applyImg('announcements')">&#10003; Apply to Template</button>
-          <button class="btn-cancel-preview" onclick="cancelPreview('announcements')">&#10005; Cancel</button>
-        </div>
-      </div>
-      <div class="img-applied" id="img-applied-announcements">
-        <div class="img-applied-controls no-print">
-          <label>&#8596; Width</label>
-          <input type="range" min="25" max="100" value="100" oninput="resizeApplied('announcements',this.value)" />
-          <span class="size-val" id="img-size-val-announcements">100%</span>
-          <button onclick="replaceImg('announcements')">&#8635; Replace</button>
-          <button onclick="removeApplied('announcements')">&#10005; Remove</button>
-          <input type="file" id="img-replace-announcements" accept="image/*,application/pdf" onchange="handleImgSelect(this,'announcements')" style="display:none" />
-        </div>
-        <div id="img-content-announcements" style="width:100%; text-align:center; background:#fff;"></div>
+      <div class="section-img-block" id="img-block-announcements">
+        <div class="img-dropzone" id="img-dropzone-announcements"><span class="dz-icon">&#128247;</span><span class="dz-label">Click or drag an image / PDF here</span><span class="dz-sub">Select → preview → Apply to embed</span><input type="file" id="img-input-announcements" accept="image/*,application/pdf" onchange="handleImgSelect(this,'announcements')" /></div>
+        <div class="img-preview-panel" id="img-preview-announcements"><div class="preview-label">Preview — click Apply to embed</div><img class="preview-thumb" id="img-thumb-announcements" src="" alt="preview" style="display:none;" /><div class="pdf-preview-label" id="pdf-label-announcements" style="display:none;"></div><div class="preview-actions"><button class="btn-apply" onclick="applyImg('announcements')">&#10003; Apply</button><button class="btn-cancel-preview" onclick="cancelPreview('announcements')">&#10005; Cancel</button></div></div>
+        <div class="img-applied" id="img-applied-announcements"><div class="img-applied-controls no-print"><label>&#8596; Width</label><input type="range" min="25" max="100" value="100" oninput="resizeApplied('announcements',this.value)" /><span class="size-val" id="img-size-val-announcements">100%</span><button onclick="replaceImg('announcements')">&#8635; Replace</button><button onclick="removeApplied('announcements')">&#10005; Remove</button><input type="file" id="img-replace-announcements" accept="image/*,application/pdf" onchange="handleImgSelect(this,'announcements')" style="display:none" /></div><div id="img-content-announcements" style="width:100%;text-align:center;background:#fff;"></div></div>
       </div>
     </div>
+    <div class="resize-handle no-print" data-target="body-announcements"></div>
   </div>
 
-  <!-- ===== CONTROLS ===== -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-title">Controls</div>
-      <button class="btn-section-clear no-print" onclick="clearSection('controls-list')" title="Clear all items in this section">&#128465; Clear</button>
+  <!-- ══ CONTROLS ══ -->
+  <div class="section-card" id="sc-controls">
+    <div class="section-head">
+      <div class="section-head-accent"></div>
+      <div class="section-head-title" contenteditable="true" spellcheck="false" data-empty="Section Title">Controls</div>
+      <div class="section-head-actions no-print">
+        <button class="sh-btn sh-clear" onclick="clearSectionCard('sc-controls')" title="Clear section content"><svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 002 2h8a2 2 0 002-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+        <button class="sh-btn sh-delete" onclick="deleteSectionCard('sc-controls')" title="Delete this section"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+      </div>
     </div>
     <div class="section-body" id="body-controls">
       <ul class="bullet-list" id="controls-list">
-        <li>
-          <span class="item-text" contenteditable="true" spellcheck="false">CSM calendar – Must be updated daily. DM will document execution on all visits</span>
-          <button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button>
-        </li>
-        <li>
-          <span class="item-text" contenteditable="true" spellcheck="false">VDI – spot check video; have a time for them to complete each day for easy watching on video. Still seeing TMs not walking around with laminated list</span>
-          <button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button>
-        </li>
-        <li>
-          <span class="item-text" contenteditable="true" spellcheck="false">Controls environment all day every day / Expectation is zero findings – controls culture!</span>
-          <button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button>
-        </li>
-        <li>
-          <span class="item-text" contenteditable="true" spellcheck="false">Callout on every VP call about txcrt. Expectation is ready at all times with no failures. Feb or March will be having a visit for a text TXCRT.</span>
-          <button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button>
-        </li>
+        <li><span class="item-text" contenteditable="true" spellcheck="false">CSM calendar – Must be updated daily. DM will document execution on all visits</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
+        <li><span class="item-text" contenteditable="true" spellcheck="false">VDI – spot check video; have a time for them to complete each day for easy watching on video. Still seeing TMs not walking around with laminated list</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
+        <li><span class="item-text" contenteditable="true" spellcheck="false">Controls environment all day every day / Expectation is zero findings – controls culture!</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
+        <li><span class="item-text" contenteditable="true" spellcheck="false">Callout on every VP call about txcrt. Expectation is ready at all times with no failures. Feb or March will be having a visit for a text TXCRT.</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
       </ul>
       <button class="add-btn no-print" onclick="addItem('controls-list')">+ Add Item</button>
-    </div>
-    <div class="resize-hint no-print"></div>
-    <div class="section-img-block" id="img-block-controls">
-      <div class="img-dropzone" id="img-dropzone-controls">
-        <span class="dz-icon">&#128247;</span>
-        <span class="dz-label">Click or drag an image or PDF here</span>
-        <span class="dz-sub">Select file &rarr; preview &rarr; click Apply to embed into template</span>
-        <input type="file" id="img-input-controls" accept="image/*,application/pdf" onchange="handleImgSelect(this,'controls')" />
-      </div>
-      <div class="img-preview-panel" id="img-preview-controls">
-        <div class="preview-label">&#128247; Preview &mdash; click Apply to embed into the template</div>
-        <img class="preview-thumb" id="img-thumb-controls" src="" alt="preview" style="display:none;" />
-        <div class="pdf-preview-label" id="pdf-label-controls" style="display:none;">&#128196; PDF selected &mdash; all pages will be embedded as images</div>
-        <div class="preview-actions">
-          <button class="btn-apply" onclick="applyImg('controls')">&#10003; Apply to Template</button>
-          <button class="btn-cancel-preview" onclick="cancelPreview('controls')">&#10005; Cancel</button>
-        </div>
-      </div>
-      <div class="img-applied" id="img-applied-controls">
-        <div class="img-applied-controls no-print">
-          <label>&#8596; Width</label>
-          <input type="range" min="25" max="100" value="100" oninput="resizeApplied('controls',this.value)" />
-          <span class="size-val" id="img-size-val-controls">100%</span>
-          <button onclick="replaceImg('controls')">&#8635; Replace</button>
-          <button onclick="removeApplied('controls')">&#10005; Remove</button>
-          <input type="file" id="img-replace-controls" accept="image/*,application/pdf" onchange="handleImgSelect(this,'controls')" style="display:none" />
-        </div>
-        <div id="img-content-controls" style="width:100%; text-align:center; background:#fff;"></div>
+      <div class="section-img-block" id="img-block-controls">
+        <div class="img-dropzone" id="img-dropzone-controls"><span class="dz-icon">&#128247;</span><span class="dz-label">Click or drag an image / PDF here</span><span class="dz-sub">Select → preview → Apply to embed</span><input type="file" id="img-input-controls" accept="image/*,application/pdf" onchange="handleImgSelect(this,'controls')" /></div>
+        <div class="img-preview-panel" id="img-preview-controls"><div class="preview-label">Preview — click Apply to embed</div><img class="preview-thumb" id="img-thumb-controls" src="" alt="preview" style="display:none;" /><div class="pdf-preview-label" id="pdf-label-controls" style="display:none;"></div><div class="preview-actions"><button class="btn-apply" onclick="applyImg('controls')">&#10003; Apply</button><button class="btn-cancel-preview" onclick="cancelPreview('controls')">&#10005; Cancel</button></div></div>
+        <div class="img-applied" id="img-applied-controls"><div class="img-applied-controls no-print"><label>&#8596; Width</label><input type="range" min="25" max="100" value="100" oninput="resizeApplied('controls',this.value)" /><span class="size-val" id="img-size-val-controls">100%</span><button onclick="replaceImg('controls')">&#8635; Replace</button><button onclick="removeApplied('controls')">&#10005; Remove</button><input type="file" id="img-replace-controls" accept="image/*,application/pdf" onchange="handleImgSelect(this,'controls')" style="display:none" /></div><div id="img-content-controls" style="width:100%;text-align:center;background:#fff;"></div></div>
       </div>
     </div>
+    <div class="resize-handle no-print" data-target="body-controls"></div>
   </div>
 
-  <!-- ===== STORE DATA TABLE ===== -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-title">Store KPI Data</div>
-      <button class="btn-section-clear no-print" onclick="clearStoreTable()" title="Clear all store rows">&#128465; Clear</button>
+  <!-- ══ STORE KPI DATA ══ -->
+  <div class="section-card" id="sc-store">
+    <div class="section-head">
+      <div class="section-head-accent"></div>
+      <div class="section-head-title" contenteditable="true" spellcheck="false" data-empty="Section Title">Store KPI Data</div>
+      <div class="section-head-actions no-print">
+        <button class="sh-btn sh-clear" onclick="clearSectionCard('sc-store')" title="Clear section content"><svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 002 2h8a2 2 0 002-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+        <button class="sh-btn sh-delete" onclick="deleteSectionCard('sc-store')" title="Delete this section"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+      </div>
     </div>
     <div class="section-body" id="body-store">
-      <div class="store-table-wrapper">
-        <table class="store-table" id="store-table">
-          <thead>
-            <tr>
-              <th>Store Description</th>
-              <th>Region</th>
-              <th>District</th>
-              <th>KPI Total Score</th>
-              <th>KPI Rank</th>
-              <th>Sales % to Plan</th>
-              <th>Sales to Plan Rank</th>
-              <th>Total Rev NYOY Growth</th>
-              <th>Total Rev NYOY Rank</th>
-              <th>Packing Growth</th>
-              <th>Packing Rank</th>
-              <th class="no-print">&#9998;</th>
-            </tr>
-          </thead>
+      <div class="table-wrapper">
+        <table class="data-table store-table" id="store-table">
+          <thead><tr>
+            <th>Store Description</th><th>Region</th><th>District</th>
+            <th>KPI Total Score</th><th>KPI Rank</th><th>Sales % to Plan</th>
+            <th>Sales to Plan Rank</th><th>Total Rev NYOY Growth</th><th>Total Rev NYOY Rank</th>
+            <th>Packing Growth</th><th>Packing Rank</th><th class="no-print">&#9998;</th>
+          </tr></thead>
           <tbody id="store-tbody">
-            <tr>
-              <td class="store-name-cell" contenteditable="true" spellcheck="false">2800 Ponte Vedra Beach FL Sawgrass</td>
-              <td contenteditable="true" spellcheck="false">047</td>
-              <td contenteditable="true" spellcheck="false">0099</td>
-              <td contenteditable="true" spellcheck="false">5.2</td>
-              <td contenteditable="true" spellcheck="false">2</td>
-              <td contenteditable="true" spellcheck="false">310.2%</td>
-              <td contenteditable="true" spellcheck="false">5</td>
-              <td contenteditable="true" spellcheck="false">228.4%</td>
-              <td contenteditable="true" spellcheck="false">3</td>
-              <td contenteditable="true" spellcheck="false">31.0%</td>
-              <td contenteditable="true" spellcheck="false">25</td>
-              <td class="no-print"><button class="remove-row-btn" onclick="removeRow(this)">&#10005;</button></td>
-            </tr>
-            <tr>
-              <td class="store-name-cell" contenteditable="true" spellcheck="false">5553 Destin FL Hwy 98</td>
-              <td contenteditable="true" spellcheck="false">047</td>
-              <td contenteditable="true" spellcheck="false">0099</td>
-              <td contenteditable="true" spellcheck="false">37.6</td>
-              <td contenteditable="true" spellcheck="false">16</td>
-              <td contenteditable="true" spellcheck="false">113.5%</td>
-              <td contenteditable="true" spellcheck="false">25</td>
-              <td contenteditable="true" spellcheck="false">15.0%</td>
-              <td contenteditable="true" spellcheck="false">67</td>
-              <td contenteditable="true" spellcheck="false">0.9%</td>
-              <td contenteditable="true" spellcheck="false">151</td>
-              <td class="no-print"><button class="remove-row-btn" onclick="removeRow(this)">&#10005;</button></td>
-            </tr>
-            <tr>
-              <td class="store-name-cell" contenteditable="true" spellcheck="false">3998 Inlet Beach FL US Hwy 98</td>
-              <td contenteditable="true" spellcheck="false">047</td>
-              <td contenteditable="true" spellcheck="false">0099</td>
-              <td contenteditable="true" spellcheck="false">17.6</td>
-              <td contenteditable="true" spellcheck="false">41</td>
-              <td contenteditable="true" spellcheck="false">113.3%</td>
-              <td contenteditable="true" spellcheck="false">41</td>
-              <td contenteditable="true" spellcheck="false">143.7%</td>
-              <td contenteditable="true" spellcheck="false">4</td>
-              <td contenteditable="true" spellcheck="false">47.9%</td>
-              <td contenteditable="true" spellcheck="false">35</td>
-              <td class="no-print"><button class="remove-row-btn" onclick="removeRow(this)">&#10005;</button></td>
-            </tr>
+            <tr><td class="store-name-cell" contenteditable="true" spellcheck="false">2800 Ponte Vedra Beach FL Sawgrass</td><td contenteditable="true" spellcheck="false">047</td><td contenteditable="true" spellcheck="false">0099</td><td contenteditable="true" spellcheck="false">5.2</td><td contenteditable="true" spellcheck="false">2</td><td contenteditable="true" spellcheck="false">310.2%</td><td contenteditable="true" spellcheck="false">5</td><td contenteditable="true" spellcheck="false">228.4%</td><td contenteditable="true" spellcheck="false">3</td><td contenteditable="true" spellcheck="false">31.0%</td><td contenteditable="true" spellcheck="false">25</td><td class="no-print"><button class="remove-row-btn" onclick="removeRow(this)">&#10005;</button></td></tr>
+            <tr><td class="store-name-cell" contenteditable="true" spellcheck="false">5553 Destin FL Hwy 98</td><td contenteditable="true" spellcheck="false">047</td><td contenteditable="true" spellcheck="false">0099</td><td contenteditable="true" spellcheck="false">37.6</td><td contenteditable="true" spellcheck="false">16</td><td contenteditable="true" spellcheck="false">113.5%</td><td contenteditable="true" spellcheck="false">25</td><td contenteditable="true" spellcheck="false">15.0%</td><td contenteditable="true" spellcheck="false">67</td><td contenteditable="true" spellcheck="false">0.9%</td><td contenteditable="true" spellcheck="false">151</td><td class="no-print"><button class="remove-row-btn" onclick="removeRow(this)">&#10005;</button></td></tr>
+            <tr><td class="store-name-cell" contenteditable="true" spellcheck="false">3998 Inlet Beach FL US Hwy 98</td><td contenteditable="true" spellcheck="false">047</td><td contenteditable="true" spellcheck="false">0099</td><td contenteditable="true" spellcheck="false">17.6</td><td contenteditable="true" spellcheck="false">41</td><td contenteditable="true" spellcheck="false">113.3%</td><td contenteditable="true" spellcheck="false">41</td><td contenteditable="true" spellcheck="false">143.7%</td><td contenteditable="true" spellcheck="false">4</td><td contenteditable="true" spellcheck="false">47.9%</td><td contenteditable="true" spellcheck="false">35</td><td class="no-print"><button class="remove-row-btn" onclick="removeRow(this)">&#10005;</button></td></tr>
           </tbody>
         </table>
       </div>
       <button class="add-row-btn no-print" onclick="addStoreRow()">+ Add Store Row</button>
-    </div>
-    <div class="resize-hint no-print"></div>
-    <div class="section-img-block" id="img-block-store">
-      <div class="img-dropzone" id="img-dropzone-store">
-        <span class="dz-icon">&#128247;</span>
-        <span class="dz-label">Click or drag an image or PDF here</span>
-        <span class="dz-sub">Select file &rarr; preview &rarr; click Apply to embed into template</span>
-        <input type="file" id="img-input-store" accept="image/*,application/pdf" onchange="handleImgSelect(this,'store')" />
-      </div>
-      <div class="img-preview-panel" id="img-preview-store">
-        <div class="preview-label">&#128247; Preview &mdash; click Apply to embed into the template</div>
-        <img class="preview-thumb" id="img-thumb-store" src="" alt="preview" style="display:none;" />
-        <div class="pdf-preview-label" id="pdf-label-store" style="display:none;">&#128196; PDF selected &mdash; all pages will be embedded as images</div>
-        <div class="preview-actions">
-          <button class="btn-apply" onclick="applyImg('store')">&#10003; Apply to Template</button>
-          <button class="btn-cancel-preview" onclick="cancelPreview('store')">&#10005; Cancel</button>
-        </div>
-      </div>
-      <div class="img-applied" id="img-applied-store">
-        <div class="img-applied-controls no-print">
-          <label>&#8596; Width</label>
-          <input type="range" min="25" max="100" value="100" oninput="resizeApplied('store',this.value)" />
-          <span class="size-val" id="img-size-val-store">100%</span>
-          <button onclick="replaceImg('store')">&#8635; Replace</button>
-          <button onclick="removeApplied('store')">&#10005; Remove</button>
-          <input type="file" id="img-replace-store" accept="image/*,application/pdf" onchange="handleImgSelect(this,'store')" style="display:none" />
-        </div>
-        <div id="img-content-store" style="width:100%; text-align:center; background:#fff;"></div>
+      <div class="section-img-block" id="img-block-store">
+        <div class="img-dropzone" id="img-dropzone-store"><span class="dz-icon">&#128247;</span><span class="dz-label">Click or drag an image / PDF here</span><span class="dz-sub">Select → preview → Apply to embed</span><input type="file" id="img-input-store" accept="image/*,application/pdf" onchange="handleImgSelect(this,'store')" /></div>
+        <div class="img-preview-panel" id="img-preview-store"><div class="preview-label">Preview — click Apply to embed</div><img class="preview-thumb" id="img-thumb-store" src="" alt="preview" style="display:none;" /><div class="pdf-preview-label" id="pdf-label-store" style="display:none;"></div><div class="preview-actions"><button class="btn-apply" onclick="applyImg('store')">&#10003; Apply</button><button class="btn-cancel-preview" onclick="cancelPreview('store')">&#10005; Cancel</button></div></div>
+        <div class="img-applied" id="img-applied-store"><div class="img-applied-controls no-print"><label>&#8596; Width</label><input type="range" min="25" max="100" value="100" oninput="resizeApplied('store',this.value)" /><span class="size-val" id="img-size-val-store">100%</span><button onclick="replaceImg('store')">&#8635; Replace</button><button onclick="removeApplied('store')">&#10005; Remove</button><input type="file" id="img-replace-store" accept="image/*,application/pdf" onchange="handleImgSelect(this,'store')" style="display:none" /></div><div id="img-content-store" style="width:100%;text-align:center;background:#fff;"></div></div>
       </div>
     </div>
+    <div class="resize-handle no-print" data-target="body-store"></div>
   </div>
 
-  <!-- ===== AMAZON ===== -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-title">Amazon</div>
-      <button class="btn-section-clear no-print" onclick="clearSection('amazon-list')" title="Clear all items in this section">&#128465; Clear</button>
+  <!-- ══ AMAZON ══ -->
+  <div class="section-card" id="sc-amazon">
+    <div class="section-head">
+      <div class="section-head-accent"></div>
+      <div class="section-head-title" contenteditable="true" spellcheck="false" data-empty="Section Title">Amazon</div>
+      <div class="section-head-actions no-print">
+        <button class="sh-btn sh-clear" onclick="clearSectionCard('sc-amazon')" title="Clear section content"><svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 002 2h8a2 2 0 002-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+        <button class="sh-btn sh-delete" onclick="deleteSectionCard('sc-amazon')" title="Delete this section"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+      </div>
     </div>
     <div class="section-body" id="body-amazon">
       <ul class="bullet-list" id="amazon-list">
-        <li>
-          <span class="item-text" contenteditable="true" spellcheck="false">Team members in front of the counter are what will set us apart from the other return locations</span>
-          <button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button>
-        </li>
-        <li>
-          <span class="item-text" contenteditable="true" spellcheck="false">She explained the importance of accurate and on-time returns and $25 per item fee if it's not</span>
-          <button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button>
-        </li>
-        <li>
-          <span class="item-text" contenteditable="true" spellcheck="false">Returns set-up should be <span class="highlight">no more than a few steps from the main computers</span> you will use to process returns</span>
-          <button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button>
-        </li>
-        <li>
-          <span class="item-text" contenteditable="true" spellcheck="false">Poly bags should be staged at front counters where returns will be processed</span>
-          <button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button>
-        </li>
-        <li>
-          <span class="item-text" contenteditable="true" spellcheck="false">There should be plenty of space for the team to drop returns into boxes without having to pull box out each time – below is the example she approved – 6-8 notches above box top</span>
-          <button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button>
-        </li>
+        <li><span class="item-text" contenteditable="true" spellcheck="false">Team members in front of the counter are what will set us apart from the other return locations</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
+        <li><span class="item-text" contenteditable="true" spellcheck="false">She explained the importance of accurate and on-time returns and $25 per item fee if it's not</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
+        <li><span class="item-text" contenteditable="true" spellcheck="false">Returns set-up should be <span class="highlight">no more than a few steps from the main computers</span> you will use to process returns</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
+        <li><span class="item-text" contenteditable="true" spellcheck="false">Poly bags should be staged at front counters where returns will be processed</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
+        <li><span class="item-text" contenteditable="true" spellcheck="false">There should be plenty of space for the team to drop returns into boxes without having to pull box out each time – below is the example she approved – 6-8 notches above box top</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
       </ul>
       <button class="add-btn no-print" onclick="addItem('amazon-list')">+ Add Item</button>
-    </div>
-    <div class="resize-hint no-print"></div>
-    <div class="section-img-block" id="img-block-amazon">
-      <div class="img-dropzone" id="img-dropzone-amazon">
-        <span class="dz-icon">&#128247;</span>
-        <span class="dz-label">Click or drag an image or PDF here</span>
-        <span class="dz-sub">Select file &rarr; preview &rarr; click Apply to embed into template</span>
-        <input type="file" id="img-input-amazon" accept="image/*,application/pdf" onchange="handleImgSelect(this,'amazon')" />
-      </div>
-      <div class="img-preview-panel" id="img-preview-amazon">
-        <div class="preview-label">&#128247; Preview &mdash; click Apply to embed into the template</div>
-        <img class="preview-thumb" id="img-thumb-amazon" src="" alt="preview" style="display:none;" />
-        <div class="pdf-preview-label" id="pdf-label-amazon" style="display:none;">&#128196; PDF selected &mdash; all pages will be embedded as images</div>
-        <div class="preview-actions">
-          <button class="btn-apply" onclick="applyImg('amazon')">&#10003; Apply to Template</button>
-          <button class="btn-cancel-preview" onclick="cancelPreview('amazon')">&#10005; Cancel</button>
-        </div>
-      </div>
-      <div class="img-applied" id="img-applied-amazon">
-        <div class="img-applied-controls no-print">
-          <label>&#8596; Width</label>
-          <input type="range" min="25" max="100" value="100" oninput="resizeApplied('amazon',this.value)" />
-          <span class="size-val" id="img-size-val-amazon">100%</span>
-          <button onclick="replaceImg('amazon')">&#8635; Replace</button>
-          <button onclick="removeApplied('amazon')">&#10005; Remove</button>
-          <input type="file" id="img-replace-amazon" accept="image/*,application/pdf" onchange="handleImgSelect(this,'amazon')" style="display:none" />
-        </div>
-        <div id="img-content-amazon" style="width:100%; text-align:center; background:#fff;"></div>
+      <div class="section-img-block" id="img-block-amazon">
+        <div class="img-dropzone" id="img-dropzone-amazon"><span class="dz-icon">&#128247;</span><span class="dz-label">Click or drag an image / PDF here</span><span class="dz-sub">Select → preview → Apply to embed</span><input type="file" id="img-input-amazon" accept="image/*,application/pdf" onchange="handleImgSelect(this,'amazon')" /></div>
+        <div class="img-preview-panel" id="img-preview-amazon"><div class="preview-label">Preview — click Apply to embed</div><img class="preview-thumb" id="img-thumb-amazon" src="" alt="preview" style="display:none;" /><div class="pdf-preview-label" id="pdf-label-amazon" style="display:none;"></div><div class="preview-actions"><button class="btn-apply" onclick="applyImg('amazon')">&#10003; Apply</button><button class="btn-cancel-preview" onclick="cancelPreview('amazon')">&#10005; Cancel</button></div></div>
+        <div class="img-applied" id="img-applied-amazon"><div class="img-applied-controls no-print"><label>&#8596; Width</label><input type="range" min="25" max="100" value="100" oninput="resizeApplied('amazon',this.value)" /><span class="size-val" id="img-size-val-amazon">100%</span><button onclick="replaceImg('amazon')">&#8635; Replace</button><button onclick="removeApplied('amazon')">&#10005; Remove</button><input type="file" id="img-replace-amazon" accept="image/*,application/pdf" onchange="handleImgSelect(this,'amazon')" style="display:none" /></div><div id="img-content-amazon" style="width:100%;text-align:center;background:#fff;"></div></div>
       </div>
     </div>
+    <div class="resize-handle no-print" data-target="body-amazon"></div>
   </div>
 
-  <!-- ===== WEEK RECAP TABLE ===== -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-title">Week Recap</div>
-      <button class="btn-section-clear no-print" onclick="clearRecapTable()" title="Clear all recap rows">&#128465; Clear</button>
+  <!-- ══ WEEK RECAP ══ -->
+  <div class="section-card" id="sc-recap">
+    <div class="section-head">
+      <div class="section-head-accent"></div>
+      <div class="section-head-title" contenteditable="true" spellcheck="false" data-empty="Section Title">Week Recap</div>
+      <div class="section-head-actions no-print">
+        <button class="sh-btn sh-clear" onclick="clearSectionCard('sc-recap')" title="Clear section content"><svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 002 2h8a2 2 0 002-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+        <button class="sh-btn sh-delete" onclick="deleteSectionCard('sc-recap')" title="Delete this section"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+      </div>
     </div>
     <div class="section-body" id="body-recap">
-      <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
-        <span style="font-weight:700; color:#1a1a2e;">Week of:</span>
-        <span class="editable-field" contenteditable="true" spellcheck="false">1/19/26</span>
+      <div class="week-of-row">
+        <span>Week of:</span>
+        <span class="editable-field" contenteditable="true" spellcheck="false" data-empty="Date">1/19/26</span>
       </div>
-      <div class="recap-table-wrapper">
-        <table class="recap-table" id="recap-table">
-          <thead>
-            <tr>
-              <th style="width:90px;">Date</th>
-              <th style="width:160px;">Category</th>
-              <th>Topic / Content</th>
-              <th class="no-print" style="width:40px;"></th>
-            </tr>
-          </thead>
+      <div class="table-wrapper">
+        <table class="data-table" id="recap-table">
+          <thead><tr>
+            <th style="width:90px;">Date</th>
+            <th style="width:150px;">Category</th>
+            <th>Topic / Content</th>
+            <th class="no-print" style="width:36px;"></th>
+          </tr></thead>
           <tbody id="recap-tbody">
-            <tr>
-              <td class="date-cell" contenteditable="true" spellcheck="false">1/22/26</td>
-              <td class="topic-cell" contenteditable="true" spellcheck="false">Recurring</td>
-              <td contenteditable="true" spellcheck="false">Retail Tasks and Updates</td>
-              <td class="no-print"><button class="remove-row-btn" onclick="removeRow(this)">&#10005;</button></td>
-            </tr>
-            <tr>
-              <td class="date-cell" contenteditable="true" spellcheck="false">1/20/26</td>
-              <td class="topic-cell" contenteditable="true" spellcheck="false">MAP App</td>
-              <td contenteditable="true" spellcheck="false"><strong>Money-Back Guarantee Reinstated</strong><br>The FedEx Money-Back Guarantee has been reinstated for U.S. domestic time-definite services shipped <strong>on or after 1/13/26</strong>. It remains suspended for packages shipped <strong>after 12/1/25</strong> for select time-sensitive international services and all other FedEx Express, Ground, and Freight services.<br><br>By 1/27/26: Print and post the updated Money-back Guarantee Reinstatement counter card OR decal located in the Store Front App, keyword: MBG. Destroy old signage that's displayed.</td>
-              <td class="no-print"><button class="remove-row-btn" onclick="removeRow(this)">&#10005;</button></td>
-            </tr>
-            <tr>
-              <td class="date-cell" contenteditable="true" spellcheck="false">1/22/26</td>
-              <td class="topic-cell" contenteditable="true" spellcheck="false">MAP App</td>
-              <td contenteditable="true" spellcheck="false"><strong>FUSE Order Edit (date and time) General Release</strong><br>Beginning 1/22/26, FUSE Order Edit (date and time) functionality will be available systemwide. This enhancement allows stores the ability to modify only the due date and time of an order.<br>Note: Full order-editing functionality is scheduled for release later in FY26.</td>
-              <td class="no-print"><button class="remove-row-btn" onclick="removeRow(this)">&#10005;</button></td>
-            </tr>
+            <tr><td class="date-cell" contenteditable="true" spellcheck="false">1/22/26</td><td class="topic-cell" contenteditable="true" spellcheck="false">Recurring</td><td contenteditable="true" spellcheck="false">Retail Tasks and Updates</td><td class="no-print"><button class="remove-row-btn" onclick="removeRow(this)">&#10005;</button></td></tr>
+            <tr><td class="date-cell" contenteditable="true" spellcheck="false">1/20/26</td><td class="topic-cell" contenteditable="true" spellcheck="false">MAP App</td><td contenteditable="true" spellcheck="false"><strong>Money-Back Guarantee Reinstated</strong><br>The FedEx Money-Back Guarantee has been reinstated for U.S. domestic time-definite services shipped <strong>on or after 1/13/26</strong>.</td><td class="no-print"><button class="remove-row-btn" onclick="removeRow(this)">&#10005;</button></td></tr>
+            <tr><td class="date-cell" contenteditable="true" spellcheck="false">1/22/26</td><td class="topic-cell" contenteditable="true" spellcheck="false">MAP App</td><td contenteditable="true" spellcheck="false"><strong>FUSE Order Edit (date and time) General Release</strong><br>Beginning 1/22/26, FUSE Order Edit functionality will be available systemwide.</td><td class="no-print"><button class="remove-row-btn" onclick="removeRow(this)">&#10005;</button></td></tr>
           </tbody>
         </table>
       </div>
       <button class="add-row-btn no-print" onclick="addRecapRow()">+ Add Row</button>
-    </div>
-    <div class="resize-hint no-print"></div>
-    <div class="section-img-block" id="img-block-recap">
-      <div class="img-dropzone" id="img-dropzone-recap">
-        <span class="dz-icon">&#128247;</span>
-        <span class="dz-label">Click or drag an image or PDF here</span>
-        <span class="dz-sub">Select file &rarr; preview &rarr; click Apply to embed into template</span>
-        <input type="file" id="img-input-recap" accept="image/*,application/pdf" onchange="handleImgSelect(this,'recap')" />
-      </div>
-      <div class="img-preview-panel" id="img-preview-recap">
-        <div class="preview-label">&#128247; Preview &mdash; click Apply to embed into the template</div>
-        <img class="preview-thumb" id="img-thumb-recap" src="" alt="preview" style="display:none;" />
-        <div class="pdf-preview-label" id="pdf-label-recap" style="display:none;">&#128196; PDF selected &mdash; all pages will be embedded as images</div>
-        <div class="preview-actions">
-          <button class="btn-apply" onclick="applyImg('recap')">&#10003; Apply to Template</button>
-          <button class="btn-cancel-preview" onclick="cancelPreview('recap')">&#10005; Cancel</button>
-        </div>
-      </div>
-      <div class="img-applied" id="img-applied-recap">
-        <div class="img-applied-controls no-print">
-          <label>&#8596; Width</label>
-          <input type="range" min="25" max="100" value="100" oninput="resizeApplied('recap',this.value)" />
-          <span class="size-val" id="img-size-val-recap">100%</span>
-          <button onclick="replaceImg('recap')">&#8635; Replace</button>
-          <button onclick="removeApplied('recap')">&#10005; Remove</button>
-          <input type="file" id="img-replace-recap" accept="image/*,application/pdf" onchange="handleImgSelect(this,'recap')" style="display:none" />
-        </div>
-        <div id="img-content-recap" style="width:100%; text-align:center; background:#fff;"></div>
+      <div class="section-img-block" id="img-block-recap">
+        <div class="img-dropzone" id="img-dropzone-recap"><span class="dz-icon">&#128247;</span><span class="dz-label">Click or drag an image / PDF here</span><span class="dz-sub">Select → preview → Apply to embed</span><input type="file" id="img-input-recap" accept="image/*,application/pdf" onchange="handleImgSelect(this,'recap')" /></div>
+        <div class="img-preview-panel" id="img-preview-recap"><div class="preview-label">Preview — click Apply to embed</div><img class="preview-thumb" id="img-thumb-recap" src="" alt="preview" style="display:none;" /><div class="pdf-preview-label" id="pdf-label-recap" style="display:none;"></div><div class="preview-actions"><button class="btn-apply" onclick="applyImg('recap')">&#10003; Apply</button><button class="btn-cancel-preview" onclick="cancelPreview('recap')">&#10005; Cancel</button></div></div>
+        <div class="img-applied" id="img-applied-recap"><div class="img-applied-controls no-print"><label>&#8596; Width</label><input type="range" min="25" max="100" value="100" oninput="resizeApplied('recap',this.value)" /><span class="size-val" id="img-size-val-recap">100%</span><button onclick="replaceImg('recap')">&#8635; Replace</button><button onclick="removeApplied('recap')">&#10005; Remove</button><input type="file" id="img-replace-recap" accept="image/*,application/pdf" onchange="handleImgSelect(this,'recap')" style="display:none" /></div><div id="img-content-recap" style="width:100%;text-align:center;background:#fff;"></div></div>
       </div>
     </div>
+    <div class="resize-handle no-print" data-target="body-recap"></div>
   </div>
 
-  <!-- ===== ADDITIONAL NOTES ===== -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-title">Additional Notes</div>
-      <button class="btn-section-clear no-print" onclick="clearSection('notes-list')" title="Clear all items in this section">&#128465; Clear</button>
+  <!-- ══ ADDITIONAL NOTES ══ -->
+  <div class="section-card" id="sc-notes">
+    <div class="section-head">
+      <div class="section-head-accent"></div>
+      <div class="section-head-title" contenteditable="true" spellcheck="false" data-empty="Section Title">Additional Notes</div>
+      <div class="section-head-actions no-print">
+        <button class="sh-btn sh-clear" onclick="clearSectionCard('sc-notes')" title="Clear section content"><svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 002 2h8a2 2 0 002-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+        <button class="sh-btn sh-delete" onclick="deleteSectionCard('sc-notes')" title="Delete this section"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
+      </div>
     </div>
     <div class="section-body" id="body-notes">
       <ul class="bullet-list" id="notes-list">
-        <li>
-          <span class="item-text" contenteditable="true" spellcheck="false">Add additional notes here...</span>
-          <button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button>
-        </li>
+        <li><span class="item-text" contenteditable="true" spellcheck="false">Add additional notes here...</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
       </ul>
       <button class="add-btn no-print" onclick="addItem('notes-list')">+ Add Item</button>
-    </div>
-    <div class="resize-hint no-print"></div>
-    <div class="section-img-block" id="img-block-notes">
-      <div class="img-dropzone" id="img-dropzone-notes">
-        <span class="dz-icon">&#128247;</span>
-        <span class="dz-label">Click or drag an image or PDF here</span>
-        <span class="dz-sub">Select file &rarr; preview &rarr; click Apply to embed into template</span>
-        <input type="file" id="img-input-notes" accept="image/*,application/pdf" onchange="handleImgSelect(this,'notes')" />
-      </div>
-      <div class="img-preview-panel" id="img-preview-notes">
-        <div class="preview-label">&#128247; Preview &mdash; click Apply to embed into the template</div>
-        <img class="preview-thumb" id="img-thumb-notes" src="" alt="preview" style="display:none;" />
-        <div class="pdf-preview-label" id="pdf-label-notes" style="display:none;">&#128196; PDF selected &mdash; all pages will be embedded as images</div>
-        <div class="preview-actions">
-          <button class="btn-apply" onclick="applyImg('notes')">&#10003; Apply to Template</button>
-          <button class="btn-cancel-preview" onclick="cancelPreview('notes')">&#10005; Cancel</button>
-        </div>
-      </div>
-      <div class="img-applied" id="img-applied-notes">
-        <div class="img-applied-controls no-print">
-          <label>&#8596; Width</label>
-          <input type="range" min="25" max="100" value="100" oninput="resizeApplied('notes',this.value)" />
-          <span class="size-val" id="img-size-val-notes">100%</span>
-          <button onclick="replaceImg('notes')">&#8635; Replace</button>
-          <button onclick="removeApplied('notes')">&#10005; Remove</button>
-          <input type="file" id="img-replace-notes" accept="image/*,application/pdf" onchange="handleImgSelect(this,'notes')" style="display:none" />
-        </div>
-        <div id="img-content-notes" style="width:100%; text-align:center; background:#fff;"></div>
+      <div class="section-img-block" id="img-block-notes">
+        <div class="img-dropzone" id="img-dropzone-notes"><span class="dz-icon">&#128247;</span><span class="dz-label">Click or drag an image / PDF here</span><span class="dz-sub">Select → preview → Apply to embed</span><input type="file" id="img-input-notes" accept="image/*,application/pdf" onchange="handleImgSelect(this,'notes')" /></div>
+        <div class="img-preview-panel" id="img-preview-notes"><div class="preview-label">Preview — click Apply to embed</div><img class="preview-thumb" id="img-thumb-notes" src="" alt="preview" style="display:none;" /><div class="pdf-preview-label" id="pdf-label-notes" style="display:none;"></div><div class="preview-actions"><button class="btn-apply" onclick="applyImg('notes')">&#10003; Apply</button><button class="btn-cancel-preview" onclick="cancelPreview('notes')">&#10005; Cancel</button></div></div>
+        <div class="img-applied" id="img-applied-notes"><div class="img-applied-controls no-print"><label>&#8596; Width</label><input type="range" min="25" max="100" value="100" oninput="resizeApplied('notes',this.value)" /><span class="size-val" id="img-size-val-notes">100%</span><button onclick="replaceImg('notes')">&#8635; Replace</button><button onclick="removeApplied('notes')">&#10005; Remove</button><input type="file" id="img-replace-notes" accept="image/*,application/pdf" onchange="handleImgSelect(this,'notes')" style="display:none" /></div><div id="img-content-notes" style="width:100%;text-align:center;background:#fff;"></div></div>
       </div>
     </div>
+    <div class="resize-handle no-print" data-target="body-notes"></div>
   </div>
 
-  <!-- ===== ADD SECTION BUTTON ===== -->
+  <!-- ══ CUSTOM SECTIONS CONTAINER ══ -->
   <div id="custom-sections-container"></div>
-  <div class="no-print" style="text-align:center; margin: 18px 0 10px;">
-    <button onclick="addCustomSection()" style="background:linear-gradient(135deg,#7b2fbe,#4a90d9); color:#fff; border:none; border-radius:30px; padding:12px 32px; font-size:1rem; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(123,47,190,0.35); letter-spacing:0.5px; transition:transform 0.15s,box-shadow 0.15s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(123,47,190,0.5)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(123,47,190,0.35)'">&#43; Add New Section</button>
+
+  <!-- ══ ADD SECTION ══ -->
+  <div class="add-section-wrap no-print">
+    <button class="add-section-btn" onclick="addCustomSection()">&#43; Add New Section</button>
   </div>
 
-  <!-- ===== FOOTER ===== -->
+  <!-- ══ FOOTER ══ -->
   <div class="doc-footer no-print">
     District: <span contenteditable="true" spellcheck="false">D99</span> &nbsp;|&nbsp;
     Prepared by: <span contenteditable="true" spellcheck="false">Amy Conliff</span> &nbsp;|&nbsp;
     Date: <span contenteditable="true" spellcheck="false">2/27/26</span>
   </div>
 
-</div><!-- end .page -->
-</div><!-- end #page-content -->
+</div><!-- .page -->
+</div><!-- #page-content -->
 
 <script>
-  // ═══════════════════════════════════════════════════════
-  // UNDO / REDO SYSTEM
-  // ═══════════════════════════════════════════════════════
-  const MAX_UNDO = 50;
-  let undoStack = [];
-  let redoStack = [];
-  let isUndoRedo = false;
+'use strict';
 
-  function captureSnapshot() {
-    return document.getElementById('page-content').innerHTML;
+/* ══════════════════════════════════════════════════════════
+   UNDO / REDO
+══════════════════════════════════════════════════════════ */
+const MAX_UNDO = 60;
+let undoStack = [], redoStack = [], isUndoRedo = false;
+
+function snap() { return document.getElementById('page-content').innerHTML; }
+
+function pushUndo() {
+  if (isUndoRedo) return;
+  const s = snap();
+  if (undoStack.length && undoStack[undoStack.length - 1] === s) return;
+  undoStack.push(s);
+  redoStack = [];
+  if (undoStack.length > MAX_UNDO) undoStack.shift();
+  syncUndoUI();
+}
+
+function doUndo() {
+  if (!undoStack.length) return;
+  isUndoRedo = true;
+  redoStack.push(snap());
+  document.getElementById('page-content').innerHTML = undoStack.pop();
+  afterRestore();
+  isUndoRedo = false;
+  showToast('↶ Undone');
+}
+
+function doRedo() {
+  if (!redoStack.length) return;
+  isUndoRedo = true;
+  undoStack.push(snap());
+  document.getElementById('page-content').innerHTML = redoStack.pop();
+  afterRestore();
+  isUndoRedo = false;
+  showToast('↷ Redone');
+}
+
+function syncUndoUI() {
+  const ub = document.getElementById('undoBtn'), rb = document.getElementById('redoBtn');
+  const uc = document.getElementById('undoCount'), rc = document.getElementById('redoCount');
+  if (ub) ub.disabled = !undoStack.length;
+  if (rb) rb.disabled = !redoStack.length;
+  if (uc) uc.textContent = undoStack.length || '';
+  if (rc) rc.textContent = redoStack.length || '';
+}
+
+function afterRestore() {
+  reattachListeners();
+  wireAllResizeHandles();
+  wireAllDragDrop();
+  restoreImgVisibility();
+  syncUndoUI();
+}
+
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); doUndo(); }
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); doRedo(); }
+});
+
+/* ══════════════════════════════════════════════════════════
+   CLIPBOARD PASTE  (plain text only)
+══════════════════════════════════════════════════════════ */
+document.addEventListener('paste', function(e) {
+  const t = e.target;
+  if (!t || t.getAttribute('contenteditable') !== 'true') return;
+  e.preventDefault();
+  pushUndo();
+  const text = e.clipboardData ? e.clipboardData.getData('text/plain') : '';
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount) { t.textContent += text; return; }
+  const r = sel.getRangeAt(0);
+  r.deleteContents();
+  const node = document.createTextNode(text);
+  r.insertNode(node);
+  r.setStartAfter(node); r.setEndAfter(node);
+  sel.removeAllRanges(); sel.addRange(r);
+});
+
+/* ══════════════════════════════════════════════════════════
+   DRAG-TO-RESIZE  (custom, smooth, works everywhere)
+══════════════════════════════════════════════════════════ */
+function wireResizeHandle(handle) {
+  handle.addEventListener('mousedown', startResize);
+  handle.addEventListener('touchstart', startResize, { passive: false });
+}
+
+function startResize(e) {
+  e.preventDefault();
+  const handle = e.currentTarget;
+  const targetId = handle.dataset.target;
+  const body = document.getElementById(targetId);
+  if (!body) return;
+
+  handle.classList.add('dragging');
+  document.body.style.cursor = 'ns-resize';
+  document.body.style.userSelect = 'none';
+
+  const startY = e.touches ? e.touches[0].clientY : e.clientY;
+  const startH = body.getBoundingClientRect().height;
+
+  function onMove(ev) {
+    const y = ev.touches ? ev.touches[0].clientY : ev.clientY;
+    const newH = Math.max(60, startH + (y - startY));
+    body.style.height = newH + 'px';
+    body.style.overflow = 'auto';
   }
 
-  function pushUndo() {
-    if (isUndoRedo) return;
-    const snap = captureSnapshot();
-    if (undoStack.length > 0 && undoStack[undoStack.length - 1] === snap) return;
-    undoStack.push(snap);
-    redoStack = []; // clear redo on new action
-    if (undoStack.length > MAX_UNDO) undoStack.shift();
-    updateUndoRedoBtns();
+  function onUp() {
+    handle.classList.remove('dragging');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onUp);
+    pushUndo();
   }
 
-  function doUndo() {
-    if (undoStack.length === 0) return;
-    isUndoRedo = true;
-    redoStack.push(captureSnapshot());
-    const prev = undoStack.pop();
-    document.getElementById('page-content').innerHTML = prev;
-    reattachListeners();
-    updateUndoRedoBtns();
-    isUndoRedo = false;
-    showToast('&#8630; Undone!');
-  }
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('touchend', onUp);
+}
 
-  function doRedo() {
-    if (redoStack.length === 0) return;
-    isUndoRedo = true;
-    undoStack.push(captureSnapshot());
-    const next = redoStack.pop();
-    document.getElementById('page-content').innerHTML = next;
-    reattachListeners();
-    updateUndoRedoBtns();
-    isUndoRedo = false;
-    showToast('&#8631; Redone!');
-  }
+function wireAllResizeHandles() {
+  document.querySelectorAll('.resize-handle').forEach(wireResizeHandle);
+}
 
-  function updateUndoRedoBtns() {
-    const undoBtn = document.getElementById('undoBtn');
-    const redoBtn = document.getElementById('redoBtn');
-    const undoCnt = document.getElementById('undoCount');
-    const redoCnt = document.getElementById('redoCount');
-    if (undoBtn) undoBtn.disabled = undoStack.length === 0;
-    if (redoBtn) redoBtn.disabled = redoStack.length === 0;
-    if (undoCnt) undoCnt.textContent = undoStack.length > 0 ? undoStack.length : '';
-    if (redoCnt) redoCnt.textContent = redoStack.length > 0 ? redoStack.length : '';
-  }
-
-  // Keyboard shortcuts
-  document.addEventListener('keydown', function(e) {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
-      e.preventDefault();
-      doUndo();
-    }
-    if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
-      e.preventDefault();
-      doRedo();
-    }
+/* ══════════════════════════════════════════════════════════
+   SECTION CARD ACTIONS
+══════════════════════════════════════════════════════════ */
+function clearSectionCard(cardId) {
+  if (!confirm('Clear all content in this section? You can Undo this.')) return;
+  pushUndo();
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  card.querySelectorAll('[contenteditable="true"]').forEach(el => {
+    // Skip the header title
+    if (el.classList.contains('section-head-title')) return;
+    el.innerHTML = '';
   });
+  // Also clear bullet lists
+  card.querySelectorAll('.bullet-list').forEach(ul => { ul.innerHTML = ''; });
+  // Clear table bodies
+  card.querySelectorAll('tbody').forEach(tb => { tb.innerHTML = ''; });
+  showToast('Section cleared — press Undo to restore');
+}
 
-  // ═══════════════════════════════════════════════════════
-  // CLIPBOARD PASTE — strip formatting, keep plain text
-  // ═══════════════════════════════════════════════════════
-  document.addEventListener('paste', function(e) {
-    const target = e.target;
-    // Only intercept paste inside contenteditable elements
-    if (!target || target.getAttribute('contenteditable') !== 'true') return;
-    e.preventDefault();
-    pushUndo();
+function deleteSectionCard(cardId) {
+  if (!confirm('Delete this entire section? You can Undo this.')) return;
+  pushUndo();
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  card.style.transition = 'opacity 0.22s, transform 0.22s';
+  card.style.opacity = '0';
+  card.style.transform = 'translateY(-6px)';
+  setTimeout(() => card.remove(), 230);
+  showToast('Section deleted — press Undo to restore');
+}
 
-    // Try to get plain text first
-    let text = '';
-    if (e.clipboardData) {
-      // Prefer plain text to avoid pasting unwanted HTML
-      text = e.clipboardData.getData('text/plain');
-    }
+/* ══════════════════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════════════════ */
+let _toastTimer = null;
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.innerHTML = msg;
+  t.className = 'toast no-print' + (type === 'error' ? ' error' : type === 'info' ? ' info' : '');
+  void t.offsetWidth;
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
 
-    // Insert at cursor position
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0) {
-      // Fallback: append to element
-      target.textContent += text;
-      return;
-    }
-    const range = sel.getRangeAt(0);
-    range.deleteContents();
-    // Insert as text node to preserve plain text
-    const textNode = document.createTextNode(text);
-    range.insertNode(textNode);
-    // Move cursor to end of inserted text
-    range.setStartAfter(textNode);
-    range.setEndAfter(textNode);
-    sel.removeAllRanges();
-    sel.addRange(range);
-  });
+/* ══════════════════════════════════════════════════════════
+   SAVE / LOAD / RESET
+══════════════════════════════════════════════════════════ */
+const STORAGE_KEY = 'dlc_notes_v5';
 
-  // ═══════════════════════════════════════════════════════
-  // FORMATTING FUNCTIONS
-  // ═══════════════════════════════════════════════════════
-
-  // Save and restore selection across format bar interactions
-  let _savedRange = null;
-
-  function saveSelection() {
-    const sel = window.getSelection();
-    if (sel && sel.rangeCount > 0) {
-      _savedRange = sel.getRangeAt(0).cloneRange();
-    }
-  }
-
-  function restoreSelection() {
-    if (_savedRange) {
-      const sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(_savedRange);
-    }
-  }
-
-  // Track last focused contenteditable
-  let _lastFocused = null;
-  document.addEventListener('focusin', function(e) {
-    if (e.target && e.target.getAttribute('contenteditable') === 'true') {
-      _lastFocused = e.target;
-    }
-  });
-
-  // Save selection on mouseup/keyup inside contenteditable
-  document.addEventListener('mouseup', function(e) {
-    if (_lastFocused && _lastFocused.contains(e.target)) saveSelection();
-  });
-  document.addEventListener('keyup', function(e) {
-    if (_lastFocused && _lastFocused.contains(e.target)) saveSelection();
-  });
-
-  function getActiveSelection() {
-    restoreSelection();
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return null;
-    return sel;
-  }
-
-  function wrapSelectionWith(tagName, styleAttr) {
-    const sel = getActiveSelection();
-    if (!sel) { showToast('Select some text first!', true); return; }
-    pushUndo();
-    const range = sel.getRangeAt(0);
-    const el = document.createElement(tagName);
-    if (styleAttr) el.setAttribute('style', styleAttr);
-    try {
-      range.surroundContents(el);
-    } catch(err) {
-      // surroundContents fails on partial selections across elements; use extractContents
-      const frag = range.extractContents();
-      el.appendChild(frag);
-      range.insertNode(el);
-    }
-    sel.removeAllRanges();
-    sel.addRange(range);
-  }
-
-  function applyFont(fontFamily) {
-    if (!fontFamily) return;
-    restoreSelection();
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
-      showToast('Select some text first!', true);
-      document.getElementById('fmt-font').value = '';
-      return;
-    }
-    pushUndo();
-    document.execCommand('fontName', false, fontFamily);
-    // execCommand uses <font> tag; we convert to span for cleaner output
-    document.getElementById('fmt-font').value = '';
-  }
-
-  function applyFontSize(size) {
-    if (!size) return;
-    restoreSelection();
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
-      showToast('Select some text first!', true);
-      document.getElementById('fmt-size').value = '';
-      return;
-    }
-    pushUndo();
-    wrapSelectionWith('span', 'font-size:' + size + ';');
-    document.getElementById('fmt-size').value = '';
-  }
-
-  function applyBold() {
-    restoreSelection();
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
-      showToast('Select some text first!', true);
-      return;
-    }
-    pushUndo();
-    document.execCommand('bold', false, null);
-    updateFormatBtns();
-  }
-
-  function applyItalic() {
-    restoreSelection();
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
-      showToast('Select some text first!', true);
-      return;
-    }
-    pushUndo();
-    document.execCommand('italic', false, null);
-    updateFormatBtns();
-  }
-
-  function applyUnderline() {
-    restoreSelection();
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
-      showToast('Select some text first!', true);
-      return;
-    }
-    pushUndo();
-    document.execCommand('underline', false, null);
-    updateFormatBtns();
-  }
-
-  function updateHighlightPreview(color) {
-    const btn = document.getElementById('btn-highlight');
-    if (btn) btn.style.borderColor = color;
-  }
-
-  function applyHighlight() {
-    restoreSelection();
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
-      showToast('Select some text first!', true);
-      return;
-    }
-    const color = document.getElementById('fmt-highlight-color').value;
-    pushUndo();
-    wrapSelectionWith('mark', 'background:' + color + '; padding:1px 3px; border-radius:2px;');
-  }
-
-  function removeHighlight() {
-    restoreSelection();
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0) {
-      showToast('Select highlighted text first!', true);
-      return;
-    }
-    pushUndo();
-    // Find mark/span elements with background in selection and unwrap them
-    const range = sel.getRangeAt(0);
-    const ancestor = range.commonAncestorContainer.nodeType === 3
-      ? range.commonAncestorContainer.parentNode
-      : range.commonAncestorContainer;
-    const marks = ancestor.querySelectorAll('mark, .highlight');
-    marks.forEach(function(m) {
-      if (sel.containsNode(m, true)) {
-        const parent = m.parentNode;
-        while (m.firstChild) parent.insertBefore(m.firstChild, m);
-        parent.removeChild(m);
-      }
-    });
-  }
-
-  function applyTextColor(color) {
-    restoreSelection();
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
-      showToast('Select some text first!', true);
-      return;
-    }
-    pushUndo();
-    document.execCommand('foreColor', false, color);
-  }
-
-  function updateFormatBtns() {
-    const boldBtn = document.getElementById('btn-bold');
-    const italicBtn = document.getElementById('btn-italic');
-    const underlineBtn = document.getElementById('btn-underline');
-    if (boldBtn) boldBtn.classList.toggle('active', document.queryCommandState('bold'));
-    if (italicBtn) italicBtn.classList.toggle('active', document.queryCommandState('italic'));
-    if (underlineBtn) underlineBtn.classList.toggle('active', document.queryCommandState('underline'));
-  }
-
-  document.addEventListener('selectionchange', updateFormatBtns);
-
-  // ═══════════════════════════════════════════════════════
-  // TOAST NOTIFICATION
-  // ═══════════════════════════════════════════════════════
-  let toastTimer = null;
-  function showToast(msg, isError) {
-    const t = document.getElementById('toast');
-    t.innerHTML = msg;
-    t.className = 'toast no-print' + (isError ? ' error' : '');
-    void t.offsetWidth;
-    t.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
-  }
-
-  // ═══════════════════════════════════════════════════════
-  // SAVE / LOAD / RESET
-  // ═══════════════════════════════════════════════════════
-  const STORAGE_KEY = 'dlc_notes_saved';
-
-  function saveTemplate() {
-    try {
-      document.querySelectorAll('[id^="img-content-"] canvas').forEach(function(canvas) {
-        try {
-          const dataUrl = canvas.toDataURL('image/png');
-          const img = document.createElement('img');
-          img.src = dataUrl;
-          img.style.cssText = canvas.style.cssText;
-          img.className = canvas.className;
-          canvas.parentNode.replaceChild(img, canvas);
-        } catch(e) { /* tainted canvas */ }
-      });
-      const data = {
-        version: 4,
-        savedAt: new Date().toLocaleString(),
-        pageHTML: document.getElementById('page-content').innerHTML
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      const ind = document.getElementById('save-indicator');
-      if (ind) ind.textContent = 'Saved: ' + data.savedAt;
-      showToast('&#128190; Saved!');
-    } catch(e) {
-      showToast('&#10005; Could not save: ' + e.message, true);
-    }
-  }
-
-  function autoLoad() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const data = JSON.parse(raw);
-      if (!data.pageHTML) return;
-      document.getElementById('page-content').innerHTML = data.pageHTML;
-      reattachListeners();
-      document.querySelectorAll('.img-dropzone').forEach(wireDragDrop);
-      document.querySelectorAll('[id^="img-content-"]').forEach(function(content) {
-        if (content.children.length > 0) {
-          const sid = content.id.replace('img-content-', '');
-          const applied  = document.getElementById('img-applied-' + sid);
-          const dropzone = document.getElementById('img-dropzone-' + sid);
-          const preview  = document.getElementById('img-preview-' + sid);
-          if (applied)  applied.style.display  = 'block';
-          if (dropzone) dropzone.style.display  = 'none';
-          if (preview)  preview.style.display   = 'none';
-        }
-      });
-      const ind = document.getElementById('save-indicator');
-      if (ind) ind.textContent = 'Saved: ' + (data.savedAt || '—');
-    } catch(e) {
-      console.warn('Could not auto-load:', e);
-    }
-  }
-
-  function resetTemplate() {
-    if (!confirm('This will erase your saved data and restore the blank template. Are you sure?')) return;
-    localStorage.removeItem(STORAGE_KEY);
-    location.reload();
-  }
-
-  // ═══════════════════════════════════════════════════════
-  // CLEAR FUNCTIONS
-  // ═══════════════════════════════════════════════════════
-  function clearAll() {
-    if (!confirm('Clear all content? You can Undo this action.')) return;
-    pushUndo();
-    document.querySelectorAll('[contenteditable="true"]').forEach(el => { el.innerHTML = ''; });
-    showToast('&#128465; Cleared. Press Undo to restore.');
-  }
-
-  function clearSection(listId) {
-    if (!confirm('Clear all items in this section? You can Undo this action.')) return;
-    pushUndo();
-    const list = document.getElementById(listId);
-    if (!list) return;
-    list.innerHTML = '';
-    showToast('&#128465; Section cleared. Press Undo to restore.');
-  }
-
-  function clearStoreTable() {
-    if (!confirm('Clear all store rows? You can Undo this action.')) return;
-    pushUndo();
-    const tbody = document.getElementById('store-tbody');
-    if (tbody) tbody.innerHTML = '';
-    showToast('&#128465; Store table cleared. Press Undo to restore.');
-  }
-
-  function clearRecapTable() {
-    if (!confirm('Clear all recap rows? You can Undo this action.')) return;
-    pushUndo();
-    const tbody = document.getElementById('recap-tbody');
-    if (tbody) tbody.innerHTML = '';
-    showToast('&#128465; Recap table cleared. Press Undo to restore.');
-  }
-
-  // ═══════════════════════════════════════════════════════
-  // BULLET / ROW HELPERS
-  // ═══════════════════════════════════════════════════════
-  function addItem(listId) {
-    pushUndo();
-    const list = document.getElementById(listId);
-    const li = document.createElement('li');
-    li.innerHTML = `
-      <span class="item-text" contenteditable="true" spellcheck="false">New item...</span>
-      <button class="remove-btn no-print" onclick="pushUndo();removeItem(this)" title="Remove">&#10005;</button>
-    `;
-    list.appendChild(li);
-    const span = li.querySelector('.item-text');
-    span.focus();
-    const range = document.createRange();
-    range.selectNodeContents(span);
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-  }
-
-  function removeItem(btn) {
-    btn.closest('li').remove();
-  }
-
-  function removeRow(btn) {
-    btn.closest('tr').remove();
-  }
-
-  function addStoreRow() {
-    pushUndo();
-    const tbody = document.getElementById('store-tbody');
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="store-name-cell" contenteditable="true" spellcheck="false">Store Name</td>
-      <td contenteditable="true" spellcheck="false">047</td>
-      <td contenteditable="true" spellcheck="false">0099</td>
-      <td contenteditable="true" spellcheck="false">0.0</td>
-      <td contenteditable="true" spellcheck="false">—</td>
-      <td contenteditable="true" spellcheck="false">0.0%</td>
-      <td contenteditable="true" spellcheck="false">—</td>
-      <td contenteditable="true" spellcheck="false">0.0%</td>
-      <td contenteditable="true" spellcheck="false">—</td>
-      <td contenteditable="true" spellcheck="false">0.0%</td>
-      <td contenteditable="true" spellcheck="false">—</td>
-      <td class="no-print"><button class="remove-row-btn" onclick="pushUndo();removeRow(this)">&#10005;</button></td>
-    `;
-    tbody.appendChild(tr);
-    tr.querySelector('td').focus();
-  }
-
-  function addRecapRow() {
-    pushUndo();
-    const tbody = document.getElementById('recap-tbody');
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="date-cell" contenteditable="true" spellcheck="false">Date</td>
-      <td class="topic-cell" contenteditable="true" spellcheck="false">Category</td>
-      <td contenteditable="true" spellcheck="false">Enter content here...</td>
-      <td class="no-print"><button class="remove-row-btn" onclick="pushUndo();removeRow(this)">&#10005;</button></td>
-    `;
-    tbody.appendChild(tr);
-    tr.querySelector('td').focus();
-  }
-
-  // ═══════════════════════════════════════════════════════
-  // IMAGE / PDF UPLOAD SYSTEM
-  // ═══════════════════════════════════════════════════════
-  const _pendingFiles = {};
-
-  function handleImgSelect(input, section) {
-    const file = input.files && input.files[0];
-    if (!file) return;
-    _pendingFiles[section] = file;
-    input.value = '';
-    const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
-    const dropzone = document.getElementById('img-dropzone-' + section);
-    const preview  = document.getElementById('img-preview-' + section);
-    const thumb    = document.getElementById('img-thumb-' + section);
-    const pdfLbl   = document.getElementById('pdf-label-' + section);
-    dropzone.style.display = 'none';
-    preview.style.display  = 'block';
-    if (isPDF) {
-      thumb.style.display  = 'none';
-      pdfLbl.style.display = 'block';
-      pdfLbl.textContent   = '\u{1F4C4} PDF selected: "' + file.name + '" \u2014 all pages will be embedded as images when you click Apply';
-    } else {
-      pdfLbl.style.display = 'none';
-      thumb.style.display  = 'block';
-      const reader = new FileReader();
-      reader.onload = e => { thumb.src = e.target.result; };
-      reader.readAsDataURL(file);
-    }
-  }
-
-  function applyImg(section) {
-    const file = _pendingFiles[section];
-    if (!file) return;
-    pushUndo();
-    const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
-    const preview = document.getElementById('img-preview-' + section);
-    const applied = document.getElementById('img-applied-' + section);
-    const content = document.getElementById('img-content-' + section);
-    const slider  = applied.querySelector('input[type="range"]');
-    const valEl   = document.getElementById('img-size-val-' + section);
-    preview.style.display = 'none';
-    applied.style.display = 'block';
-    if (slider) slider.value = 100;
-    if (valEl)  valEl.textContent = '100%';
-    if (isPDF) {
-      content.innerHTML = '<div style="padding:12px; color:#7b2fbe; font-weight:700;">&#9203; Rendering PDF pages…</div>';
-      const reader = new FileReader();
-      reader.onload = async function(e) {
-        try {
-          const pdfData = new Uint8Array(e.target.result);
-          const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
-          content.innerHTML = '';
-          for (let p = 1; p <= pdf.numPages; p++) {
-            const page = await pdf.getPage(p);
-            const desiredWidth = content.offsetWidth || 750;
-            const viewport0 = page.getViewport({ scale: 1 });
-            const scale = desiredWidth / viewport0.width;
-            const viewport = page.getViewport({ scale });
-            const canvas = document.createElement('canvas');
-            canvas.width  = viewport.width;
-            canvas.height = viewport.height;
-            canvas.style.width  = '100%';
-            canvas.style.height = 'auto';
-            canvas.style.display = 'block';
-            canvas.style.marginBottom = '2px';
-            canvas.className = 'pdf-page-img';
-            const ctx = canvas.getContext('2d');
-            await page.render({ canvasContext: ctx, viewport }).promise;
-            content.appendChild(canvas);
-          }
-          const sizeBar = applied.querySelector('.img-applied-controls');
-          if (sizeBar) {
-            const rangeEl = sizeBar.querySelector('input[type="range"]');
-            const lbl     = sizeBar.querySelector('label');
-            const sv      = sizeBar.querySelector('.size-val');
-            if (rangeEl) rangeEl.style.display = 'none';
-            if (lbl)     lbl.style.display     = 'none';
-            if (sv)      sv.style.display      = 'none';
-          }
-          showToast('\u{1F4C4} PDF embedded (' + pdf.numPages + ' page' + (pdf.numPages > 1 ? 's' : '') + ')!');
-        } catch(err) {
-          content.innerHTML = '<div style="padding:12px; color:#e74c3c;">&#9888; Could not render PDF: ' + err.message + '</div>';
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    } else {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        content.innerHTML = '';
+function saveTemplate() {
+  try {
+    // Convert canvas → img before saving
+    document.querySelectorAll('[id^="img-content-"] canvas').forEach(canvas => {
+      try {
         const img = document.createElement('img');
-        img.src   = e.target.result;
-        img.alt   = 'Section image';
-        img.style.cssText = 'width:100%; height:auto; display:block; object-fit:contain;';
-        content.appendChild(img);
-        showToast('\u2705 Image applied!');
-      };
-      reader.readAsDataURL(file);
-    }
-    delete _pendingFiles[section];
-  }
-
-  function cancelPreview(section) {
-    delete _pendingFiles[section];
-    document.getElementById('img-preview-' + section).style.display  = 'none';
-    document.getElementById('img-dropzone-' + section).style.display = 'flex';
-  }
-
-  function resizeApplied(section, val) {
-    const content = document.getElementById('img-content-' + section);
-    const valEl   = document.getElementById('img-size-val-' + section);
-    if (content) {
-      const imgs = content.querySelectorAll('img, canvas');
-      imgs.forEach(el => { el.style.width = val + '%'; });
-    }
-    if (valEl) valEl.textContent = val + '%';
-  }
-
-  function replaceImg(section) {
-    const input = document.getElementById('img-replace-' + section);
-    if (input) input.click();
-  }
-
-  function removeApplied(section) {
-    if (!confirm('Remove this image from the template?')) return;
-    pushUndo();
-    const applied  = document.getElementById('img-applied-' + section);
-    const dropzone = document.getElementById('img-dropzone-' + section);
-    const content  = document.getElementById('img-content-' + section);
-    if (content) content.innerHTML = '';
-    applied.style.display  = 'none';
-    dropzone.style.display = 'flex';
-    const sizeBar = applied.querySelector('.img-applied-controls');
-    if (sizeBar) {
-      sizeBar.querySelectorAll('input[type="range"], label, .size-val').forEach(el => el.style.display = '');
-    }
-    showToast('Image removed.');
-  }
-
-  // ═══════════════════════════════════════════════════════
-  // AUTO-CAPTURE UNDO ON EDITS (debounced)
-  // ═══════════════════════════════════════════════════════
-  let debounceTimer = null;
-  function reattachListeners() {
-    document.querySelectorAll('[contenteditable="true"]').forEach(el => {
-      el.removeEventListener('focus', onFocusCapture);
-      el.addEventListener('focus', onFocusCapture);
+        img.src = canvas.toDataURL('image/png');
+        img.style.cssText = canvas.style.cssText;
+        img.className = canvas.className;
+        canvas.parentNode.replaceChild(img, canvas);
+      } catch(e) {}
     });
-  }
-  function onFocusCapture() {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(pushUndo, 300);
-  }
+    const data = { v: 5, at: new Date().toLocaleString(), html: document.getElementById('page-content').innerHTML };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    const ind = document.getElementById('save-indicator');
+    if (ind) ind.textContent = 'Saved ' + data.at;
+    showToast('&#128190; Saved!');
+  } catch(e) { showToast('Could not save: ' + e.message, 'error'); }
+}
 
-  // ═══════════════════════════════════════════════════════
-  // DRAG-DROP WIRING
-  // ═══════════════════════════════════════════════════════
-  function wireDragDrop(zone) {
-    zone.addEventListener('dragover', function(e) {
-      e.preventDefault();
-      zone.style.borderColor = '#7b2fbe';
-      zone.style.background  = '#f0e6ff';
-    });
-    zone.addEventListener('dragleave', function() {
-      zone.style.borderColor = '';
-      zone.style.background  = '';
-    });
-    zone.addEventListener('drop', function(e) {
-      e.preventDefault();
-      zone.style.borderColor = '';
-      zone.style.background  = '';
-      const block = zone.closest('.section-img-block');
-      if (!block) return;
-      const section = block.id.replace('img-block-', '');
-      const input = document.getElementById('img-input-' + section);
-      if (!input || !e.dataTransfer.files.length) return;
-      const dt = new DataTransfer();
-      dt.items.add(e.dataTransfer.files[0]);
-      input.files = dt.files;
-      handleImgSelect(input, section);
-    });
-  }
+function autoLoad() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (!data.html) return;
+    document.getElementById('page-content').innerHTML = data.html;
+    afterRestore();
+    const ind = document.getElementById('save-indicator');
+    if (ind) ind.textContent = 'Saved ' + (data.at || '—');
+  } catch(e) { console.warn('autoLoad:', e); }
+}
 
-  // ═══════════════════════════════════════════════════════
-  // ADD CUSTOM SECTION
-  // ═══════════════════════════════════════════════════════
-  let customSectionCount = 0;
-
-  function addCustomSection() {
-    pushUndo();
-    customSectionCount++;
-    const sid = 'custom' + customSectionCount;
-    const listId = sid + '-list';
-
-    const section = document.createElement('div');
-    section.className = 'section';
-    section.id = 'section-' + sid;
-    section.innerHTML = `
-      <div class="section-header">
-        <div class="section-title" contenteditable="true" spellcheck="false"
-             style="flex:1; outline:none; min-width:80px;"
-             onfocus="if(this.textContent.trim()==='New Section') { const r=document.createRange(); r.selectNodeContents(this); window.getSelection().removeAllRanges(); window.getSelection().addRange(r); }"
-        >New Section</div>
-        <button class="btn-section-clear no-print" onclick="clearSection('${listId}')" title="Clear section">&#128465; Clear</button>
-        <button class="no-print" onclick="removeCustomSection('section-${sid}')" title="Remove this section"
-          style="background:#ff4d4d; color:#fff; border:none; border-radius:50%; width:26px; height:26px; font-size:1rem; cursor:pointer; line-height:1; flex-shrink:0;">&#10005;</button>
-      </div>
-      <div class="section-body" id="body-${sid}">
-        <ul class="bullet-list" id="${listId}">
-          <li>
-            <span class="item-text" contenteditable="true" spellcheck="false">Enter item here...</span>
-            <button class="remove-btn no-print" onclick="pushUndo();removeItem(this)" title="Remove">&#10005;</button>
-          </li>
-        </ul>
-        <button class="add-btn no-print" onclick="addItem('${listId}')">+ Add Item</button>
-      </div>
-      <div class="resize-hint no-print"></div>
-      <div class="section-img-block" id="img-block-${sid}">
-        <div class="img-dropzone" id="img-dropzone-${sid}">
-          <span class="dz-icon">&#128247;</span>
-          <span class="dz-label">Click or drag an image or PDF here</span>
-          <span class="dz-sub">Select file &rarr; preview &rarr; click Apply to embed into template</span>
-          <input type="file" id="img-input-${sid}" accept="image/*,application/pdf" onchange="handleImgSelect(this,'${sid}')" />
-        </div>
-        <div class="img-preview-panel" id="img-preview-${sid}">
-          <div class="preview-label">&#128247; Preview &mdash; click Apply to embed into the template</div>
-          <img class="preview-thumb" id="img-thumb-${sid}" src="" alt="preview" style="display:none;" />
-          <div class="pdf-preview-label" id="pdf-label-${sid}" style="display:none;"></div>
-          <div class="preview-actions">
-            <button class="btn-apply" onclick="applyImg('${sid}')">&#10003; Apply to Template</button>
-            <button class="btn-cancel-preview" onclick="cancelPreview('${sid}')">&#10005; Cancel</button>
-          </div>
-        </div>
-        <div class="img-applied" id="img-applied-${sid}">
-          <div class="img-applied-controls no-print">
-            <label>&#8596; Width</label>
-            <input type="range" min="25" max="100" value="100" oninput="resizeApplied('${sid}',this.value)" />
-            <span class="size-val" id="img-size-val-${sid}">100%</span>
-            <button onclick="replaceImg('${sid}')">&#8635; Replace</button>
-            <button onclick="removeApplied('${sid}')">&#10005; Remove</button>
-            <input type="file" id="img-replace-${sid}" accept="image/*,application/pdf" onchange="handleImgSelect(this,'${sid}')" style="display:none" />
-          </div>
-          <div id="img-content-${sid}" style="width:100%; text-align:center; background:#fff;"></div>
-        </div>
-      </div>
-    `;
-
-    document.getElementById('custom-sections-container').appendChild(section);
-    wireDragDrop(section.querySelector('.img-dropzone'));
-    reattachListeners();
-
-    const titleEl = section.querySelector('.section-title');
-    titleEl.focus();
-    const range = document.createRange();
-    range.selectNodeContents(titleEl);
-    window.getSelection().removeAllRanges();
-    window.getSelection().addRange(range);
-
-    showToast('&#10010; New section added!');
-  }
-
-  function removeCustomSection(sectionId) {
-    pushUndo();
-    const el = document.getElementById(sectionId);
-    if (el) {
-      el.style.transition = 'opacity 0.2s';
-      el.style.opacity = '0';
-      setTimeout(() => { el.remove(); }, 200);
+function restoreImgVisibility() {
+  document.querySelectorAll('[id^="img-content-"]').forEach(content => {
+    if (content.children.length > 0) {
+      const sid = content.id.replace('img-content-', '');
+      const applied  = document.getElementById('img-applied-' + sid);
+      const dropzone = document.getElementById('img-dropzone-' + sid);
+      const preview  = document.getElementById('img-preview-' + sid);
+      if (applied)  applied.style.display  = 'block';
+      if (dropzone) dropzone.style.display  = 'none';
+      if (preview)  preview.style.display   = 'none';
     }
-    showToast('Section removed. Press &#8630; Undo to restore.');
-  }
-
-  // ═══════════════════════════════════════════════════════
-  // INIT
-  // ═══════════════════════════════════════════════════════
-  document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.img-dropzone').forEach(wireDragDrop);
-    autoLoad();
-    reattachListeners();
-    updateUndoRedoBtns();
-    updateHighlightPreview(document.getElementById('fmt-highlight-color').value);
   });
-</script>
+}
 
+function resetTemplate() {
+  if (!confirm('Erase saved data and restore the blank template?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+}
+
+/* ══════════════════════════════════════════════════════════
+   CLEAR ALL
+══════════════════════════════════════════════════════════ */
+function clearAll() {
+  if (!confirm('Clear ALL content? You can Undo this.')) return;
+  pushUndo();
+  document.querySelectorAll('[contenteditable="true"]').forEach(el => { el.innerHTML = ''; });
+  showToast('All content cleared — press Undo to restore');
+}
+
+/* ══════════════════════════════════════════════════════════
+   FORMATTING
+══════════════════════════════════════════════════════════ */
+let _savedRange = null, _lastFocused = null;
+
+document.addEventListener('focusin', e => {
+  if (e.target && e.target.getAttribute('contenteditable') === 'true') _lastFocused = e.target;
+});
+document.addEventListener('mouseup', e => { if (_lastFocused && _lastFocused.contains(e.target)) saveSelection(); });
+document.addEventListener('keyup',   e => { if (_lastFocused && _lastFocused.contains(e.target)) saveSelection(); });
+
+function saveSelection() {
+  const sel = window.getSelection();
+  if (sel && sel.rangeCount > 0) _savedRange = sel.getRangeAt(0).cloneRange();
+}
+function restoreSelection() {
+  if (_savedRange) { const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(_savedRange); }
+}
+function hasSelection() {
+  restoreSelection();
+  const sel = window.getSelection();
+  return sel && sel.rangeCount > 0 && !sel.isCollapsed;
+}
+
+function wrapSel(tag, style) {
+  if (!hasSelection()) { showToast('Select some text first', 'error'); return false; }
+  pushUndo();
+  const sel = window.getSelection();
+  const range = sel.getRangeAt(0);
+  const el = document.createElement(tag);
+  if (style) el.setAttribute('style', style);
+  try { range.surroundContents(el); }
+  catch(err) { const f = range.extractContents(); el.appendChild(f); range.insertNode(el); }
+  return true;
+}
+
+function applyFont(v) {
+  if (!v) return;
+  if (!hasSelection()) { showToast('Select some text first', 'error'); document.getElementById('fmt-font').value = ''; return; }
+  pushUndo(); document.execCommand('fontName', false, v);
+  document.getElementById('fmt-font').value = '';
+}
+function applyFontSize(v) {
+  if (!v) return;
+  wrapSel('span', 'font-size:' + v + ';');
+  document.getElementById('fmt-size').value = '';
+}
+function applyBold()      { if (!hasSelection()) { showToast('Select some text first', 'error'); return; } pushUndo(); document.execCommand('bold',      false, null); syncFmtBtns(); }
+function applyItalic()    { if (!hasSelection()) { showToast('Select some text first', 'error'); return; } pushUndo(); document.execCommand('italic',    false, null); syncFmtBtns(); }
+function applyUnderline() { if (!hasSelection()) { showToast('Select some text first', 'error'); return; } pushUndo(); document.execCommand('underline', false, null); syncFmtBtns(); }
+function applyHighlight() {
+  const c = document.getElementById('fmt-hl-color').value;
+  wrapSel('mark', 'background:' + c + '; padding:1px 3px; border-radius:2px;');
+}
+function removeHighlight() {
+  restoreSelection();
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount) { showToast('Select highlighted text first', 'error'); return; }
+  pushUndo();
+  const range = sel.getRangeAt(0);
+  const anc = range.commonAncestorContainer.nodeType === 3 ? range.commonAncestorContainer.parentNode : range.commonAncestorContainer;
+  anc.querySelectorAll('mark, .highlight').forEach(m => {
+    if (sel.containsNode(m, true)) { const p = m.parentNode; while (m.firstChild) p.insertBefore(m.firstChild, m); p.removeChild(m); }
+  });
+}
+function applyTextColor(c) {
+  if (!hasSelection()) { showToast('Select some text first', 'error'); return; }
+  pushUndo(); document.execCommand('foreColor', false, c);
+}
+function syncFmtBtns() {
+  ['bold','italic','underline'].forEach(cmd => {
+    const btn = document.getElementById('btn-' + cmd);
+    if (btn) btn.classList.toggle('active', document.queryCommandState(cmd));
+  });
+}
+document.addEventListener('selectionchange', syncFmtBtns);
+
+/* ══════════════════════════════════════════════════════════
+   BULLET LIST HELPERS
+══════════════════════════════════════════════════════════ */
+function addItem(listId) {
+  pushUndo();
+  const list = document.getElementById(listId);
+  if (!list) return;
+  const li = document.createElement('li');
+  li.innerHTML = '<span class="item-text" contenteditable="true" spellcheck="false" data-empty="Type here..."></span><button class="remove-btn no-print" onclick="pushUndo();removeItem(this)" title="Remove">&#10005;</button>';
+  list.appendChild(li);
+  const span = li.querySelector('.item-text');
+  span.focus();
+  const r = document.createRange(); r.selectNodeContents(span);
+  const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+}
+function removeItem(btn) { pushUndo(); btn.closest('li').remove(); }
+function removeRow(btn)  { pushUndo(); btn.closest('tr').remove(); }
+
+function addStoreRow() {
+  pushUndo();
+  const tbody = document.getElementById('store-tbody');
+  if (!tbody) return;
+  const tr = document.createElement('tr');
+  tr.innerHTML = '<td class="store-name-cell" contenteditable="true" spellcheck="false">Store Name</td><td contenteditable="true" spellcheck="false">047</td><td contenteditable="true" spellcheck="false">0099</td><td contenteditable="true" spellcheck="false">0.0</td><td contenteditable="true" spellcheck="false">—</td><td contenteditable="true" spellcheck="false">0.0%</td><td contenteditable="true" spellcheck="false">—</td><td contenteditable="true" spellcheck="false">0.0%</td><td contenteditable="true" spellcheck="false">—</td><td contenteditable="true" spellcheck="false">0.0%</td><td contenteditable="true" spellcheck="false">—</td><td class="no-print"><button class="remove-row-btn" onclick="pushUndo();removeRow(this)">&#10005;</button></td>';
+  tbody.appendChild(tr);
+  tr.querySelector('td').focus();
+}
+
+function addRecapRow() {
+  pushUndo();
+  const tbody = document.getElementById('recap-tbody');
+  if (!tbody) return;
+  const tr = document.createElement('tr');
+  tr.innerHTML = '<td class="date-cell" contenteditable="true" spellcheck="false">Date</td><td class="topic-cell" contenteditable="true" spellcheck="false">Category</td><td contenteditable="true" spellcheck="false">Enter content here...</td><td class="no-print"><button class="remove-row-btn" onclick="pushUndo();removeRow(this)">&#10005;</button></td>';
+  tbody.appendChild(tr);
+  tr.querySelector('td').focus();
+}
+
+/* ══════════════════════════════════════════════════════════
+   ADD CUSTOM SECTION
+══════════════════════════════════════════════════════════ */
+let _customCount = 0;
+function addCustomSection() {
+  pushUndo();
+  _customCount++;
+  const sid = 'custom' + _customCount;
+  const listId = sid + '-list';
+  const cardId = 'sc-' + sid;
+  const bodyId = 'body-' + sid;
+
+  const card = document.createElement('div');
+  card.className = 'section-card';
+  card.id = cardId;
+  card.innerHTML = `
+    <div class="section-head">
+      <div class="section-head-accent"></div>
+      <div class="section-head-title" contenteditable="true" spellcheck="false" data-empty="Section Title"
+           onfocus="const r=document.createRange();r.selectNodeContents(this);window.getSelection().removeAllRanges();window.getSelection().addRange(r);"
+      >New Section</div>
+      <div class="section-head-actions no-print">
+        <button class="sh-btn sh-clear" onclick="clearSectionCard('${cardId}')" title="Clear section content">
+          <svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 002 2h8a2 2 0 002-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+        </button>
+        <button class="sh-btn sh-delete" onclick="deleteSectionCard('${cardId}')" title="Delete this section">
+          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="section-body" id="${bodyId}">
+      <ul class="bullet-list" id="${listId}">
+        <li><span class="item-text" contenteditable="true" spellcheck="false" data-empty="Type here..."></span><button class="remove-btn no-print" onclick="pushUndo();removeItem(this)" title="Remove">&#10005;</button></li>
+      </ul>
+      <button class="add-btn no-print" onclick="addItem('${listId}')">+ Add Item</button>
+      <div class="section-img-block" id="img-block-${sid}">
+        <div class="img-dropzone" id="img-dropzone-${sid}"><span class="dz-icon">&#128247;</span><span class="dz-label">Click or drag an image / PDF here</span><span class="dz-sub">Select → preview → Apply to embed</span><input type="file" id="img-input-${sid}" accept="image/*,application/pdf" onchange="handleImgSelect(this,'${sid}')" /></div>
+        <div class="img-preview-panel" id="img-preview-${sid}"><div class="preview-label">Preview — click Apply to embed</div><img class="preview-thumb" id="img-thumb-${sid}" src="" alt="preview" style="display:none;" /><div class="pdf-preview-label" id="pdf-label-${sid}" style="display:none;"></div><div class="preview-actions"><button class="btn-apply" onclick="applyImg('${sid}')">&#10003; Apply</button><button class="btn-cancel-preview" onclick="cancelPreview('${sid}')">&#10005; Cancel</button></div></div>
+        <div class="img-applied" id="img-applied-${sid}"><div class="img-applied-controls no-print"><label>&#8596; Width</label><input type="range" min="25" max="100" value="100" oninput="resizeApplied('${sid}',this.value)" /><span class="size-val" id="img-size-val-${sid}">100%</span><button onclick="replaceImg('${sid}')">&#8635; Replace</button><button onclick="removeApplied('${sid}')">&#10005; Remove</button><input type="file" id="img-replace-${sid}" accept="image/*,application/pdf" onchange="handleImgSelect(this,'${sid}')" style="display:none" /></div><div id="img-content-${sid}" style="width:100%;text-align:center;background:#fff;"></div></div>
+      </div>
+    </div>
+    <div class="resize-handle no-print" data-target="${bodyId}"></div>
+  `;
+
+  document.getElementById('custom-sections-container').appendChild(card);
+  wireResizeHandle(card.querySelector('.resize-handle'));
+  wireDragDrop(card.querySelector('.img-dropzone'));
+  reattachListeners();
+
+  const title = card.querySelector('.section-head-title');
+  title.focus();
+  const r = document.createRange(); r.selectNodeContents(title);
+  window.getSelection().removeAllRanges(); window.getSelection().addRange(r);
+
+  showToast('New section added');
+}
+
+/* ══════════════════════════════════════════════════════════
+   IMAGE / PDF UPLOAD
+══════════════════════════════════════════════════════════ */
+const _pending = {};
+
+function handleImgSelect(input, sid) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  _pending[sid] = file;
+  input.value = '';
+  const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+  document.getElementById('img-dropzone-' + sid).style.display = 'none';
+  document.getElementById('img-preview-' + sid).style.display  = 'block';
+  const thumb  = document.getElementById('img-thumb-' + sid);
+  const pdfLbl = document.getElementById('pdf-label-' + sid);
+  if (isPDF) {
+    thumb.style.display = 'none'; pdfLbl.style.display = 'block';
+    pdfLbl.textContent = '📄 PDF: "' + file.name + '" — all pages will be embedded when you click Apply';
+  } else {
+    pdfLbl.style.display = 'none'; thumb.style.display = 'block';
+    const fr = new FileReader(); fr.onload = e => { thumb.src = e.target.result; }; fr.readAsDataURL(file);
+  }
+}
+
+function applyImg(sid) {
+  const file = _pending[sid]; if (!file) return;
+  pushUndo();
+  const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+  const preview = document.getElementById('img-preview-' + sid);
+  const applied = document.getElementById('img-applied-' + sid);
+  const content = document.getElementById('img-content-' + sid);
+  const slider  = applied.querySelector('input[type="range"]');
+  const valEl   = document.getElementById('img-size-val-' + sid);
+  preview.style.display = 'none'; applied.style.display = 'block';
+  if (slider) slider.value = 100; if (valEl) valEl.textContent = '100%';
+  if (isPDF) {
+    content.innerHTML = '<div style="padding:12px;color:#7b2fbe;font-weight:700;">⏳ Rendering PDF…</div>';
+    const fr = new FileReader();
+    fr.onload = async function(e) {
+      try {
+        const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(e.target.result) }).promise;
+        content.innerHTML = '';
+        for (let p = 1; p <= pdf.numPages; p++) {
+          const page = await pdf.getPage(p);
+          const dw = content.offsetWidth || 750;
+          const vp0 = page.getViewport({ scale: 1 });
+          const vp  = page.getViewport({ scale: dw / vp0.width });
+          const canvas = document.createElement('canvas');
+          canvas.width = vp.width; canvas.height = vp.height;
+          canvas.style.cssText = 'width:100%;height:auto;display:block;margin-bottom:2px;';
+          canvas.className = 'pdf-page-img';
+          await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+          content.appendChild(canvas);
+        }
+        const sb = applied.querySelector('.img-applied-controls');
+        if (sb) sb.querySelectorAll('input[type="range"],label,.size-val').forEach(el => el.style.display = 'none');
+        showToast('📄 PDF embedded (' + pdf.numPages + ' page' + (pdf.numPages > 1 ? 's' : '') + ')');
+      } catch(err) { content.innerHTML = '<div style="padding:12px;color:#e74c3c;">⚠ Could not render PDF: ' + err.message + '</div>'; }
+    };
+    fr.readAsArrayBuffer(file);
+  } else {
+    const fr = new FileReader();
+    fr.onload = function(e) {
+      content.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = e.target.result; img.alt = 'Section image';
+      img.style.cssText = 'width:100%;height:auto;display:block;object-fit:contain;';
+      content.appendChild(img);
+      showToast('✅ Image applied');
+    };
+    fr.readAsDataURL(file);
+  }
+  delete _pending[sid];
+}
+
+function cancelPreview(sid) {
+  delete _pending[sid];
+  document.getElementById('img-preview-' + sid).style.display  = 'none';
+  document.getElementById('img-dropzone-' + sid).style.display = 'flex';
+}
+function resizeApplied(sid, val) {
+  const c = document.getElementById('img-content-' + sid);
+  const v = document.getElementById('img-size-val-' + sid);
+  if (c) c.querySelectorAll('img,canvas').forEach(el => { el.style.width = val + '%'; });
+  if (v) v.textContent = val + '%';
+}
+function replaceImg(sid) { const i = document.getElementById('img-replace-' + sid); if (i) i.click(); }
+function removeApplied(sid) {
+  if (!confirm('Remove this image?')) return;
+  pushUndo();
+  const applied  = document.getElementById('img-applied-' + sid);
+  const dropzone = document.getElementById('img-dropzone-' + sid);
+  const content  = document.getElementById('img-content-' + sid);
+  if (content) content.innerHTML = '';
+  applied.style.display = 'none'; dropzone.style.display = 'flex';
+  const sb = applied.querySelector('.img-applied-controls');
+  if (sb) sb.querySelectorAll('input[type="range"],label,.size-val').forEach(el => el.style.display = '');
+  showToast('Image removed');
+}
+
+/* ══════════════════════════════════════════════════════════
+   DRAG-DROP for image zones
+══════════════════════════════════════════════════════════ */
+function wireDragDrop(zone) {
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = '#7b2fbe'; zone.style.background = '#f0e6ff'; });
+  zone.addEventListener('dragleave', () => { zone.style.borderColor = ''; zone.style.background = ''; });
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.style.borderColor = ''; zone.style.background = '';
+    const block = zone.closest('.section-img-block'); if (!block) return;
+    const sid = block.id.replace('img-block-', '');
+    const input = document.getElementById('img-input-' + sid);
+    if (!input || !e.dataTransfer.files.length) return;
+    const dt = new DataTransfer(); dt.items.add(e.dataTransfer.files[0]);
+    input.files = dt.files; handleImgSelect(input, sid);
+  });
+}
+function wireAllDragDrop() { document.querySelectorAll('.img-dropzone').forEach(wireDragDrop); }
+
+/* ══════════════════════════════════════════════════════════
+   AUTO-CAPTURE UNDO ON FOCUS
+══════════════════════════════════════════════════════════ */
+let _debounce = null;
+function reattachListeners() {
+  document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+    el.removeEventListener('focus', _onFocus);
+    el.addEventListener('focus', _onFocus);
+  });
+}
+function _onFocus() { clearTimeout(_debounce); _debounce = setTimeout(pushUndo, 400); }
+
+/* ══════════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', function() {
+  wireAllDragDrop();
+  wireAllResizeHandles();
+  autoLoad();
+  reattachListeners();
+  syncUndoUI();
+});
+</script>
 </body>
 </html>
