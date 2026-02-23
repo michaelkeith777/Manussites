@@ -667,9 +667,9 @@
     <span class="save-indicator" id="save-indicator" title="Click Save File to download — then open that file next time">Open saved file to resume</span>
   </div>
   <div class="toolbar-sep"></div>
-  <button class="tb-btn accent" onclick="window.print()">
+  <button class="tb-btn accent" onclick="prepareForPrint()" title="Opens a clean, perfectly aligned print preview">
     <svg viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7a1 1 0 110-2 1 1 0 010 2zm-1-9H6v4h12V3z"></path></svg>
-    Print / PDF
+    Prepare for Print
   </button>
   <button class="tb-btn" onclick="resetTemplate()" title="Reload the original blank template">
     <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"></path></svg>
@@ -1690,6 +1690,193 @@ function addCustomSection() {
   const r = document.createRange(); r.selectNodeContents(title);
   window.getSelection().removeAllRanges(); window.getSelection().addRange(r);
   showToast('New section added');
+}
+
+/* ══════════════════════════════════════════════════════════
+   PREPARE FOR PRINT
+   Opens a new window with a clean, pixel-perfect print layout
+   that bypasses all browser CSS print quirks.
+══════════════════════════════════════════════════════════ */
+function prepareForPrint() {
+  // Collect all images/canvases as data-URLs so they survive the new window
+  document.querySelectorAll('.file-item-content img').forEach(img => {
+    if (img.src && !img.dataset.printSrc) img.dataset.printSrc = img.src;
+  });
+  document.querySelectorAll('.file-item-content canvas').forEach(canvas => {
+    try { canvas.dataset.printSrc = canvas.toDataURL('image/png'); } catch(e) {}
+  });
+
+  // ── Build clean HTML for the print window ──────────────────
+  const docTitle = document.querySelector('.header-banner h2');
+  const title = docTitle ? docTitle.innerText.trim() : 'DLC Notes';
+
+  // Header meta fields
+  let metaHtml = '';
+  document.querySelectorAll('.header-sub .field-group').forEach(fg => {
+    const lbl = fg.querySelector('label');
+    const val = fg.querySelector('.editable-field');
+    if (lbl && val) {
+      metaHtml += `<div class="meta-item"><span class="meta-label">${lbl.innerText.trim()}</span><span class="meta-val">${val.innerText.trim()}</span></div>`;
+    }
+  });
+
+  // Sections
+  let sectionsHtml = '';
+  document.querySelectorAll('.section-card').forEach(card => {
+    const headTitle = card.querySelector('.section-head-title');
+    if (!headTitle) return;
+    const sectionTitle = headTitle.innerText.trim();
+
+    // Bullet items
+    let itemsHtml = '';
+    card.querySelectorAll('.bullet-list .item-text').forEach(item => {
+      const txt = item.innerHTML.trim();
+      if (txt) itemsHtml += `<li>${txt}</li>`;
+    });
+
+    // Tables
+    let tablesHtml = '';
+    card.querySelectorAll('.data-table').forEach(tbl => {
+      tablesHtml += '<table class="p-table">';
+      tbl.querySelectorAll('tr').forEach(row => {
+        tablesHtml += '<tr>';
+        row.querySelectorAll('th, td').forEach(cell => {
+          // Skip the no-print remove-button cells
+          if (cell.classList.contains('no-print')) return;
+          const tag = cell.tagName.toLowerCase();
+          const cls = cell.className.replace('no-print','').trim();
+          tablesHtml += `<${tag} class="${cls}">${cell.innerHTML}</${tag}>`;
+        });
+        tablesHtml += '</tr>';
+      });
+      tablesHtml += '</table>';
+    });
+
+    // Attachments (images + PDF canvases)
+    let attachHtml = '';
+    card.querySelectorAll('.file-item').forEach(item => {
+      const nameEl = item.querySelector('.file-item-name');
+      const name   = nameEl ? nameEl.innerText.trim() : 'Attachment';
+      const iconEl = item.querySelector('.file-item-icon');
+      const icon   = iconEl ? iconEl.innerText : '📎';
+
+      let mediaHtml = '';
+      item.querySelectorAll('.file-item-content img').forEach(img => {
+        const src = img.dataset.printSrc || img.src;
+        if (src) {
+          const w = img.style.width || '100%';
+          mediaHtml += `<img src="${src}" style="max-width:${w};width:${w};height:auto;display:block;margin:0 auto 4px;" />`;
+        }
+      });
+      item.querySelectorAll('.file-item-content canvas').forEach(canvas => {
+        const src = canvas.dataset.printSrc;
+        if (src) mediaHtml += `<img src="${src}" style="max-width:100%;width:100%;height:auto;display:block;margin:0 auto 4px;" />`;
+      });
+
+      if (mediaHtml) {
+        attachHtml += `<div class="p-attach">
+          <div class="p-attach-name">${icon} ${name}</div>
+          ${mediaHtml}
+        </div>`;
+      }
+    });
+
+    const hasContent = itemsHtml || tablesHtml || attachHtml;
+    if (!hasContent && !sectionTitle) return;
+
+    sectionsHtml += `
+      <div class="p-section">
+        <div class="p-section-head">
+          <div class="p-section-accent"></div>
+          <div class="p-section-title">${sectionTitle}</div>
+        </div>
+        <div class="p-section-body">
+          ${itemsHtml ? `<ul class="p-list">${itemsHtml}</ul>` : ''}
+          ${tablesHtml}
+          ${attachHtml}
+        </div>
+      </div>`;
+  });
+
+  // ── Print window CSS ────────────────────────────────────────
+  const css = `
+    @page { margin: 0.6in 0.55in; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10pt; color: #1a1a2e; background: #fff; }
+
+    /* Header */
+    .p-header { background: linear-gradient(135deg, #f5a623 0%, #e07b00 100%); padding: 12px 18px 10px; }
+    .p-header h1 { font-size: 16pt; font-weight: 800; color: #fff; margin: 0; }
+    .p-meta { background: #fff8ee; border-left: 5px solid #f5a623; padding: 7px 18px; display: flex; flex-wrap: wrap; gap: 18px; align-items: center; }
+    .meta-item { display: flex; align-items: center; gap: 5px; }
+    .meta-label { font-size: 7pt; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.4px; }
+    .meta-val   { font-size: 10pt; font-weight: 600; color: #333; }
+
+    /* Sections */
+    .p-section { border: 1px solid #d0d0d8; border-radius: 5px; margin: 8px 0; page-break-inside: avoid; break-inside: avoid; overflow: hidden; }
+    .p-section-head { display: flex; align-items: center; background: linear-gradient(90deg, #1e1e3f 0%, #2a2a52 100%); min-height: 26px; }
+    .p-section-accent { width: 4px; min-height: 26px; background: #f5a623; flex-shrink: 0; margin-right: 10px; }
+    .p-section-title { font-size: 8pt; font-weight: 700; color: #f0f0ff; text-transform: uppercase; letter-spacing: 1px; padding: 5px 6px; }
+    .p-section-body { padding: 7px 12px 6px; }
+
+    /* Bullet list */
+    .p-list { list-style: none; padding: 0; margin: 0 0 4px; }
+    .p-list li { display: flex; align-items: flex-start; gap: 7px; margin-bottom: 3px; padding: 2px 4px; page-break-inside: avoid; break-inside: avoid; }
+    .p-list li::before { content: '\2022'; color: #f5a623; font-size: 1rem; line-height: 1.5; flex-shrink: 0; }
+
+    /* Tables */
+    .p-table { width: 100%; border-collapse: collapse; font-size: 8pt; margin-top: 5px; }
+    .p-table th { background: #1a1a2e; color: #f5a623; padding: 5px 7px; font-size: 7pt; text-align: left; border: 1px solid #333; white-space: normal; word-break: break-word; }
+    .p-table td { padding: 4px 7px; border: 1px solid #ddd; vertical-align: top; font-size: 8pt; word-break: break-word; white-space: normal; }
+    .p-table tr:nth-child(even) td { background: #f8f8f8; }
+    .store-table th, .store-table td { text-align: center; }
+    .store-table .store-name-cell { text-align: left; font-weight: 600; }
+    .date-cell { font-weight: 700; color: #4a1a7a; }
+    .topic-cell { font-weight: 700; color: #1a1a2e; }
+
+    /* Attachments */
+    .p-attach { border: 1px solid #e0e0e0; border-radius: 4px; margin-top: 6px; overflow: hidden; page-break-inside: avoid; break-inside: avoid; }
+    .p-attach-name { font-size: 7pt; font-weight: 700; color: #555; background: #f5f5f5; padding: 3px 8px; border-bottom: 1px solid #e0e0e0; }
+    .p-attach img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+
+    /* Highlight */
+    mark, .highlight { background: #ffe066; padding: 1px 2px; border-radius: 2px; }
+  `;
+
+  // ── Assemble and open ────────────────────────────────────────
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${title}</title>
+  <style>${css}</style>
+</head>
+<body>
+  <div class="p-header"><h1>${title}</h1></div>
+  <div class="p-meta">${metaHtml}</div>
+  ${sectionsHtml}
+</body>
+</html>`;
+
+  const pw = window.open('', '_blank', 'width=900,height=700');
+  if (!pw) { showToast('Pop-up blocked — allow pop-ups and try again', 'error'); return; }
+  pw.document.open();
+  pw.document.write(html);
+  pw.document.close();
+
+  // Wait for images to load, then auto-print
+  pw.onload = function() {
+    setTimeout(function() {
+      pw.focus();
+      pw.print();
+    }, 600);
+  };
+  // Fallback if onload doesn't fire (some browsers)
+  setTimeout(function() {
+    try { if (pw && !pw.closed) { pw.focus(); pw.print(); } } catch(e) {}
+  }, 1800);
+
+  showToast('Print preview ready — check the new window', 'info');
 }
 
 /* ══════════════════════════════════════════════════════════
