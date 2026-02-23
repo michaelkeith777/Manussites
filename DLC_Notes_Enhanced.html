@@ -30,67 +30,31 @@
       .recap-table th, .store-table th { background: #1a1a2e !important; color: #f5a623 !important; }
       .doc-footer { background: #1a1a2e !important; }
       .highlight { background: #ffe066 !important; }
-      .img-applied { display: block !important; }
-      .img-dropzone, .img-preview-panel, .img-applied-controls { display: none !important; }
-      .section-img-block { border: none !important; background: transparent !important; }
+      .file-item-img { display: block !important; }
+      .file-gallery-dropzone, .file-item-controls { display: none !important; }
     }
 
     /* ══════════════════════════════════════════════
        TOP TOOLBAR
     ══════════════════════════════════════════════ */
     .toolbar {
-      position: sticky;
-      top: 0;
-      z-index: 300;
+      position: sticky; top: 0; z-index: 300;
       background: linear-gradient(90deg, #12122a 0%, #1e1e3f 100%);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 0 20px;
-      height: 48px;
-      flex-wrap: nowrap;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.4);
-      overflow-x: auto;
+      display: flex; align-items: center; gap: 8px;
+      padding: 0 20px; height: 48px; flex-wrap: nowrap;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.4); overflow-x: auto;
     }
     .toolbar::-webkit-scrollbar { height: 3px; }
     .toolbar::-webkit-scrollbar-thumb { background: #f5a623; border-radius: 2px; }
-
-    .toolbar-brand {
-      font-size: 0.9rem;
-      font-weight: 800;
-      color: #f5a623;
-      letter-spacing: 1.5px;
-      white-space: nowrap;
-      margin-right: 8px;
-      flex-shrink: 0;
-    }
-    .toolbar-sep {
-      width: 1px;
-      height: 28px;
-      background: rgba(255,255,255,0.12);
-      flex-shrink: 0;
-    }
-    .tb-group {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      flex-shrink: 0;
-    }
+    .toolbar-brand { font-size: 0.9rem; font-weight: 800; color: #f5a623; letter-spacing: 1.5px; white-space: nowrap; margin-right: 8px; flex-shrink: 0; }
+    .toolbar-sep { width: 1px; height: 28px; background: rgba(255,255,255,0.12); flex-shrink: 0; }
+    .tb-group { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
     .tb-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: rgba(255,255,255,0.07);
-      color: #e0e0f0;
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 6px;
-      padding: 5px 11px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.18s, border-color 0.18s, color 0.18s;
-      white-space: nowrap;
-      flex-shrink: 0;
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(255,255,255,0.07); color: #e0e0f0;
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 6px;
+      padding: 5px 11px; font-size: 0.78rem; font-weight: 600; cursor: pointer;
+      transition: background 0.18s, border-color 0.18s, color 0.18s; white-space: nowrap; flex-shrink: 0;
     }
     .tb-btn:hover { background: rgba(245,166,35,0.18); border-color: #f5a623; color: #f5a623; }
     .tb-btn:disabled { opacity: 0.35; cursor: not-allowed; }
@@ -102,89 +66,26 @@
     .tb-btn.red:hover    { background: #a93226; }
     .tb-btn.slate  { background: #5a5a8a; color: #fff; border-color: #5a5a8a; }
     .tb-btn.slate:hover  { background: #7a7aae; }
-    .tb-count {
-      font-size: 0.65rem;
-      color: #7a7aae;
-      min-width: 14px;
-      text-align: center;
-    }
-    .save-indicator {
-      font-size: 0.68rem;
-      color: #7acea0;
-      font-style: italic;
-      white-space: nowrap;
-      max-width: 140px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      flex-shrink: 0;
-    }
-    .toolbar-spacer { flex: 1; }
+    .tb-count { font-size: 0.65rem; color: #7a7aae; min-width: 14px; text-align: center; }
+    .save-indicator { font-size: 0.68rem; color: #7acea0; font-style: italic; white-space: nowrap; max-width: 160px; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
 
     /* ══════════════════════════════════════════════
        FORMAT BAR
     ══════════════════════════════════════════════ */
     .format-bar {
-      position: sticky;
-      top: 48px;
-      z-index: 290;
-      background: #1e1e3a;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 20px;
-      flex-wrap: nowrap;
-      overflow-x: auto;
+      position: sticky; top: 48px; z-index: 290;
+      background: #1e1e3a; border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 20px; flex-wrap: nowrap; overflow-x: auto;
       box-shadow: 0 2px 8px rgba(0,0,0,0.25);
     }
     .format-bar::-webkit-scrollbar { height: 3px; }
     .format-bar::-webkit-scrollbar-thumb { background: #f5a623; border-radius: 2px; }
-    .fmt-label {
-      font-size: 0.65rem;
-      color: #888;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .fmt-select {
-      background: #2a2a4a;
-      color: #e0e0f0;
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 5px;
-      padding: 3px 7px;
-      font-size: 0.78rem;
-      cursor: pointer;
-      outline: none;
-      flex-shrink: 0;
-      transition: border-color 0.15s;
-    }
+    .fmt-label { font-size: 0.65rem; color: #888; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; flex-shrink: 0; }
+    .fmt-select { background: #2a2a4a; color: #e0e0f0; border: 1px solid rgba(255,255,255,0.15); border-radius: 5px; padding: 3px 7px; font-size: 0.78rem; cursor: pointer; outline: none; flex-shrink: 0; transition: border-color 0.15s; }
     .fmt-select:hover, .fmt-select:focus { border-color: #f5a623; }
-    .fmt-color {
-      width: 26px;
-      height: 24px;
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 5px;
-      background: #2a2a4a;
-      cursor: pointer;
-      padding: 1px;
-      flex-shrink: 0;
-    }
-    .fmt-btn {
-      background: #2a2a4a;
-      color: #e0e0f0;
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 5px;
-      padding: 3px 9px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.15s, border-color 0.15s, color 0.15s;
-      white-space: nowrap;
-      flex-shrink: 0;
-      line-height: 1.5;
-    }
+    .fmt-color { width: 26px; height: 24px; border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; background: #2a2a4a; cursor: pointer; padding: 1px; flex-shrink: 0; }
+    .fmt-btn { background: #2a2a4a; color: #e0e0f0; border: 1px solid rgba(255,255,255,0.15); border-radius: 5px; padding: 3px 9px; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s; white-space: nowrap; flex-shrink: 0; line-height: 1.5; }
     .fmt-btn:hover { background: #3a3a6a; border-color: #f5a623; color: #f5a623; }
     .fmt-btn.active { background: #f5a623; color: #12122a; border-color: #f5a623; }
     .fmt-sep { width: 1px; height: 20px; background: rgba(255,255,255,0.1); flex-shrink: 0; margin: 0 3px; }
@@ -194,21 +95,12 @@
        TOAST
     ══════════════════════════════════════════════ */
     .toast {
-      position: fixed;
-      bottom: 28px;
-      left: 50%;
+      position: fixed; bottom: 28px; left: 50%;
       transform: translateX(-50%) translateY(16px);
-      background: #27ae60;
-      color: #fff;
-      padding: 10px 26px;
-      border-radius: 30px;
-      font-size: 0.88rem;
-      font-weight: 700;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.3);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.28s, transform 0.28s;
-      z-index: 9999;
+      background: #27ae60; color: #fff; padding: 10px 26px;
+      border-radius: 30px; font-size: 0.88rem; font-weight: 700;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.3); opacity: 0;
+      pointer-events: none; transition: opacity 0.28s, transform 0.28s; z-index: 9999;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     .toast.error { background: #c0392b; }
@@ -217,201 +109,80 @@
     /* ══════════════════════════════════════════════
        PAGE
     ══════════════════════════════════════════════ */
-    .page {
-      max-width: 940px;
-      margin: 28px auto 60px;
-      background: #fff;
-      border-radius: 14px;
-      box-shadow: 0 6px 32px rgba(0,0,0,0.12);
-      overflow: hidden;
-    }
+    .page { max-width: 940px; margin: 28px auto 60px; background: #fff; border-radius: 14px; box-shadow: 0 6px 32px rgba(0,0,0,0.12); overflow: hidden; }
 
     /* ══════════════════════════════════════════════
        DOCUMENT HEADER
     ══════════════════════════════════════════════ */
-    .header-banner {
-      background: linear-gradient(135deg, #f5a623 0%, #e07b00 100%);
-      padding: 20px 32px 16px;
-      position: relative;
-    }
-    .header-banner h2 {
-      font-size: 1.65rem;
-      font-weight: 800;
-      color: #fff;
-      text-shadow: 0 1px 6px rgba(0,0,0,0.22);
-      outline: none;
-      border-radius: 4px;
-      padding: 2px 6px;
-      transition: background 0.15s;
-      display: inline-block;
-      min-width: 200px;
-    }
+    .header-banner { background: linear-gradient(135deg, #f5a623 0%, #e07b00 100%); padding: 20px 32px 16px; position: relative; }
+    .header-banner h2 { font-size: 1.65rem; font-weight: 800; color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,0.22); outline: none; border-radius: 4px; padding: 2px 6px; transition: background 0.15s; display: inline-block; min-width: 200px; }
     .header-banner h2:hover { background: rgba(255,255,255,0.12); }
     .header-banner h2:focus { background: rgba(255,255,255,0.2); }
-    .header-banner h2[data-empty]:empty::before {
-      content: attr(data-empty);
-      color: rgba(255,255,255,0.5);
-      font-style: italic;
-    }
-    .header-sub {
-      background: #fff8ee;
-      border-left: 5px solid #f5a623;
-      padding: 10px 32px;
-      display: flex;
-      gap: 28px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
+    .header-banner h2[data-empty]:empty::before { content: attr(data-empty); color: rgba(255,255,255,0.5); font-style: italic; }
+    .header-sub { background: #fff8ee; border-left: 5px solid #f5a623; padding: 10px 32px; display: flex; gap: 28px; align-items: center; flex-wrap: wrap; }
     .field-group { display: flex; align-items: center; gap: 8px; }
-    .field-group label {
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #999;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
-    }
-    .editable-field {
-      outline: none;
-      border-bottom: 2px dashed #f5a623;
-      padding: 2px 6px;
-      min-width: 110px;
-      font-size: 0.92rem;
-      font-weight: 600;
-      color: #333;
-      background: transparent;
-      border-radius: 3px 3px 0 0;
-      transition: border-color 0.18s, background 0.18s;
-    }
+    .field-group label { font-size: 0.75rem; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+    .editable-field { outline: none; border-bottom: 2px dashed #f5a623; padding: 2px 6px; min-width: 110px; font-weight: 600; color: #333; background: transparent; border-radius: 3px 3px 0 0; transition: border-color 0.18s, background 0.18s; }
     .editable-field:focus { border-bottom-color: #e07b00; background: #fff3d6; }
-    .editable-field[data-empty]:empty::before {
-      content: attr(data-empty);
-      color: #ccc;
-      font-style: italic;
-      font-weight: 400;
-    }
+    .editable-field[data-empty]:empty::before { content: attr(data-empty); color: #ccc; font-style: italic; font-weight: 400; }
 
     /* ══════════════════════════════════════════════
-       SECTION CARD  (the main unit)
+       SECTION CARD
     ══════════════════════════════════════════════ */
     .section-card {
-      margin: 18px 24px;
-      border-radius: 10px;
-      border: 1px solid #e8e8f0;
-      background: #fff;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      transition: box-shadow 0.2s;
-      overflow: hidden;
+      margin: 18px 24px; border-radius: 10px; border: 1px solid #e8e8f0;
+      background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      transition: box-shadow 0.2s, opacity 0.2s; overflow: hidden;
     }
     .section-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.09); }
+    /* Drag-reorder states */
+    .section-card.drag-source { opacity: 0.45; box-shadow: none; }
+    .section-card.drag-over   { box-shadow: 0 0 0 3px #f5a623, 0 4px 18px rgba(245,166,35,0.25); }
 
     /* ── Section Header Bar ── */
     .section-head {
-      display: flex;
-      align-items: center;
-      gap: 0;
+      display: flex; align-items: center; gap: 0;
       background: linear-gradient(90deg, #1e1e3f 0%, #2a2a52 100%);
-      padding: 0 0 0 14px;
-      min-height: 42px;
-      cursor: default;
+      padding: 0 0 0 0; min-height: 42px;
+    }
+    /* Drag handle grip on the left of every header */
+    .section-drag-grip {
+      display: flex; align-items: center; justify-content: center;
+      width: 28px; min-height: 42px; cursor: grab; flex-shrink: 0;
+      color: rgba(255,255,255,0.2); font-size: 1rem; transition: color 0.15s;
       user-select: none;
     }
-    .section-head-accent {
-      width: 4px;
-      height: 100%;
-      min-height: 42px;
-      background: #f5a623;
-      border-radius: 2px;
-      flex-shrink: 0;
-      margin-right: 12px;
-    }
+    .section-drag-grip:hover { color: #f5a623; }
+    .section-drag-grip:active { cursor: grabbing; }
+    .section-head-accent { width: 4px; min-height: 42px; background: #f5a623; border-radius: 2px; flex-shrink: 0; margin-right: 12px; }
     .section-head-title {
-      flex: 1;
-      font-size: 0.88rem;
-      font-weight: 700;
-      color: #f0f0ff;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      outline: none;
-      padding: 10px 6px;
-      border-radius: 4px;
-      transition: background 0.15s;
-      cursor: text;
-      min-width: 60px;
+      flex: 1; font-size: 0.88rem; font-weight: 700; color: #f0f0ff;
+      text-transform: uppercase; letter-spacing: 1.2px; outline: none;
+      padding: 10px 6px; border-radius: 4px; transition: background 0.15s; cursor: text; min-width: 60px;
     }
     .section-head-title:hover { background: rgba(255,255,255,0.06); }
-    .section-head-title:focus {
-      background: rgba(245,166,35,0.12);
-      color: #f5a623;
-      letter-spacing: 0.5px;
-    }
-    .section-head-title[data-empty]:empty::before {
-      content: attr(data-empty);
-      color: rgba(255,255,255,0.3);
-      font-style: italic;
-      text-transform: none;
-      letter-spacing: 0;
-    }
-    /* Header action buttons */
-    .section-head-actions {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      padding: 0 8px;
-      opacity: 0;
-      transition: opacity 0.18s;
-    }
+    .section-head-title:focus { background: rgba(245,166,35,0.12); color: #f5a623; letter-spacing: 0.5px; }
+    .section-head-title[data-empty]:empty::before { content: attr(data-empty); color: rgba(255,255,255,0.3); font-style: italic; text-transform: none; letter-spacing: 0; }
+    .section-head-actions { display: flex; align-items: center; gap: 2px; padding: 0 8px; opacity: 0; transition: opacity 0.18s; }
     .section-card:hover .section-head-actions,
     .section-head:focus-within .section-head-actions { opacity: 1; }
-    .sh-btn {
-      background: transparent;
-      border: none;
-      color: rgba(255,255,255,0.45);
-      border-radius: 5px;
-      width: 28px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: background 0.15s, color 0.15s;
-      flex-shrink: 0;
-    }
+    .sh-btn { background: transparent; border: none; color: rgba(255,255,255,0.45); border-radius: 5px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; cursor: pointer; transition: background 0.15s, color 0.15s; flex-shrink: 0; }
     .sh-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-    .sh-btn.sh-clear:hover { background: rgba(245,166,35,0.2); color: #f5a623; }
+    .sh-btn.sh-clear:hover  { background: rgba(245,166,35,0.2); color: #f5a623; }
     .sh-btn.sh-delete:hover { background: rgba(192,57,43,0.3); color: #ff6b6b; }
     .sh-btn svg { width: 14px; height: 14px; fill: currentColor; }
 
     /* ── Section Body ── */
-    .section-body {
-      padding: 16px 18px 12px;
-      position: relative;
-      /* JS-driven resize */
-    }
+    .section-body { padding: 16px 18px 12px; position: relative; }
 
     /* ── Resize Handle ── */
     .resize-handle {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 14px;
-      background: #f7f7fb;
-      border-top: 1px solid #ebebf5;
-      cursor: ns-resize;
-      user-select: none;
-      transition: background 0.15s;
+      display: flex; align-items: center; justify-content: center;
+      height: 14px; background: #f7f7fb; border-top: 1px solid #ebebf5;
+      cursor: ns-resize; user-select: none; transition: background 0.15s;
     }
     .resize-handle:hover { background: #ede8ff; }
-    .resize-handle::before {
-      content: '';
-      display: block;
-      width: 36px;
-      height: 3px;
-      background: #c8c8e0;
-      border-radius: 2px;
-      transition: background 0.15s, width 0.15s;
-    }
+    .resize-handle::before { content: ''; display: block; width: 36px; height: 3px; background: #c8c8e0; border-radius: 2px; transition: background 0.15s, width 0.15s; }
     .resize-handle:hover::before { background: #7b2fbe; width: 52px; }
     .resize-handle.dragging { background: #ede8ff; }
     .resize-handle.dragging::before { background: #f5a623; width: 60px; }
@@ -420,62 +191,15 @@
        BULLET LIST
     ══════════════════════════════════════════════ */
     .bullet-list { list-style: none; padding: 0; margin: 0 0 8px; }
-    .bullet-list li {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 6px;
-      padding: 5px 8px;
-      border-radius: 6px;
-      transition: background 0.12s;
-    }
+    .bullet-list li { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; padding: 5px 8px; border-radius: 6px; transition: background 0.12s; }
     .bullet-list li:hover { background: #fafafa; }
-    .bullet-list li::before {
-      content: '•';
-      color: #f5a623;
-      font-size: 1.15rem;
-      line-height: 1.45;
-      flex-shrink: 0;
-    }
-    .item-text {
-      flex: 1;
-      outline: none;
-      min-height: 22px;
-      font-size: 0.92rem;
-      line-height: 1.55;
-      padding: 1px 4px;
-      border-radius: 4px;
-      transition: background 0.12s;
-    }
+    .bullet-list li::before { content: '•'; color: #f5a623; font-size: 1.15rem; line-height: 1.45; flex-shrink: 0; }
+    .item-text { flex: 1; outline: none; min-height: 22px; font-size: 0.92rem; line-height: 1.55; padding: 1px 4px; border-radius: 4px; transition: background 0.12s; }
     .item-text:focus { background: #fff8ee; }
-    .item-text[data-empty]:empty::before {
-      content: attr(data-empty);
-      color: #ccc;
-      font-style: italic;
-    }
-    .remove-btn {
-      background: none;
-      border: none;
-      color: #ddd;
-      font-size: 1rem;
-      cursor: pointer;
-      padding: 0 4px;
-      line-height: 1;
-      transition: color 0.12s;
-      flex-shrink: 0;
-    }
+    .item-text[data-empty]:empty::before { content: attr(data-empty); color: #ccc; font-style: italic; }
+    .remove-btn { background: none; border: none; color: #ddd; font-size: 1rem; cursor: pointer; padding: 0 4px; line-height: 1; transition: color 0.12s; flex-shrink: 0; }
     .remove-btn:hover { color: #e05252; }
-    .add-btn {
-      background: none;
-      border: 2px dashed #ddd;
-      color: #bbb;
-      border-radius: 6px;
-      padding: 5px 14px;
-      font-size: 0.82rem;
-      cursor: pointer;
-      transition: all 0.18s;
-      margin-top: 4px;
-    }
+    .add-btn { background: none; border: 2px dashed #ddd; color: #bbb; border-radius: 6px; padding: 5px 14px; font-size: 0.82rem; cursor: pointer; transition: all 0.18s; margin-top: 4px; }
     .add-btn:hover { border-color: #f5a623; color: #f5a623; background: #fff8ee; }
 
     /* ══════════════════════════════════════════════
@@ -484,169 +208,140 @@
     .highlight { background: #ffe066; padding: 1px 3px; border-radius: 2px; }
 
     /* ══════════════════════════════════════════════
-       TABLES  (Recap + Store)
+       TABLES
     ══════════════════════════════════════════════ */
     .table-wrapper { overflow-x: auto; margin-top: 6px; }
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.82rem;
-    }
-    .data-table th {
-      background: #1a1a2e;
-      color: #f5a623;
-      padding: 9px 12px;
-      text-align: left;
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
-    }
-    .data-table td {
-      padding: 8px 12px;
-      border-bottom: 1px solid #f0f0f0;
-      vertical-align: top;
-    }
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .data-table th { background: #1a1a2e; color: #f5a623; padding: 9px 12px; text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+    .data-table td { padding: 8px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
     .data-table tr:nth-child(even) td { background: #fafafa; }
     .data-table tr:hover td { background: #fff8ee; }
     .data-table td[contenteditable] { outline: none; }
-    .data-table td[contenteditable]:focus {
-      background: #fff8ee !important;
-      box-shadow: inset 0 0 0 2px #f5a623;
-      border-radius: 2px;
-    }
-    .store-table th { text-align: center; }
-    .store-table td { text-align: center; }
+    .data-table td[contenteditable]:focus { background: #fff8ee !important; box-shadow: inset 0 0 0 2px #f5a623; border-radius: 2px; }
+    .store-table th, .store-table td { text-align: center; }
     .store-table .store-name-cell { text-align: left; font-weight: 600; }
     .date-cell { font-weight: 700; color: #4a1a7a; white-space: nowrap; min-width: 80px; }
     .topic-cell { font-weight: 700; color: #1a1a2e; min-width: 120px; }
-    .remove-row-btn {
-      background: none; border: none; color: #ddd;
-      cursor: pointer; font-size: 0.9rem; padding: 2px 5px;
-      transition: color 0.12s; border-radius: 4px;
-    }
+    .remove-row-btn { background: none; border: none; color: #ddd; cursor: pointer; font-size: 0.9rem; padding: 2px 5px; transition: color 0.12s; border-radius: 4px; }
     .remove-row-btn:hover { color: #e05252; background: #fff0f0; }
-    .add-row-btn {
-      background: none;
-      border: 2px dashed #ddd;
-      color: #bbb;
-      border-radius: 6px;
-      padding: 5px 16px;
-      font-size: 0.82rem;
-      cursor: pointer;
-      transition: all 0.18s;
-      margin-top: 8px;
-      display: inline-block;
-    }
+    .add-row-btn { background: none; border: 2px dashed #ddd; color: #bbb; border-radius: 6px; padding: 5px 16px; font-size: 0.82rem; cursor: pointer; transition: all 0.18s; margin-top: 8px; display: inline-block; }
     .add-row-btn:hover { border-color: #f5a623; color: #f5a623; background: #fff8ee; }
-
-    /* Week-of row */
-    .week-of-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
+    .week-of-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
     .week-of-row span:first-child { font-weight: 700; color: #1a1a2e; font-size: 0.88rem; }
 
     /* ══════════════════════════════════════════════
-       IMAGE UPLOADER
+       MULTI-FILE GALLERY
     ══════════════════════════════════════════════ */
-    .section-img-block {
+    .file-gallery {
       margin-top: 14px;
-      border-radius: 8px;
-      overflow: visible;
       border: 2px dashed #e0d0f5;
+      border-radius: 10px;
       background: #faf6ff;
       transition: border-color 0.18s;
+      overflow: hidden;
     }
-    .section-img-block:hover { border-color: #7b2fbe; }
-    .img-dropzone {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      padding: 18px 16px;
-      cursor: pointer;
-      position: relative;
+    .file-gallery:hover { border-color: #7b2fbe; }
+
+    /* Gallery header row */
+    .file-gallery-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 14px; background: rgba(123,47,190,0.06);
+      border-bottom: 1px solid #e8d8ff;
     }
-    .img-dropzone input[type="file"] {
+    .file-gallery-label {
+      font-size: 0.72rem; font-weight: 700; color: #7b2fbe;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .file-gallery-count {
+      font-size: 0.68rem; color: #aaa; font-style: italic;
+    }
+
+    /* Drop zone */
+    .file-gallery-dropzone {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 5px; padding: 18px 16px;
+      cursor: pointer; position: relative; transition: background 0.15s;
+    }
+    .file-gallery-dropzone:hover { background: #f0e6ff; }
+    .file-gallery-dropzone.dz-active { background: #e8d8ff; border-color: #7b2fbe; }
+    .file-gallery-dropzone input[type="file"] {
       position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
     }
-    .dz-icon { font-size: 1.8rem; color: #c9a8f0; }
+    .dz-icon  { font-size: 1.8rem; color: #c9a8f0; }
     .dz-label { font-size: 0.82rem; color: #aaa; font-weight: 600; }
     .dz-sub   { font-size: 0.72rem; color: #ccc; }
-    .img-preview-panel {
-      display: none; padding: 12px;
-      background: #f0e8ff; border-top: 1px solid #d9c0f5;
+
+    /* Attached files list */
+    .file-gallery-list {
+      display: flex; flex-direction: column; gap: 0;
     }
-    .preview-label { font-size: 0.75rem; font-weight: 700; color: #7b2fbe; margin-bottom: 8px; text-transform: uppercase; }
-    .preview-thumb { width: 100%; max-height: 200px; object-fit: contain; border-radius: 6px; border: 1px solid #d0b8f0; background: #fff; display: block; margin-bottom: 10px; }
-    .pdf-preview-label { background: #fff; border: 1px solid #d0b8f0; border-radius: 6px; padding: 12px; text-align: center; color: #7b2fbe; font-weight: 700; font-size: 0.88rem; margin-bottom: 10px; }
-    .preview-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-    .btn-apply {
-      background: linear-gradient(135deg, #2ecc71, #27ae60);
-      color: #fff; border: none; border-radius: 7px; padding: 8px 20px;
-      font-size: 0.84rem; font-weight: 700; cursor: pointer;
-      box-shadow: 0 3px 10px rgba(46,204,113,0.35); transition: transform 0.12s;
+    .file-item {
+      border-top: 1px solid #ede8ff;
+      background: #fff;
+      transition: background 0.12s;
     }
-    .btn-apply:hover { transform: translateY(-1px); }
-    .btn-cancel-preview { background: #eee; color: #555; border: none; border-radius: 7px; padding: 8px 14px; font-size: 0.84rem; font-weight: 600; cursor: pointer; }
-    .btn-cancel-preview:hover { background: #ddd; }
-    .img-applied { display: none; width: 100%; position: relative; }
-    .img-applied img { width: 100%; height: auto; display: block; object-fit: contain; }
-    .img-applied .pdf-page-img { width: 100%; height: auto; display: block; margin-bottom: 2px; }
-    .img-applied-controls {
-      display: flex; gap: 8px; padding: 6px 10px;
-      background: rgba(26,26,46,0.85); flex-wrap: wrap; align-items: center;
+    .file-item:first-child { border-top: none; }
+
+    /* File item header (name + controls) */
+    .file-item-header {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 12px; cursor: pointer;
     }
-    .img-applied-controls button {
-      background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 5px; padding: 4px 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: background 0.12s;
+    .file-item-header:hover { background: #faf5ff; }
+    .file-item-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .file-item-name {
+      flex: 1; font-size: 0.82rem; font-weight: 600; color: #333;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .img-applied-controls button:hover { background: rgba(245,166,35,0.85); color: #1a1a2e; }
-    .img-applied-controls label { font-size: 0.72rem; color: #f5a623; font-weight: 700; white-space: nowrap; }
-    .img-applied-controls input[type="range"] { flex: 1; min-width: 70px; accent-color: #f5a623; cursor: pointer; }
-    .img-applied-controls .size-val { font-size: 0.72rem; color: #fff; min-width: 34px; }
+    .file-item-toggle {
+      font-size: 0.7rem; color: #aaa; flex-shrink: 0; transition: transform 0.2s;
+    }
+    .file-item.expanded .file-item-toggle { transform: rotate(180deg); }
+
+    /* File item controls bar */
+    .file-item-controls {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 12px; background: rgba(26,26,46,0.88); flex-wrap: wrap;
+    }
+    .file-item-controls button {
+      background: rgba(255,255,255,0.1); color: #fff;
+      border: 1px solid rgba(255,255,255,0.18); border-radius: 5px;
+      padding: 3px 10px; font-size: 0.72rem; font-weight: 700;
+      cursor: pointer; transition: background 0.12s; white-space: nowrap;
+    }
+    .file-item-controls button:hover { background: rgba(245,166,35,0.8); color: #1a1a2e; }
+    .file-item-controls label { font-size: 0.68rem; color: #f5a623; font-weight: 700; white-space: nowrap; }
+    .file-item-controls input[type="range"] { flex: 1; min-width: 70px; accent-color: #f5a623; cursor: pointer; }
+    .file-item-controls .size-val { font-size: 0.68rem; color: #fff; min-width: 34px; }
+
+    /* File item content (the image/PDF) */
+    .file-item-content {
+      display: none; padding: 0;
+      background: #fff; text-align: center;
+    }
+    .file-item.expanded .file-item-content { display: block; }
+    .file-item-content img,
+    .file-item-content canvas {
+      width: 100%; height: auto; display: block; object-fit: contain;
+    }
 
     /* ══════════════════════════════════════════════
        ADD SECTION BUTTON
     ══════════════════════════════════════════════ */
-    .add-section-wrap {
-      text-align: center;
-      padding: 20px 0 10px;
-    }
+    .add-section-wrap { text-align: center; padding: 20px 0 10px; }
     .add-section-btn {
-      background: linear-gradient(135deg, #7b2fbe, #4a90d9);
-      color: #fff;
-      border: none;
-      border-radius: 30px;
-      padding: 11px 30px;
-      font-size: 0.92rem;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 4px 16px rgba(123,47,190,0.3);
-      letter-spacing: 0.4px;
-      transition: transform 0.15s, box-shadow 0.15s;
+      background: linear-gradient(135deg, #7b2fbe, #4a90d9); color: #fff;
+      border: none; border-radius: 30px; padding: 11px 30px; font-size: 0.92rem;
+      font-weight: 700; cursor: pointer; box-shadow: 0 4px 16px rgba(123,47,190,0.3);
+      letter-spacing: 0.4px; transition: transform 0.15s, box-shadow 0.15s;
     }
     .add-section-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(123,47,190,0.45); }
 
     /* ══════════════════════════════════════════════
        FOOTER
     ══════════════════════════════════════════════ */
-    .doc-footer {
-      background: #1a1a2e;
-      color: #777;
-      text-align: center;
-      font-size: 0.74rem;
-      padding: 14px 32px;
-      margin-top: 10px;
-    }
-    .doc-footer span[contenteditable] {
-      color: #f5a623; outline: none;
-      border-bottom: 1px dashed #f5a623; padding: 1px 4px;
-    }
+    .doc-footer { background: #1a1a2e; color: #777; text-align: center; font-size: 0.74rem; padding: 14px 32px; margin-top: 10px; }
+    .doc-footer span[contenteditable] { color: #f5a623; outline: none; border-bottom: 1px dashed #f5a623; padding: 1px 4px; }
     .doc-footer span[contenteditable]:focus { background: rgba(245,166,35,0.1); }
 
     /* ══════════════════════════════════════════════
@@ -673,8 +368,6 @@
 <div class="toolbar no-print">
   <span class="toolbar-brand">DLC NOTES</span>
   <div class="toolbar-sep"></div>
-
-  <!-- Undo / Redo -->
   <div class="tb-group">
     <button class="tb-btn slate" id="undoBtn" onclick="doUndo()" title="Undo (Ctrl+Z)" disabled>
       <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05 1-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
@@ -687,10 +380,7 @@
     </button>
     <span class="tb-count" id="redoCount"></span>
   </div>
-
   <div class="toolbar-sep"></div>
-
-  <!-- Save -->
   <div class="tb-group">
     <button class="tb-btn green" onclick="saveTemplate()" title="Download a saved copy of this file to your computer">
       <svg viewBox="0 0 24 24"><path d="M17 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4zm-5 16a3 3 0 110-6 3 3 0 010 6zm3-10H5V5h10v4z"/></svg>
@@ -698,19 +388,15 @@
     </button>
     <span class="save-indicator" id="save-indicator" title="Click Save File to download — then open that file next time">Open saved file to resume</span>
   </div>
-
   <div class="toolbar-sep"></div>
-
   <button class="tb-btn accent" onclick="window.print()">
     <svg viewBox="0 0 24 24"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7a1 1 0 110-2 1 1 0 010 2zm-1-9H6v4h12V3z"/></svg>
     Print / PDF
   </button>
-
-  <button class="tb-btn" onclick="resetTemplate()" title="Erase saved data and restore blank template">
+  <button class="tb-btn" onclick="resetTemplate()" title="Reload the original blank template">
     <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
     Reset
   </button>
-
   <button class="tb-btn red" onclick="clearAll()">
     <svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 002 2h8a2 2 0 002-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
     Clear All
@@ -732,44 +418,29 @@
     <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
     <option value="Impact, sans-serif">Impact</option>
   </select>
-
   <div class="fmt-sep"></div>
-
   <span class="fmt-label">Size</span>
   <select class="fmt-select" id="fmt-size" onchange="applyFontSize(this.value)" title="Font size">
     <option value="">— Size —</option>
-    <option value="10px">10</option>
-    <option value="11px">11</option>
-    <option value="12px">12</option>
-    <option value="13px">13</option>
-    <option value="14px">14</option>
-    <option value="16px">16</option>
-    <option value="18px">18</option>
-    <option value="20px">20</option>
-    <option value="24px">24</option>
-    <option value="28px">28</option>
-    <option value="32px">32</option>
-    <option value="36px">36</option>
+    <option value="10px">10</option><option value="11px">11</option>
+    <option value="12px">12</option><option value="13px">13</option>
+    <option value="14px">14</option><option value="16px">16</option>
+    <option value="18px">18</option><option value="20px">20</option>
+    <option value="24px">24</option><option value="28px">28</option>
+    <option value="32px">32</option><option value="36px">36</option>
   </select>
-
   <div class="fmt-sep"></div>
-
-  <button class="fmt-btn" id="btn-bold"      onclick="applyBold()"      title="Bold (Ctrl+B)"><b>B</b></button>
-  <button class="fmt-btn" id="btn-italic"    onclick="applyItalic()"    title="Italic (Ctrl+I)"><i>I</i></button>
-  <button class="fmt-btn" id="btn-underline" onclick="applyUnderline()" title="Underline (Ctrl+U)"><u>U</u></button>
-
+  <button class="fmt-btn" id="btn-bold"      onclick="applyBold()"      title="Bold"><b>B</b></button>
+  <button class="fmt-btn" id="btn-italic"    onclick="applyItalic()"    title="Italic"><i>I</i></button>
+  <button class="fmt-btn" id="btn-underline" onclick="applyUnderline()" title="Underline"><u>U</u></button>
   <div class="fmt-sep"></div>
-
   <span class="fmt-label">Highlight</span>
   <input class="fmt-color" type="color" id="fmt-hl-color" value="#ffe066" title="Highlight color" />
   <button class="fmt-btn" onclick="applyHighlight()" title="Highlight selected text">&#9646; Apply</button>
   <button class="fmt-btn" onclick="removeHighlight()" title="Remove highlight" style="font-size:0.72rem;">&#10005; Remove</button>
-
   <div class="fmt-sep"></div>
-
   <span class="fmt-label">Color</span>
   <input class="fmt-color" type="color" id="fmt-text-color" value="#222222" title="Text color" onchange="applyTextColor(this.value)" />
-
   <span class="fmt-tip">Select text first, then format</span>
 </div>
 
@@ -806,15 +477,12 @@
   <!-- ══ ANNOUNCEMENTS ══ -->
   <div class="section-card" id="sc-announcements">
     <div class="section-head">
+      <div class="section-drag-grip no-print" title="Drag to reorder">&#8942;&#8942;</div>
       <div class="section-head-accent"></div>
       <div class="section-head-title" contenteditable="true" spellcheck="false" data-empty="Section Title">Announcements &amp; General Updates</div>
       <div class="section-head-actions no-print">
-        <button class="sh-btn sh-clear" onclick="clearSectionCard('sc-announcements')" title="Clear section content">
-          <svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 002 2h8a2 2 0 002-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-        </button>
-        <button class="sh-btn sh-delete" onclick="deleteSectionCard('sc-announcements')" title="Delete this section">
-          <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-        </button>
+        <button class="sh-btn sh-clear" onclick="clearSectionCard('sc-announcements')" title="Clear section content"><svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 002 2h8a2 2 0 002-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+        <button class="sh-btn sh-delete" onclick="deleteSectionCard('sc-announcements')" title="Delete this section"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
       </div>
     </div>
     <div class="section-body" id="body-announcements">
@@ -829,10 +497,18 @@
         <li><span class="item-text" contenteditable="true" spellcheck="false">Consumables – Make sure accurate due to so many stores being in SAVE</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
       </ul>
       <button class="add-btn no-print" onclick="addItem('announcements-list')">+ Add Item</button>
-      <div class="section-img-block" id="img-block-announcements">
-        <div class="img-dropzone" id="img-dropzone-announcements"><span class="dz-icon">&#128247;</span><span class="dz-label">Click or drag an image / PDF here</span><span class="dz-sub">Select → preview → Apply to embed</span><input type="file" id="img-input-announcements" accept="image/*,application/pdf" onchange="handleImgSelect(this,'announcements')" /></div>
-        <div class="img-preview-panel" id="img-preview-announcements"><div class="preview-label">Preview — click Apply to embed</div><img class="preview-thumb" id="img-thumb-announcements" src="" alt="preview" style="display:none;" /><div class="pdf-preview-label" id="pdf-label-announcements" style="display:none;"></div><div class="preview-actions"><button class="btn-apply" onclick="applyImg('announcements')">&#10003; Apply</button><button class="btn-cancel-preview" onclick="cancelPreview('announcements')">&#10005; Cancel</button></div></div>
-        <div class="img-applied" id="img-applied-announcements"><div class="img-applied-controls no-print"><label>&#8596; Width</label><input type="range" min="25" max="100" value="100" oninput="resizeApplied('announcements',this.value)" /><span class="size-val" id="img-size-val-announcements">100%</span><button onclick="replaceImg('announcements')">&#8635; Replace</button><button onclick="removeApplied('announcements')">&#10005; Remove</button><input type="file" id="img-replace-announcements" accept="image/*,application/pdf" onchange="handleImgSelect(this,'announcements')" style="display:none" /></div><div id="img-content-announcements" style="width:100%;text-align:center;background:#fff;"></div></div>
+      <div class="file-gallery" id="gallery-announcements">
+        <div class="file-gallery-header no-print">
+          <span class="file-gallery-label">&#128247; Attachments</span>
+          <span class="file-gallery-count" id="gallery-count-announcements">No files attached</span>
+        </div>
+        <div class="file-gallery-list" id="gallery-list-announcements"></div>
+        <div class="file-gallery-dropzone no-print" id="gallery-dz-announcements">
+          <span class="dz-icon">&#128247;</span>
+          <span class="dz-label">Click or drag images / PDFs here</span>
+          <span class="dz-sub">Add as many files as you need — each appears as a collapsible card</span>
+          <input type="file" id="gallery-input-announcements" accept="image/*,application/pdf" multiple onchange="handleGalleryFiles(this,'announcements')" />
+        </div>
       </div>
     </div>
     <div class="resize-handle no-print" data-target="body-announcements"></div>
@@ -841,6 +517,7 @@
   <!-- ══ CONTROLS ══ -->
   <div class="section-card" id="sc-controls">
     <div class="section-head">
+      <div class="section-drag-grip no-print" title="Drag to reorder">&#8942;&#8942;</div>
       <div class="section-head-accent"></div>
       <div class="section-head-title" contenteditable="true" spellcheck="false" data-empty="Section Title">Controls</div>
       <div class="section-head-actions no-print">
@@ -856,10 +533,18 @@
         <li><span class="item-text" contenteditable="true" spellcheck="false">Callout on every VP call about txcrt. Expectation is ready at all times with no failures. Feb or March will be having a visit for a text TXCRT.</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
       </ul>
       <button class="add-btn no-print" onclick="addItem('controls-list')">+ Add Item</button>
-      <div class="section-img-block" id="img-block-controls">
-        <div class="img-dropzone" id="img-dropzone-controls"><span class="dz-icon">&#128247;</span><span class="dz-label">Click or drag an image / PDF here</span><span class="dz-sub">Select → preview → Apply to embed</span><input type="file" id="img-input-controls" accept="image/*,application/pdf" onchange="handleImgSelect(this,'controls')" /></div>
-        <div class="img-preview-panel" id="img-preview-controls"><div class="preview-label">Preview — click Apply to embed</div><img class="preview-thumb" id="img-thumb-controls" src="" alt="preview" style="display:none;" /><div class="pdf-preview-label" id="pdf-label-controls" style="display:none;"></div><div class="preview-actions"><button class="btn-apply" onclick="applyImg('controls')">&#10003; Apply</button><button class="btn-cancel-preview" onclick="cancelPreview('controls')">&#10005; Cancel</button></div></div>
-        <div class="img-applied" id="img-applied-controls"><div class="img-applied-controls no-print"><label>&#8596; Width</label><input type="range" min="25" max="100" value="100" oninput="resizeApplied('controls',this.value)" /><span class="size-val" id="img-size-val-controls">100%</span><button onclick="replaceImg('controls')">&#8635; Replace</button><button onclick="removeApplied('controls')">&#10005; Remove</button><input type="file" id="img-replace-controls" accept="image/*,application/pdf" onchange="handleImgSelect(this,'controls')" style="display:none" /></div><div id="img-content-controls" style="width:100%;text-align:center;background:#fff;"></div></div>
+      <div class="file-gallery" id="gallery-controls">
+        <div class="file-gallery-header no-print">
+          <span class="file-gallery-label">&#128247; Attachments</span>
+          <span class="file-gallery-count" id="gallery-count-controls">No files attached</span>
+        </div>
+        <div class="file-gallery-list" id="gallery-list-controls"></div>
+        <div class="file-gallery-dropzone no-print" id="gallery-dz-controls">
+          <span class="dz-icon">&#128247;</span>
+          <span class="dz-label">Click or drag images / PDFs here</span>
+          <span class="dz-sub">Add as many files as you need</span>
+          <input type="file" id="gallery-input-controls" accept="image/*,application/pdf" multiple onchange="handleGalleryFiles(this,'controls')" />
+        </div>
       </div>
     </div>
     <div class="resize-handle no-print" data-target="body-controls"></div>
@@ -868,6 +553,7 @@
   <!-- ══ STORE KPI DATA ══ -->
   <div class="section-card" id="sc-store">
     <div class="section-head">
+      <div class="section-drag-grip no-print" title="Drag to reorder">&#8942;&#8942;</div>
       <div class="section-head-accent"></div>
       <div class="section-head-title" contenteditable="true" spellcheck="false" data-empty="Section Title">Store KPI Data</div>
       <div class="section-head-actions no-print">
@@ -892,10 +578,18 @@
         </table>
       </div>
       <button class="add-row-btn no-print" onclick="addStoreRow()">+ Add Store Row</button>
-      <div class="section-img-block" id="img-block-store">
-        <div class="img-dropzone" id="img-dropzone-store"><span class="dz-icon">&#128247;</span><span class="dz-label">Click or drag an image / PDF here</span><span class="dz-sub">Select → preview → Apply to embed</span><input type="file" id="img-input-store" accept="image/*,application/pdf" onchange="handleImgSelect(this,'store')" /></div>
-        <div class="img-preview-panel" id="img-preview-store"><div class="preview-label">Preview — click Apply to embed</div><img class="preview-thumb" id="img-thumb-store" src="" alt="preview" style="display:none;" /><div class="pdf-preview-label" id="pdf-label-store" style="display:none;"></div><div class="preview-actions"><button class="btn-apply" onclick="applyImg('store')">&#10003; Apply</button><button class="btn-cancel-preview" onclick="cancelPreview('store')">&#10005; Cancel</button></div></div>
-        <div class="img-applied" id="img-applied-store"><div class="img-applied-controls no-print"><label>&#8596; Width</label><input type="range" min="25" max="100" value="100" oninput="resizeApplied('store',this.value)" /><span class="size-val" id="img-size-val-store">100%</span><button onclick="replaceImg('store')">&#8635; Replace</button><button onclick="removeApplied('store')">&#10005; Remove</button><input type="file" id="img-replace-store" accept="image/*,application/pdf" onchange="handleImgSelect(this,'store')" style="display:none" /></div><div id="img-content-store" style="width:100%;text-align:center;background:#fff;"></div></div>
+      <div class="file-gallery" id="gallery-store">
+        <div class="file-gallery-header no-print">
+          <span class="file-gallery-label">&#128247; Attachments</span>
+          <span class="file-gallery-count" id="gallery-count-store">No files attached</span>
+        </div>
+        <div class="file-gallery-list" id="gallery-list-store"></div>
+        <div class="file-gallery-dropzone no-print" id="gallery-dz-store">
+          <span class="dz-icon">&#128247;</span>
+          <span class="dz-label">Click or drag images / PDFs here</span>
+          <span class="dz-sub">Add as many files as you need</span>
+          <input type="file" id="gallery-input-store" accept="image/*,application/pdf" multiple onchange="handleGalleryFiles(this,'store')" />
+        </div>
       </div>
     </div>
     <div class="resize-handle no-print" data-target="body-store"></div>
@@ -904,6 +598,7 @@
   <!-- ══ AMAZON ══ -->
   <div class="section-card" id="sc-amazon">
     <div class="section-head">
+      <div class="section-drag-grip no-print" title="Drag to reorder">&#8942;&#8942;</div>
       <div class="section-head-accent"></div>
       <div class="section-head-title" contenteditable="true" spellcheck="false" data-empty="Section Title">Amazon</div>
       <div class="section-head-actions no-print">
@@ -920,10 +615,18 @@
         <li><span class="item-text" contenteditable="true" spellcheck="false">There should be plenty of space for the team to drop returns into boxes without having to pull box out each time – below is the example she approved – 6-8 notches above box top</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
       </ul>
       <button class="add-btn no-print" onclick="addItem('amazon-list')">+ Add Item</button>
-      <div class="section-img-block" id="img-block-amazon">
-        <div class="img-dropzone" id="img-dropzone-amazon"><span class="dz-icon">&#128247;</span><span class="dz-label">Click or drag an image / PDF here</span><span class="dz-sub">Select → preview → Apply to embed</span><input type="file" id="img-input-amazon" accept="image/*,application/pdf" onchange="handleImgSelect(this,'amazon')" /></div>
-        <div class="img-preview-panel" id="img-preview-amazon"><div class="preview-label">Preview — click Apply to embed</div><img class="preview-thumb" id="img-thumb-amazon" src="" alt="preview" style="display:none;" /><div class="pdf-preview-label" id="pdf-label-amazon" style="display:none;"></div><div class="preview-actions"><button class="btn-apply" onclick="applyImg('amazon')">&#10003; Apply</button><button class="btn-cancel-preview" onclick="cancelPreview('amazon')">&#10005; Cancel</button></div></div>
-        <div class="img-applied" id="img-applied-amazon"><div class="img-applied-controls no-print"><label>&#8596; Width</label><input type="range" min="25" max="100" value="100" oninput="resizeApplied('amazon',this.value)" /><span class="size-val" id="img-size-val-amazon">100%</span><button onclick="replaceImg('amazon')">&#8635; Replace</button><button onclick="removeApplied('amazon')">&#10005; Remove</button><input type="file" id="img-replace-amazon" accept="image/*,application/pdf" onchange="handleImgSelect(this,'amazon')" style="display:none" /></div><div id="img-content-amazon" style="width:100%;text-align:center;background:#fff;"></div></div>
+      <div class="file-gallery" id="gallery-amazon">
+        <div class="file-gallery-header no-print">
+          <span class="file-gallery-label">&#128247; Attachments</span>
+          <span class="file-gallery-count" id="gallery-count-amazon">No files attached</span>
+        </div>
+        <div class="file-gallery-list" id="gallery-list-amazon"></div>
+        <div class="file-gallery-dropzone no-print" id="gallery-dz-amazon">
+          <span class="dz-icon">&#128247;</span>
+          <span class="dz-label">Click or drag images / PDFs here</span>
+          <span class="dz-sub">Add as many files as you need</span>
+          <input type="file" id="gallery-input-amazon" accept="image/*,application/pdf" multiple onchange="handleGalleryFiles(this,'amazon')" />
+        </div>
       </div>
     </div>
     <div class="resize-handle no-print" data-target="body-amazon"></div>
@@ -932,6 +635,7 @@
   <!-- ══ WEEK RECAP ══ -->
   <div class="section-card" id="sc-recap">
     <div class="section-head">
+      <div class="section-drag-grip no-print" title="Drag to reorder">&#8942;&#8942;</div>
       <div class="section-head-accent"></div>
       <div class="section-head-title" contenteditable="true" spellcheck="false" data-empty="Section Title">Week Recap</div>
       <div class="section-head-actions no-print">
@@ -960,10 +664,18 @@
         </table>
       </div>
       <button class="add-row-btn no-print" onclick="addRecapRow()">+ Add Row</button>
-      <div class="section-img-block" id="img-block-recap">
-        <div class="img-dropzone" id="img-dropzone-recap"><span class="dz-icon">&#128247;</span><span class="dz-label">Click or drag an image / PDF here</span><span class="dz-sub">Select → preview → Apply to embed</span><input type="file" id="img-input-recap" accept="image/*,application/pdf" onchange="handleImgSelect(this,'recap')" /></div>
-        <div class="img-preview-panel" id="img-preview-recap"><div class="preview-label">Preview — click Apply to embed</div><img class="preview-thumb" id="img-thumb-recap" src="" alt="preview" style="display:none;" /><div class="pdf-preview-label" id="pdf-label-recap" style="display:none;"></div><div class="preview-actions"><button class="btn-apply" onclick="applyImg('recap')">&#10003; Apply</button><button class="btn-cancel-preview" onclick="cancelPreview('recap')">&#10005; Cancel</button></div></div>
-        <div class="img-applied" id="img-applied-recap"><div class="img-applied-controls no-print"><label>&#8596; Width</label><input type="range" min="25" max="100" value="100" oninput="resizeApplied('recap',this.value)" /><span class="size-val" id="img-size-val-recap">100%</span><button onclick="replaceImg('recap')">&#8635; Replace</button><button onclick="removeApplied('recap')">&#10005; Remove</button><input type="file" id="img-replace-recap" accept="image/*,application/pdf" onchange="handleImgSelect(this,'recap')" style="display:none" /></div><div id="img-content-recap" style="width:100%;text-align:center;background:#fff;"></div></div>
+      <div class="file-gallery" id="gallery-recap">
+        <div class="file-gallery-header no-print">
+          <span class="file-gallery-label">&#128247; Attachments</span>
+          <span class="file-gallery-count" id="gallery-count-recap">No files attached</span>
+        </div>
+        <div class="file-gallery-list" id="gallery-list-recap"></div>
+        <div class="file-gallery-dropzone no-print" id="gallery-dz-recap">
+          <span class="dz-icon">&#128247;</span>
+          <span class="dz-label">Click or drag images / PDFs here</span>
+          <span class="dz-sub">Add as many files as you need</span>
+          <input type="file" id="gallery-input-recap" accept="image/*,application/pdf" multiple onchange="handleGalleryFiles(this,'recap')" />
+        </div>
       </div>
     </div>
     <div class="resize-handle no-print" data-target="body-recap"></div>
@@ -972,6 +684,7 @@
   <!-- ══ ADDITIONAL NOTES ══ -->
   <div class="section-card" id="sc-notes">
     <div class="section-head">
+      <div class="section-drag-grip no-print" title="Drag to reorder">&#8942;&#8942;</div>
       <div class="section-head-accent"></div>
       <div class="section-head-title" contenteditable="true" spellcheck="false" data-empty="Section Title">Additional Notes</div>
       <div class="section-head-actions no-print">
@@ -984,10 +697,18 @@
         <li><span class="item-text" contenteditable="true" spellcheck="false">Add additional notes here...</span><button class="remove-btn no-print" onclick="removeItem(this)" title="Remove">&#10005;</button></li>
       </ul>
       <button class="add-btn no-print" onclick="addItem('notes-list')">+ Add Item</button>
-      <div class="section-img-block" id="img-block-notes">
-        <div class="img-dropzone" id="img-dropzone-notes"><span class="dz-icon">&#128247;</span><span class="dz-label">Click or drag an image / PDF here</span><span class="dz-sub">Select → preview → Apply to embed</span><input type="file" id="img-input-notes" accept="image/*,application/pdf" onchange="handleImgSelect(this,'notes')" /></div>
-        <div class="img-preview-panel" id="img-preview-notes"><div class="preview-label">Preview — click Apply to embed</div><img class="preview-thumb" id="img-thumb-notes" src="" alt="preview" style="display:none;" /><div class="pdf-preview-label" id="pdf-label-notes" style="display:none;"></div><div class="preview-actions"><button class="btn-apply" onclick="applyImg('notes')">&#10003; Apply</button><button class="btn-cancel-preview" onclick="cancelPreview('notes')">&#10005; Cancel</button></div></div>
-        <div class="img-applied" id="img-applied-notes"><div class="img-applied-controls no-print"><label>&#8596; Width</label><input type="range" min="25" max="100" value="100" oninput="resizeApplied('notes',this.value)" /><span class="size-val" id="img-size-val-notes">100%</span><button onclick="replaceImg('notes')">&#8635; Replace</button><button onclick="removeApplied('notes')">&#10005; Remove</button><input type="file" id="img-replace-notes" accept="image/*,application/pdf" onchange="handleImgSelect(this,'notes')" style="display:none" /></div><div id="img-content-notes" style="width:100%;text-align:center;background:#fff;"></div></div>
+      <div class="file-gallery" id="gallery-notes">
+        <div class="file-gallery-header no-print">
+          <span class="file-gallery-label">&#128247; Attachments</span>
+          <span class="file-gallery-count" id="gallery-count-notes">No files attached</span>
+        </div>
+        <div class="file-gallery-list" id="gallery-list-notes"></div>
+        <div class="file-gallery-dropzone no-print" id="gallery-dz-notes">
+          <span class="dz-icon">&#128247;</span>
+          <span class="dz-label">Click or drag images / PDFs here</span>
+          <span class="dz-sub">Add as many files as you need</span>
+          <input type="file" id="gallery-input-notes" accept="image/*,application/pdf" multiple onchange="handleGalleryFiles(this,'notes')" />
+        </div>
       </div>
     </div>
     <div class="resize-handle no-print" data-target="body-notes"></div>
@@ -1064,8 +785,8 @@ function syncUndoUI() {
 function afterRestore() {
   reattachListeners();
   wireAllResizeHandles();
-  wireAllDragDrop();
-  restoreImgVisibility();
+  wireAllGalleryDropzones();
+  wireAllSectionDrag();
   syncUndoUI();
 }
 
@@ -1094,7 +815,7 @@ document.addEventListener('paste', function(e) {
 });
 
 /* ══════════════════════════════════════════════════════════
-   DRAG-TO-RESIZE  (custom, smooth, works everywhere)
+   DRAG-TO-RESIZE  (section body height)
 ══════════════════════════════════════════════════════════ */
 function wireResizeHandle(handle) {
   handle.addEventListener('mousedown', startResize);
@@ -1107,21 +828,17 @@ function startResize(e) {
   const targetId = handle.dataset.target;
   const body = document.getElementById(targetId);
   if (!body) return;
-
   handle.classList.add('dragging');
   document.body.style.cursor = 'ns-resize';
   document.body.style.userSelect = 'none';
-
   const startY = e.touches ? e.touches[0].clientY : e.clientY;
   const startH = body.getBoundingClientRect().height;
-
   function onMove(ev) {
     const y = ev.touches ? ev.touches[0].clientY : ev.clientY;
     const newH = Math.max(60, startH + (y - startY));
     body.style.height = newH + 'px';
     body.style.overflow = 'auto';
   }
-
   function onUp() {
     handle.classList.remove('dragging');
     document.body.style.cursor = '';
@@ -1132,7 +849,6 @@ function startResize(e) {
     document.removeEventListener('touchend', onUp);
     pushUndo();
   }
-
   document.addEventListener('mousemove', onMove);
   document.addEventListener('mouseup', onUp);
   document.addEventListener('touchmove', onMove, { passive: false });
@@ -1144,6 +860,118 @@ function wireAllResizeHandles() {
 }
 
 /* ══════════════════════════════════════════════════════════
+   DRAG-TO-REORDER SECTIONS
+══════════════════════════════════════════════════════════ */
+let _dragSrc = null;
+
+function wireAllSectionDrag() {
+  document.querySelectorAll('.section-drag-grip').forEach(grip => {
+    // Remove old listeners by cloning
+    const newGrip = grip.cloneNode(true);
+    grip.parentNode.replaceChild(newGrip, grip);
+    newGrip.addEventListener('mousedown', onGripMouseDown);
+    newGrip.addEventListener('touchstart', onGripTouchStart, { passive: false });
+  });
+}
+
+function onGripMouseDown(e) {
+  e.preventDefault();
+  const card = e.currentTarget.closest('.section-card');
+  if (!card) return;
+  startSectionDrag(card, e.clientX, e.clientY, 'mouse');
+}
+
+function onGripTouchStart(e) {
+  e.preventDefault();
+  const card = e.currentTarget.closest('.section-card');
+  if (!card) return;
+  startSectionDrag(card, e.touches[0].clientX, e.touches[0].clientY, 'touch');
+}
+
+function startSectionDrag(card, startX, startY, mode) {
+  pushUndo();
+  _dragSrc = card;
+  card.classList.add('drag-source');
+  document.body.style.userSelect = 'none';
+
+  // Create a floating ghost
+  const rect = card.getBoundingClientRect();
+  const ghost = card.cloneNode(true);
+  ghost.id = 'drag-ghost';
+  ghost.style.cssText = `
+    position: fixed; left: ${rect.left}px; top: ${rect.top}px;
+    width: ${rect.width}px; opacity: 0.88; pointer-events: none;
+    z-index: 9000; box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    border-radius: 10px; transition: none;
+    transform: rotate(1deg) scale(1.01);
+  `;
+  document.body.appendChild(ghost);
+
+  let lastOver = null;
+  const offsetX = startX - rect.left;
+  const offsetY = startY - rect.top;
+
+  function getPos(ev) {
+    return mode === 'touch'
+      ? { x: ev.touches[0].clientX, y: ev.touches[0].clientY }
+      : { x: ev.clientX, y: ev.clientY };
+  }
+
+  function onMove(ev) {
+    const { x, y } = getPos(ev);
+    ghost.style.left = (x - offsetX) + 'px';
+    ghost.style.top  = (y - offsetY) + 'px';
+
+    // Find which card we're hovering over
+    ghost.style.display = 'none';
+    const el = document.elementFromPoint(x, y);
+    ghost.style.display = '';
+    const target = el ? el.closest('.section-card') : null;
+
+    if (target && target !== _dragSrc) {
+      if (lastOver && lastOver !== target) lastOver.classList.remove('drag-over');
+      target.classList.add('drag-over');
+      lastOver = target;
+    } else if (!target && lastOver) {
+      lastOver.classList.remove('drag-over');
+      lastOver = null;
+    }
+  }
+
+  function onUp(ev) {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onUp);
+
+    ghost.remove();
+    card.classList.remove('drag-source');
+    document.body.style.userSelect = '';
+
+    if (lastOver) {
+      lastOver.classList.remove('drag-over');
+      // Insert _dragSrc before or after lastOver based on position
+      const { y } = getPos(ev.touches ? ev : ev);
+      const tRect = lastOver.getBoundingClientRect();
+      const parent = lastOver.parentNode;
+      if (y < tRect.top + tRect.height / 2) {
+        parent.insertBefore(_dragSrc, lastOver);
+      } else {
+        parent.insertBefore(_dragSrc, lastOver.nextSibling);
+      }
+      showToast('Section moved');
+      pushUndo();
+    }
+    _dragSrc = null;
+  }
+
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('touchend', onUp);
+}
+
+/* ══════════════════════════════════════════════════════════
    SECTION CARD ACTIONS
 ══════════════════════════════════════════════════════════ */
 function clearSectionCard(cardId) {
@@ -1152,14 +980,14 @@ function clearSectionCard(cardId) {
   const card = document.getElementById(cardId);
   if (!card) return;
   card.querySelectorAll('[contenteditable="true"]').forEach(el => {
-    // Skip the header title
     if (el.classList.contains('section-head-title')) return;
     el.innerHTML = '';
   });
-  // Also clear bullet lists
   card.querySelectorAll('.bullet-list').forEach(ul => { ul.innerHTML = ''; });
-  // Clear table bodies
   card.querySelectorAll('tbody').forEach(tb => { tb.innerHTML = ''; });
+  // Clear file galleries
+  card.querySelectorAll('.file-gallery-list').forEach(list => { list.innerHTML = ''; });
+  card.querySelectorAll('.file-gallery-count').forEach(el => { el.textContent = 'No files attached'; });
   showToast('Section cleared — press Undo to restore');
 }
 
@@ -1190,13 +1018,12 @@ function showToast(msg, type) {
 }
 
 /* ══════════════════════════════════════════════════════════
-   SAVE AS FILE  (downloads a self-contained HTML with content baked in)
+   SAVE AS FILE
 ══════════════════════════════════════════════════════════ */
-
 function saveTemplate() {
   try {
-    // 1. Convert any PDF canvas elements → data-URL <img> so they survive serialisation
-    document.querySelectorAll('[id^="img-content-"] canvas').forEach(canvas => {
+    // Convert canvas → img before saving
+    document.querySelectorAll('.file-item-content canvas').forEach(canvas => {
       try {
         const img = document.createElement('img');
         img.src = canvas.toDataURL('image/png');
@@ -1206,52 +1033,35 @@ function saveTemplate() {
       } catch(e) {}
     });
 
-    // 2. Grab the live page content HTML
     const contentHTML = document.getElementById('page-content').innerHTML;
-
-    // 3. Grab the full source of this file and splice in the saved content
     const fullHTML = document.documentElement.outerHTML;
-
-    // Replace the page-content div's inner HTML with the current live content
-    // We do a targeted replacement between the opening and closing markers
     const startMarker = '<div id="page-content">';
     const endMarker   = '</div><!-- #page-content -->';
     const startIdx = fullHTML.indexOf(startMarker);
     const endIdx   = fullHTML.indexOf(endMarker);
-
-    if (startIdx === -1 || endIdx === -1) {
-      throw new Error('Could not locate page-content markers in document source.');
-    }
+    if (startIdx === -1 || endIdx === -1) throw new Error('Could not locate page-content markers.');
 
     const savedHTML =
       fullHTML.slice(0, startIdx + startMarker.length) +
       '\n' + contentHTML + '\n' +
       fullHTML.slice(endIdx);
 
-    // 4. Build a filename from the document title + timestamp
     const titleEl = document.querySelector('.header-banner h2');
     const titleText = (titleEl ? titleEl.textContent.trim() : 'DLC Notes').replace(/[^a-zA-Z0-9 _-]/g, '').trim() || 'DLC Notes';
     const now = new Date();
-    const stamp = now.getFullYear() + '-' +
-      String(now.getMonth()+1).padStart(2,'0') + '-' +
-      String(now.getDate()).padStart(2,'0');
+    const stamp = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
     const filename = titleText + ' ' + stamp + '.html';
 
-    // 5. Trigger browser download
     const blob = new Blob([savedHTML], { type: 'text/html;charset=utf-8' });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
-    a.href     = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
     setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
 
-    // 6. Update the save indicator
     const ind = document.getElementById('save-indicator');
     const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     if (ind) ind.textContent = 'Downloaded ' + timeStr;
-
     showToast('&#128190; Saved — check your Downloads folder!');
   } catch(e) {
     showToast('Save failed: ' + e.message, 'error');
@@ -1259,27 +1069,10 @@ function saveTemplate() {
   }
 }
 
-// autoLoad is no longer needed (content is baked in), but kept as a no-op
-// so any existing saved localStorage data doesn't break anything.
 function autoLoad() {}
-
-function restoreImgVisibility() {
-  document.querySelectorAll('[id^="img-content-"]').forEach(content => {
-    if (content.children.length > 0) {
-      const sid = content.id.replace('img-content-', '');
-      const applied  = document.getElementById('img-applied-' + sid);
-      const dropzone = document.getElementById('img-dropzone-' + sid);
-      const preview  = document.getElementById('img-preview-' + sid);
-      if (applied)  applied.style.display  = 'block';
-      if (dropzone) dropzone.style.display  = 'none';
-      if (preview)  preview.style.display   = 'none';
-    }
-  });
-}
 
 function resetTemplate() {
   if (!confirm('Discard all changes and reload the original blank template?')) return;
-  // Navigate to the original file URL without any hash/query, forcing a hard reload
   const clean = window.location.href.split('?')[0].split('#')[0];
   window.location.replace(clean + '?reset=' + Date.now());
 }
@@ -1291,6 +1084,8 @@ function clearAll() {
   if (!confirm('Clear ALL content? You can Undo this.')) return;
   pushUndo();
   document.querySelectorAll('[contenteditable="true"]').forEach(el => { el.innerHTML = ''; });
+  document.querySelectorAll('.file-gallery-list').forEach(list => { list.innerHTML = ''; });
+  document.querySelectorAll('.file-gallery-count').forEach(el => { el.textContent = 'No files attached'; });
   showToast('All content cleared — press Undo to restore');
 }
 
@@ -1317,7 +1112,6 @@ function hasSelection() {
   const sel = window.getSelection();
   return sel && sel.rangeCount > 0 && !sel.isCollapsed;
 }
-
 function wrapSel(tag, style) {
   if (!hasSelection()) { showToast('Select some text first', 'error'); return false; }
   pushUndo();
@@ -1329,7 +1123,6 @@ function wrapSel(tag, style) {
   catch(err) { const f = range.extractContents(); el.appendChild(f); range.insertNode(el); }
   return true;
 }
-
 function applyFont(v) {
   if (!v) return;
   if (!hasSelection()) { showToast('Select some text first', 'error'); document.getElementById('fmt-font').value = ''; return; }
@@ -1410,26 +1203,166 @@ function addRecapRow() {
 }
 
 /* ══════════════════════════════════════════════════════════
+   MULTI-FILE GALLERY
+══════════════════════════════════════════════════════════ */
+let _fileCounter = 0;
+
+function handleGalleryFiles(input, gid) {
+  const files = Array.from(input.files || []);
+  if (!files.length) return;
+  input.value = '';
+  pushUndo();
+  files.forEach(file => addFileToGallery(gid, file));
+}
+
+function addFileToGallery(gid, file) {
+  const listEl  = document.getElementById('gallery-list-' + gid);
+  const countEl = document.getElementById('gallery-count-' + gid);
+  if (!listEl) return;
+
+  _fileCounter++;
+  const fid = gid + '-f' + _fileCounter;
+  const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+  const icon  = isPDF ? '📄' : '🖼️';
+
+  const item = document.createElement('div');
+  item.className = 'file-item expanded';
+  item.id = 'fitem-' + fid;
+  item.innerHTML = `
+    <div class="file-item-header" onclick="toggleFileItem('${fid}')">
+      <span class="file-item-icon">${icon}</span>
+      <span class="file-item-name">${escHtml(file.name)}</span>
+      <span class="file-item-toggle no-print">▼</span>
+    </div>
+    <div class="file-item-controls no-print">
+      ${isPDF ? '' : `<label>↔ Width</label><input type="range" min="25" max="100" value="100" oninput="resizeFileItem('${fid}',this.value)" /><span class="size-val" id="fsz-${fid}">100%</span>`}
+      <button onclick="removeFileItem('${fid}','${gid}')">✕ Remove</button>
+    </div>
+    <div class="file-item-content" id="fcontent-${fid}"></div>
+  `;
+  listEl.appendChild(item);
+
+  // Render the file into the content area
+  const contentEl = document.getElementById('fcontent-' + fid);
+  if (isPDF) {
+    contentEl.innerHTML = '<div style="padding:12px;color:#7b2fbe;font-weight:700;">⏳ Rendering PDF…</div>';
+    const fr = new FileReader();
+    fr.onload = async function(e) {
+      try {
+        const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(e.target.result) }).promise;
+        contentEl.innerHTML = '';
+        for (let p = 1; p <= pdf.numPages; p++) {
+          const page = await pdf.getPage(p);
+          const dw = contentEl.offsetWidth || 750;
+          const vp0 = page.getViewport({ scale: 1 });
+          const vp  = page.getViewport({ scale: dw / vp0.width });
+          const canvas = document.createElement('canvas');
+          canvas.width = vp.width; canvas.height = vp.height;
+          canvas.style.cssText = 'width:100%;height:auto;display:block;margin-bottom:2px;';
+          await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+          contentEl.appendChild(canvas);
+        }
+        showToast('📄 PDF embedded (' + pdf.numPages + ' page' + (pdf.numPages > 1 ? 's' : '') + ')');
+      } catch(err) {
+        contentEl.innerHTML = '<div style="padding:12px;color:#e74c3c;">⚠ Could not render PDF: ' + err.message + '</div>';
+      }
+    };
+    fr.readAsArrayBuffer(file);
+  } else {
+    const fr = new FileReader();
+    fr.onload = function(e) {
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.alt = file.name;
+      img.style.cssText = 'width:100%;height:auto;display:block;object-fit:contain;';
+      contentEl.appendChild(img);
+      showToast('✅ Image added');
+    };
+    fr.readAsDataURL(file);
+  }
+
+  updateGalleryCount(gid);
+}
+
+function toggleFileItem(fid) {
+  const item = document.getElementById('fitem-' + fid);
+  if (item) item.classList.toggle('expanded');
+}
+
+function resizeFileItem(fid, val) {
+  const c = document.getElementById('fcontent-' + fid);
+  const v = document.getElementById('fsz-' + fid);
+  if (c) c.querySelectorAll('img,canvas').forEach(el => { el.style.width = val + '%'; });
+  if (v) v.textContent = val + '%';
+}
+
+function removeFileItem(fid, gid) {
+  if (!confirm('Remove this attachment?')) return;
+  pushUndo();
+  const item = document.getElementById('fitem-' + fid);
+  if (item) item.remove();
+  updateGalleryCount(gid);
+  showToast('Attachment removed');
+}
+
+function updateGalleryCount(gid) {
+  const listEl  = document.getElementById('gallery-list-' + gid);
+  const countEl = document.getElementById('gallery-count-' + gid);
+  if (!listEl || !countEl) return;
+  const n = listEl.querySelectorAll('.file-item').length;
+  countEl.textContent = n === 0 ? 'No files attached' : n + ' file' + (n > 1 ? 's' : '') + ' attached';
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ── Gallery drop-zone wiring ── */
+function wireGalleryDropzone(zone) {
+  zone.addEventListener('dragover', e => {
+    e.preventDefault();
+    zone.classList.add('dz-active');
+  });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dz-active'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('dz-active');
+    const gid = zone.id.replace('gallery-dz-', '');
+    const files = Array.from(e.dataTransfer.files).filter(f =>
+      f.type.startsWith('image/') || f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')
+    );
+    if (!files.length) return;
+    pushUndo();
+    files.forEach(file => addFileToGallery(gid, file));
+  });
+}
+
+function wireAllGalleryDropzones() {
+  document.querySelectorAll('.file-gallery-dropzone').forEach(wireGalleryDropzone);
+}
+
+/* ══════════════════════════════════════════════════════════
    ADD CUSTOM SECTION
 ══════════════════════════════════════════════════════════ */
 let _customCount = 0;
 function addCustomSection() {
   pushUndo();
   _customCount++;
-  const sid = 'custom' + _customCount;
+  const sid    = 'custom' + _customCount;
   const listId = sid + '-list';
   const cardId = 'sc-' + sid;
   const bodyId = 'body-' + sid;
+  const gid    = sid;
 
   const card = document.createElement('div');
   card.className = 'section-card';
   card.id = cardId;
   card.innerHTML = `
     <div class="section-head">
+      <div class="section-drag-grip no-print" title="Drag to reorder">&#8942;&#8942;</div>
       <div class="section-head-accent"></div>
       <div class="section-head-title" contenteditable="true" spellcheck="false" data-empty="Section Title"
-           onfocus="const r=document.createRange();r.selectNodeContents(this);window.getSelection().removeAllRanges();window.getSelection().addRange(r);"
-      >New Section</div>
+           onfocus="const r=document.createRange();r.selectNodeContents(this);window.getSelection().removeAllRanges();window.getSelection().addRange(r);">New Section</div>
       <div class="section-head-actions no-print">
         <button class="sh-btn sh-clear" onclick="clearSectionCard('${cardId}')" title="Clear section content">
           <svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 002 2h8a2 2 0 002-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
@@ -1444,10 +1377,18 @@ function addCustomSection() {
         <li><span class="item-text" contenteditable="true" spellcheck="false" data-empty="Type here..."></span><button class="remove-btn no-print" onclick="pushUndo();removeItem(this)" title="Remove">&#10005;</button></li>
       </ul>
       <button class="add-btn no-print" onclick="addItem('${listId}')">+ Add Item</button>
-      <div class="section-img-block" id="img-block-${sid}">
-        <div class="img-dropzone" id="img-dropzone-${sid}"><span class="dz-icon">&#128247;</span><span class="dz-label">Click or drag an image / PDF here</span><span class="dz-sub">Select → preview → Apply to embed</span><input type="file" id="img-input-${sid}" accept="image/*,application/pdf" onchange="handleImgSelect(this,'${sid}')" /></div>
-        <div class="img-preview-panel" id="img-preview-${sid}"><div class="preview-label">Preview — click Apply to embed</div><img class="preview-thumb" id="img-thumb-${sid}" src="" alt="preview" style="display:none;" /><div class="pdf-preview-label" id="pdf-label-${sid}" style="display:none;"></div><div class="preview-actions"><button class="btn-apply" onclick="applyImg('${sid}')">&#10003; Apply</button><button class="btn-cancel-preview" onclick="cancelPreview('${sid}')">&#10005; Cancel</button></div></div>
-        <div class="img-applied" id="img-applied-${sid}"><div class="img-applied-controls no-print"><label>&#8596; Width</label><input type="range" min="25" max="100" value="100" oninput="resizeApplied('${sid}',this.value)" /><span class="size-val" id="img-size-val-${sid}">100%</span><button onclick="replaceImg('${sid}')">&#8635; Replace</button><button onclick="removeApplied('${sid}')">&#10005; Remove</button><input type="file" id="img-replace-${sid}" accept="image/*,application/pdf" onchange="handleImgSelect(this,'${sid}')" style="display:none" /></div><div id="img-content-${sid}" style="width:100%;text-align:center;background:#fff;"></div></div>
+      <div class="file-gallery" id="gallery-${gid}">
+        <div class="file-gallery-header no-print">
+          <span class="file-gallery-label">&#128247; Attachments</span>
+          <span class="file-gallery-count" id="gallery-count-${gid}">No files attached</span>
+        </div>
+        <div class="file-gallery-list" id="gallery-list-${gid}"></div>
+        <div class="file-gallery-dropzone no-print" id="gallery-dz-${gid}">
+          <span class="dz-icon">&#128247;</span>
+          <span class="dz-label">Click or drag images / PDFs here</span>
+          <span class="dz-sub">Add as many files as you need</span>
+          <input type="file" id="gallery-input-${gid}" accept="image/*,application/pdf" multiple onchange="handleGalleryFiles(this,'${gid}')" />
+        </div>
       </div>
     </div>
     <div class="resize-handle no-print" data-target="${bodyId}"></div>
@@ -1455,134 +1396,16 @@ function addCustomSection() {
 
   document.getElementById('custom-sections-container').appendChild(card);
   wireResizeHandle(card.querySelector('.resize-handle'));
-  wireDragDrop(card.querySelector('.img-dropzone'));
+  wireGalleryDropzone(card.querySelector('.file-gallery-dropzone'));
+  wireAllSectionDrag();
   reattachListeners();
 
   const title = card.querySelector('.section-head-title');
   title.focus();
   const r = document.createRange(); r.selectNodeContents(title);
   window.getSelection().removeAllRanges(); window.getSelection().addRange(r);
-
   showToast('New section added');
 }
-
-/* ══════════════════════════════════════════════════════════
-   IMAGE / PDF UPLOAD
-══════════════════════════════════════════════════════════ */
-const _pending = {};
-
-function handleImgSelect(input, sid) {
-  const file = input.files && input.files[0];
-  if (!file) return;
-  _pending[sid] = file;
-  input.value = '';
-  const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
-  document.getElementById('img-dropzone-' + sid).style.display = 'none';
-  document.getElementById('img-preview-' + sid).style.display  = 'block';
-  const thumb  = document.getElementById('img-thumb-' + sid);
-  const pdfLbl = document.getElementById('pdf-label-' + sid);
-  if (isPDF) {
-    thumb.style.display = 'none'; pdfLbl.style.display = 'block';
-    pdfLbl.textContent = '📄 PDF: "' + file.name + '" — all pages will be embedded when you click Apply';
-  } else {
-    pdfLbl.style.display = 'none'; thumb.style.display = 'block';
-    const fr = new FileReader(); fr.onload = e => { thumb.src = e.target.result; }; fr.readAsDataURL(file);
-  }
-}
-
-function applyImg(sid) {
-  const file = _pending[sid]; if (!file) return;
-  pushUndo();
-  const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
-  const preview = document.getElementById('img-preview-' + sid);
-  const applied = document.getElementById('img-applied-' + sid);
-  const content = document.getElementById('img-content-' + sid);
-  const slider  = applied.querySelector('input[type="range"]');
-  const valEl   = document.getElementById('img-size-val-' + sid);
-  preview.style.display = 'none'; applied.style.display = 'block';
-  if (slider) slider.value = 100; if (valEl) valEl.textContent = '100%';
-  if (isPDF) {
-    content.innerHTML = '<div style="padding:12px;color:#7b2fbe;font-weight:700;">⏳ Rendering PDF…</div>';
-    const fr = new FileReader();
-    fr.onload = async function(e) {
-      try {
-        const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(e.target.result) }).promise;
-        content.innerHTML = '';
-        for (let p = 1; p <= pdf.numPages; p++) {
-          const page = await pdf.getPage(p);
-          const dw = content.offsetWidth || 750;
-          const vp0 = page.getViewport({ scale: 1 });
-          const vp  = page.getViewport({ scale: dw / vp0.width });
-          const canvas = document.createElement('canvas');
-          canvas.width = vp.width; canvas.height = vp.height;
-          canvas.style.cssText = 'width:100%;height:auto;display:block;margin-bottom:2px;';
-          canvas.className = 'pdf-page-img';
-          await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
-          content.appendChild(canvas);
-        }
-        const sb = applied.querySelector('.img-applied-controls');
-        if (sb) sb.querySelectorAll('input[type="range"],label,.size-val').forEach(el => el.style.display = 'none');
-        showToast('📄 PDF embedded (' + pdf.numPages + ' page' + (pdf.numPages > 1 ? 's' : '') + ')');
-      } catch(err) { content.innerHTML = '<div style="padding:12px;color:#e74c3c;">⚠ Could not render PDF: ' + err.message + '</div>'; }
-    };
-    fr.readAsArrayBuffer(file);
-  } else {
-    const fr = new FileReader();
-    fr.onload = function(e) {
-      content.innerHTML = '';
-      const img = document.createElement('img');
-      img.src = e.target.result; img.alt = 'Section image';
-      img.style.cssText = 'width:100%;height:auto;display:block;object-fit:contain;';
-      content.appendChild(img);
-      showToast('✅ Image applied');
-    };
-    fr.readAsDataURL(file);
-  }
-  delete _pending[sid];
-}
-
-function cancelPreview(sid) {
-  delete _pending[sid];
-  document.getElementById('img-preview-' + sid).style.display  = 'none';
-  document.getElementById('img-dropzone-' + sid).style.display = 'flex';
-}
-function resizeApplied(sid, val) {
-  const c = document.getElementById('img-content-' + sid);
-  const v = document.getElementById('img-size-val-' + sid);
-  if (c) c.querySelectorAll('img,canvas').forEach(el => { el.style.width = val + '%'; });
-  if (v) v.textContent = val + '%';
-}
-function replaceImg(sid) { const i = document.getElementById('img-replace-' + sid); if (i) i.click(); }
-function removeApplied(sid) {
-  if (!confirm('Remove this image?')) return;
-  pushUndo();
-  const applied  = document.getElementById('img-applied-' + sid);
-  const dropzone = document.getElementById('img-dropzone-' + sid);
-  const content  = document.getElementById('img-content-' + sid);
-  if (content) content.innerHTML = '';
-  applied.style.display = 'none'; dropzone.style.display = 'flex';
-  const sb = applied.querySelector('.img-applied-controls');
-  if (sb) sb.querySelectorAll('input[type="range"],label,.size-val').forEach(el => el.style.display = '');
-  showToast('Image removed');
-}
-
-/* ══════════════════════════════════════════════════════════
-   DRAG-DROP for image zones
-══════════════════════════════════════════════════════════ */
-function wireDragDrop(zone) {
-  zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = '#7b2fbe'; zone.style.background = '#f0e6ff'; });
-  zone.addEventListener('dragleave', () => { zone.style.borderColor = ''; zone.style.background = ''; });
-  zone.addEventListener('drop', e => {
-    e.preventDefault(); zone.style.borderColor = ''; zone.style.background = '';
-    const block = zone.closest('.section-img-block'); if (!block) return;
-    const sid = block.id.replace('img-block-', '');
-    const input = document.getElementById('img-input-' + sid);
-    if (!input || !e.dataTransfer.files.length) return;
-    const dt = new DataTransfer(); dt.items.add(e.dataTransfer.files[0]);
-    input.files = dt.files; handleImgSelect(input, sid);
-  });
-}
-function wireAllDragDrop() { document.querySelectorAll('.img-dropzone').forEach(wireDragDrop); }
 
 /* ══════════════════════════════════════════════════════════
    AUTO-CAPTURE UNDO ON FOCUS
@@ -1600,8 +1423,9 @@ function _onFocus() { clearTimeout(_debounce); _debounce = setTimeout(pushUndo, 
    INIT
 ══════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', function() {
-  wireAllDragDrop();
   wireAllResizeHandles();
+  wireAllGalleryDropzones();
+  wireAllSectionDrag();
   autoLoad();
   reattachListeners();
   syncUndoUI();
