@@ -692,11 +692,11 @@
 
   <!-- Save -->
   <div class="tb-group">
-    <button class="tb-btn green" onclick="saveTemplate()">
+    <button class="tb-btn green" onclick="saveTemplate()" title="Download a saved copy of this file to your computer">
       <svg viewBox="0 0 24 24"><path d="M17 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4zm-5 16a3 3 0 110-6 3 3 0 010 6zm3-10H5V5h10v4z"/></svg>
-      Save
+      Save File
     </button>
-    <span class="save-indicator" id="save-indicator">Not saved yet</span>
+    <span class="save-indicator" id="save-indicator" title="Click Save File to download — then open that file next time">Open saved file to resume</span>
   </div>
 
   <div class="toolbar-sep"></div>
@@ -1190,13 +1190,12 @@ function showToast(msg, type) {
 }
 
 /* ══════════════════════════════════════════════════════════
-   SAVE / LOAD / RESET
+   SAVE AS FILE  (downloads a self-contained HTML with content baked in)
 ══════════════════════════════════════════════════════════ */
-const STORAGE_KEY = 'dlc_notes_v5';
 
 function saveTemplate() {
   try {
-    // Convert canvas → img before saving
+    // 1. Convert any PDF canvas elements → data-URL <img> so they survive serialisation
     document.querySelectorAll('[id^="img-content-"] canvas').forEach(canvas => {
       try {
         const img = document.createElement('img');
@@ -1206,26 +1205,63 @@ function saveTemplate() {
         canvas.parentNode.replaceChild(img, canvas);
       } catch(e) {}
     });
-    const data = { v: 5, at: new Date().toLocaleString(), html: document.getElementById('page-content').innerHTML };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+    // 2. Grab the live page content HTML
+    const contentHTML = document.getElementById('page-content').innerHTML;
+
+    // 3. Grab the full source of this file and splice in the saved content
+    const fullHTML = document.documentElement.outerHTML;
+
+    // Replace the page-content div's inner HTML with the current live content
+    // We do a targeted replacement between the opening and closing markers
+    const startMarker = '<div id="page-content">';
+    const endMarker   = '</div><!-- #page-content -->';
+    const startIdx = fullHTML.indexOf(startMarker);
+    const endIdx   = fullHTML.indexOf(endMarker);
+
+    if (startIdx === -1 || endIdx === -1) {
+      throw new Error('Could not locate page-content markers in document source.');
+    }
+
+    const savedHTML =
+      fullHTML.slice(0, startIdx + startMarker.length) +
+      '\n' + contentHTML + '\n' +
+      fullHTML.slice(endIdx);
+
+    // 4. Build a filename from the document title + timestamp
+    const titleEl = document.querySelector('.header-banner h2');
+    const titleText = (titleEl ? titleEl.textContent.trim() : 'DLC Notes').replace(/[^a-zA-Z0-9 _-]/g, '').trim() || 'DLC Notes';
+    const now = new Date();
+    const stamp = now.getFullYear() + '-' +
+      String(now.getMonth()+1).padStart(2,'0') + '-' +
+      String(now.getDate()).padStart(2,'0');
+    const filename = titleText + ' ' + stamp + '.html';
+
+    // 5. Trigger browser download
+    const blob = new Blob([savedHTML], { type: 'text/html;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
+
+    // 6. Update the save indicator
     const ind = document.getElementById('save-indicator');
-    if (ind) ind.textContent = 'Saved ' + data.at;
-    showToast('&#128190; Saved!');
-  } catch(e) { showToast('Could not save: ' + e.message, 'error'); }
+    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (ind) ind.textContent = 'Downloaded ' + timeStr;
+
+    showToast('&#128190; Saved — check your Downloads folder!');
+  } catch(e) {
+    showToast('Save failed: ' + e.message, 'error');
+    console.error('saveTemplate:', e);
+  }
 }
 
-function autoLoad() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
-    const data = JSON.parse(raw);
-    if (!data.html) return;
-    document.getElementById('page-content').innerHTML = data.html;
-    afterRestore();
-    const ind = document.getElementById('save-indicator');
-    if (ind) ind.textContent = 'Saved ' + (data.at || '—');
-  } catch(e) { console.warn('autoLoad:', e); }
-}
+// autoLoad is no longer needed (content is baked in), but kept as a no-op
+// so any existing saved localStorage data doesn't break anything.
+function autoLoad() {}
 
 function restoreImgVisibility() {
   document.querySelectorAll('[id^="img-content-"]').forEach(content => {
@@ -1242,9 +1278,10 @@ function restoreImgVisibility() {
 }
 
 function resetTemplate() {
-  if (!confirm('Erase saved data and restore the blank template?')) return;
-  localStorage.removeItem(STORAGE_KEY);
-  location.reload();
+  if (!confirm('Discard all changes and reload the original blank template?')) return;
+  // Navigate to the original file URL without any hash/query, forcing a hard reload
+  const clean = window.location.href.split('?')[0].split('#')[0];
+  window.location.replace(clean + '?reset=' + Date.now());
 }
 
 /* ══════════════════════════════════════════════════════════
