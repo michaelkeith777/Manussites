@@ -1699,15 +1699,16 @@ function addCustomSection() {
    it directly to a .pdf file — no browser print dialog at all.
 ══════════════════════════════════════════════════════════ */
 function downloadPDF() {
-  // Collect all images/canvases as data-URLs so they survive the new window
-  document.querySelectorAll('.file-item-content img').forEach(img => {
-    if (img.src && !img.dataset.printSrc) img.dataset.printSrc = img.src;
-  });
+  if (typeof html2pdf === 'undefined') {
+    showToast('PDF library not loaded yet — please wait a moment and try again', 'error');
+    return;
+  }
+
+  // Snapshot canvas elements to img data-URLs before building PDF
   document.querySelectorAll('.file-item-content canvas').forEach(canvas => {
     try { canvas.dataset.printSrc = canvas.toDataURL('image/png'); } catch(e) {}
   });
 
-  // ── Build clean HTML for the print window ──────────────────
   const docTitle = document.querySelector('.header-banner h2');
   const title = docTitle ? docTitle.innerText.trim() : 'DLC Notes';
 
@@ -1721,266 +1722,203 @@ function downloadPDF() {
     }
   });
 
-  // Sections
-  let sectionsHtml = '';
-  document.querySelectorAll('.section-card').forEach(card => {
-    const headTitle = card.querySelector('.section-head-title');
-    if (!headTitle) return;
-    const sectionTitle = headTitle.innerText.trim();
-
-    // Bullet items
-    let itemsHtml = '';
-    card.querySelectorAll('.bullet-list .item-text').forEach(item => {
-      const txt = item.innerHTML.trim();
-      if (txt) itemsHtml += `<li>${txt}</li>`;
-    });
-
-    // Tables
-    let tablesHtml = '';
-    card.querySelectorAll('.data-table').forEach(tbl => {
-      tablesHtml += '<table class="p-table">';
-      tbl.querySelectorAll('tr').forEach(row => {
-        tablesHtml += '<tr>';
-        row.querySelectorAll('th, td').forEach(cell => {
-          // Skip the no-print remove-button cells
-          if (cell.classList.contains('no-print')) return;
-          const tag = cell.tagName.toLowerCase();
-          const cls = cell.className.replace('no-print','').trim();
-          tablesHtml += `<${tag} class="${cls}">${cell.innerHTML}</${tag}>`;
-        });
-        tablesHtml += '</tr>';
-      });
-      tablesHtml += '</table>';
-    });
-
-    // Attachments (images + PDF canvases)
-    let attachHtml = '';
-    card.querySelectorAll('.file-item').forEach(item => {
-      const nameEl = item.querySelector('.file-item-name');
-      const name   = nameEl ? nameEl.innerText.trim() : 'Attachment';
-      const iconEl = item.querySelector('.file-item-icon');
-      const icon   = iconEl ? iconEl.innerText : '📎';
-
-      let mediaHtml = '';
-      item.querySelectorAll('.file-item-content img').forEach(img => {
-        const src = img.dataset.printSrc || img.src;
-        if (src) {
-          const w = img.style.width || '100%';
-          mediaHtml += `<img src="${src}" style="max-width:${w};width:${w};height:auto;display:block;margin:0 auto 4px;" />`;
-        }
-      });
-      item.querySelectorAll('.file-item-content canvas').forEach(canvas => {
-        const src = canvas.dataset.printSrc;
-        if (src) mediaHtml += `<img src="${src}" style="max-width:100%;width:100%;height:auto;display:block;margin:0 auto 4px;" />`;
-      });
-
-      if (mediaHtml) {
-        attachHtml += `<div class="p-attach">
-          <div class="p-attach-name">${icon} ${name}</div>
-          ${mediaHtml}
-        </div>`;
-      }
-    });
-
-    const hasContent = itemsHtml || tablesHtml || attachHtml;
-    if (!hasContent && !sectionTitle) return;
-
-    sectionsHtml += `
-      <div class="p-section">
-        <div class="p-section-head">
-          <div class="p-section-accent"></div>
-          <div class="p-section-title">${sectionTitle}</div>
-        </div>
-        <div class="p-section-body">
-          ${itemsHtml ? `<ul class="p-list">${itemsHtml}</ul>` : ''}
-          ${tablesHtml}
-          ${attachHtml}
-        </div>
-      </div>`;
-  });
-
-  // ── CSS for the off-screen PDF element ────────────────────────
-  const css = `
-    *, *::before, *::after { box-sizing: border-box; }
-    body {
-      margin: 0; padding: 0;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      font-size: 10pt;
-      color: #1a1a2e;
-      background: #fff;
-      width: 100%;
-    }
-
-    /* ── Document header ── */
-    .p-header {
-      background: linear-gradient(135deg, #f5a623 0%, #e07b00 100%) !important;
-      padding: 12px 18px 10px;
-      width: 100%;
-    }
-    .p-header h1 { font-size: 16pt; font-weight: 800; color: #fff !important; margin: 0; }
-    .p-meta {
-      background: #fff8ee !important;
-      border-left: 5px solid #f5a623 !important;
-      padding: 7px 18px;
-      display: flex; flex-wrap: wrap; gap: 18px; align-items: center;
-    }
-    .meta-item { display: flex; align-items: center; gap: 5px; }
-    .meta-label { font-size: 7pt; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.4px; }
-    .meta-val   { font-size: 10pt; font-weight: 600; color: #333; }
-
-    /* ── Sections ── */
-    .p-section {
-      border: 1px solid #d0d0d8;
-      border-radius: 5px;
-      margin: 8px 0;
-      overflow: hidden;
-      page-break-inside: avoid;
-      break-inside: avoid;
-    }
-    .p-section-head {
-      display: flex; align-items: center;
-      background: linear-gradient(90deg, #1e1e3f 0%, #2a2a52 100%) !important;
-      min-height: 26px;
-    }
-    .p-section-accent { width: 4px; min-height: 26px; background: #f5a623 !important; flex-shrink: 0; margin-right: 10px; }
-    .p-section-title { font-size: 8pt; font-weight: 700; color: #f0f0ff !important; text-transform: uppercase; letter-spacing: 1px; padding: 5px 6px; }
-    .p-section-body { padding: 7px 12px 6px; }
-
-    /* ── Bullet list ── */
-    .p-list { list-style: none; padding: 0; margin: 0 0 4px; }
-    .p-list li {
-      display: flex; align-items: flex-start; gap: 7px;
-      margin-bottom: 3px; padding: 2px 4px;
-      page-break-inside: avoid; break-inside: avoid;
-    }
-    .p-list li::before { content: "\u2022"; color: #f5a623 !important; font-size: 1rem; line-height: 1.5; flex-shrink: 0; }
-
-    /* ── Tables ── */
-    .p-table { width: 100%; border-collapse: collapse; font-size: 8pt; margin-top: 5px; table-layout: auto; }
-    .p-table th {
-      background: #1a1a2e !important; color: #f5a623 !important;
-      padding: 5px 7px; font-size: 7pt; text-align: left;
-      border: 1px solid #333; white-space: normal; word-break: break-word;
-    }
-    .p-table td {
-      padding: 4px 7px; border: 1px solid #ddd;
-      vertical-align: top; font-size: 8pt;
-      word-break: break-word; white-space: normal;
-    }
-    .p-table tr:nth-child(even) td { background: #f8f8f8 !important; }
-    .store-table th, .store-table td { text-align: center; }
-    .store-table .store-name-cell { text-align: left; font-weight: 600; }
-    .date-cell { font-weight: 700; color: #4a1a7a; }
-    .topic-cell { font-weight: 700; color: #1a1a2e; }
-
-    /* ── Attachments ── */
-    .p-attach {
-      border: 1px solid #e0e0e0; border-radius: 4px;
-      margin-top: 6px; overflow: hidden;
-      page-break-inside: avoid; break-inside: avoid;
-    }
-    .p-attach-name {
-      font-size: 7pt; font-weight: 700; color: #555;
-      background: #f5f5f5 !important; padding: 3px 8px;
-      border-bottom: 1px solid #e0e0e0;
-    }
-    .p-attach img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
-
-    /* ── Highlight ── */
-    mark, .highlight { background: #ffe066 !important; padding: 1px 2px; border-radius: 2px; }
-
-    /* ── @media print: hide the bar, remove screen-only spacing ── */
-    @media print {
-      *, *::before, *::after {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
-      .print-bar { display: none !important; }
-      .print-content { margin-top: 0 !important; }
-      html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
-      .p-header { background: linear-gradient(135deg, #f5a623 0%, #e07b00 100%) !important; }
-      .p-meta { background: #fff8ee !important; }
-      .p-section-head { background: linear-gradient(90deg, #1e1e3f 0%, #2a2a52 100%) !important; }
-      .p-section-accent { background: #f5a623 !important; }
-      .p-section-title { color: #f0f0ff !important; }
-      .p-header h1 { color: #fff !important; }
-      .p-list li::before { color: #f5a623 !important; }
-      .p-table th { background: #1a1a2e !important; color: #f5a623 !important; }
-      .p-table tr:nth-child(even) td { background: #f8f8f8 !important; }
-      .p-attach-name { background: #f5f5f5 !important; }
-      mark, .highlight { background: #ffe066 !important; }
-    }
-  `;
-
-  // ── Build off-screen container and render to PDF ────────────
-  if (typeof html2pdf === 'undefined') {
-    showToast('PDF library not loaded yet — please wait a moment and try again', 'error');
-    return;
-  }
+  // ── Build each section as DOM nodes with full inline styles ──
+  // (html2canvas ignores stylesheet rules; everything must be inline)
 
   // Disable button while generating
   const pdfBtn = document.getElementById('pdfBtn');
-  if (pdfBtn) { pdfBtn.disabled = true; pdfBtn.textContent = 'Generating…'; }
-  showToast('Generating PDF — please wait…', 'info');
+  if (pdfBtn) { pdfBtn.disabled = true; pdfBtn.textContent = 'Generating...'; }
+  showToast('Generating PDF - please wait...', 'info');
 
-  // Build the container div with inline styles (html2pdf ignores external stylesheets)
-  const container = document.createElement('div');
-  container.style.cssText = 'width:750px;font-family:Segoe UI,Arial,sans-serif;font-size:10pt;color:#1a1a2e;background:#fff;padding:0;margin:0;';
+  // Outer wrapper
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'width:720px;font-family:Segoe UI,Arial,sans-serif;font-size:10pt;color:#1a1a2e;background:#fff;padding:0;margin:0;';
 
-  // Inject a <style> block so html2pdf picks up our rules
-  const styleEl = document.createElement('style');
-  styleEl.textContent = css;
-  container.appendChild(styleEl);
-
-  // Header
+  // ---- Header ----
   const hdr = document.createElement('div');
-  hdr.className = 'p-header';
-  hdr.innerHTML = `<h1 style="font-size:16pt;font-weight:800;color:#fff;margin:0;">${title}</h1>`;
-  hdr.style.cssText = 'background:linear-gradient(135deg,#f5a623 0%,#e07b00 100%);padding:12px 18px 10px;width:100%;';
-  container.appendChild(hdr);
+  hdr.style.cssText = 'background:#e07b00;padding:12px 18px 10px;width:100%;';
+  const hdrH1 = document.createElement('h1');
+  hdrH1.style.cssText = 'font-size:16pt;font-weight:800;color:#fff;margin:0;font-family:Segoe UI,Arial,sans-serif;';
+  hdrH1.textContent = title;
+  hdr.appendChild(hdrH1);
+  wrap.appendChild(hdr);
 
-  // Meta bar
-  const meta = document.createElement('div');
-  meta.className = 'p-meta';
-  meta.innerHTML = metaHtml;
-  meta.style.cssText = 'background:#fff8ee;border-left:5px solid #f5a623;padding:7px 18px;display:flex;flex-wrap:wrap;gap:18px;align-items:center;';
-  container.appendChild(meta);
+  // ---- Meta bar ----
+  const metaBar = document.createElement('div');
+  metaBar.style.cssText = 'background:#fff8ee;border-left:5px solid #f5a623;padding:7px 18px;display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin-bottom:4px;';
+  document.querySelectorAll('.header-sub .field-group').forEach(function(fg) {
+    var lbl = fg.querySelector('label');
+    var val = fg.querySelector('.editable-field');
+    if (lbl && val && val.innerText.trim()) {
+      var item = document.createElement('div');
+      item.style.cssText = 'display:flex;align-items:center;gap:5px;';
+      var labelEl = document.createElement('span');
+      labelEl.style.cssText = 'font-size:7pt;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.4px;';
+      labelEl.textContent = lbl.innerText.trim();
+      var valEl = document.createElement('span');
+      valEl.style.cssText = 'font-size:10pt;font-weight:600;color:#333;';
+      valEl.textContent = val.innerText.trim();
+      item.appendChild(labelEl);
+      item.appendChild(valEl);
+      metaBar.appendChild(item);
+    }
+  });
+  wrap.appendChild(metaBar);
 
-  // Sections
-  const sectDiv = document.createElement('div');
-  sectDiv.innerHTML = sectionsHtml;
-  container.appendChild(sectDiv);
+  // ---- Sections ----
+  document.querySelectorAll('.section-card').forEach(function(card) {
+    var headTitleEl = card.querySelector('.section-head-title');
+    if (!headTitleEl) return;
+    var sectionTitle = headTitleEl.innerText.trim();
 
-  // Append off-screen (must be in DOM for html2pdf to measure)
-  container.style.position = 'absolute';
-  container.style.left = '-9999px';
-  container.style.top = '0';
-  document.body.appendChild(container);
+    // Collect bullet items
+    var bullets = [];
+    card.querySelectorAll('.bullet-list .item-text').forEach(function(item) {
+      var txt = item.innerText.trim();
+      if (txt) bullets.push(txt);
+    });
 
-  // File name from title
-  const safeTitle = title.replace(/[^a-z0-9\s\-_]/gi, '').trim().replace(/\s+/g, '_') || 'DLC_Notes';
-  const today = new Date().toISOString().slice(0,10);
-  const fileName = safeTitle + '_' + today + '.pdf';
+    // Collect table rows
+    var tables = card.querySelectorAll('.data-table');
+
+    // Collect attachments
+    var attachments = [];
+    card.querySelectorAll('.file-item').forEach(function(item) {
+      var nameEl = item.querySelector('.file-item-name');
+      var name = nameEl ? nameEl.innerText.trim() : 'Attachment';
+      var srcs = [];
+      item.querySelectorAll('.file-item-content img').forEach(function(img) {
+        var src = img.dataset.printSrc || img.src;
+        if (src) srcs.push({ src: src, w: img.style.width || '100%' });
+      });
+      item.querySelectorAll('.file-item-content canvas').forEach(function(canvas) {
+        if (canvas.dataset.printSrc) srcs.push({ src: canvas.dataset.printSrc, w: '100%' });
+      });
+      if (srcs.length) attachments.push({ name: name, srcs: srcs });
+    });
+
+    if (!bullets.length && !tables.length && !attachments.length && !sectionTitle) return;
+
+    // Section card
+    var sec = document.createElement('div');
+    sec.style.cssText = 'border:1px solid #d0d0d8;border-radius:5px;margin:8px 0;overflow:hidden;';
+
+    // Section header
+    var secHead = document.createElement('div');
+    secHead.style.cssText = 'display:flex;align-items:center;background:#1e1e3f;min-height:26px;';
+    var accent = document.createElement('div');
+    accent.style.cssText = 'width:4px;min-height:26px;background:#f5a623;flex-shrink:0;margin-right:10px;';
+    var secTitle = document.createElement('div');
+    secTitle.style.cssText = 'font-size:8pt;font-weight:700;color:#f0f0ff;text-transform:uppercase;letter-spacing:1px;padding:5px 6px;font-family:Segoe UI,Arial,sans-serif;';
+    secTitle.textContent = sectionTitle;
+    secHead.appendChild(accent);
+    secHead.appendChild(secTitle);
+    sec.appendChild(secHead);
+
+    // Section body
+    var body = document.createElement('div');
+    body.style.cssText = 'padding:7px 12px 6px;';
+
+    // Bullet list
+    if (bullets.length) {
+      var ul = document.createElement('ul');
+      ul.style.cssText = 'list-style:none;padding:0;margin:0 0 4px;';
+      bullets.forEach(function(txt) {
+        var li = document.createElement('li');
+        li.style.cssText = 'display:flex;align-items:flex-start;gap:7px;margin-bottom:3px;padding:2px 4px;';
+        var bullet = document.createElement('span');
+        bullet.style.cssText = 'color:#f5a623;font-size:1rem;line-height:1.5;flex-shrink:0;';
+        bullet.textContent = '\u2022';
+        var text = document.createElement('span');
+        text.innerHTML = txt;
+        li.appendChild(bullet);
+        li.appendChild(text);
+        ul.appendChild(li);
+      });
+      body.appendChild(ul);
+    }
+
+    // Tables
+    tables.forEach(function(srcTbl) {
+      var tbl = document.createElement('table');
+      tbl.style.cssText = 'width:100%;border-collapse:collapse;font-size:8pt;margin-top:5px;table-layout:fixed;';
+      srcTbl.querySelectorAll('tr').forEach(function(srcRow) {
+        var tr = document.createElement('tr');
+        var isHeader = srcRow.querySelector('th') !== null;
+        srcRow.querySelectorAll('th,td').forEach(function(srcCell) {
+          if (srcCell.classList.contains('no-print')) return;
+          var cell = document.createElement(srcCell.tagName.toLowerCase());
+          cell.innerHTML = srcCell.innerHTML;
+          if (isHeader) {
+            cell.style.cssText = 'background:#1a1a2e;color:#f5a623;padding:5px 7px;font-size:7pt;text-align:left;border:1px solid #333;word-break:break-word;white-space:normal;';
+          } else {
+            cell.style.cssText = 'padding:4px 7px;border:1px solid #ddd;vertical-align:top;font-size:8pt;word-break:break-word;white-space:normal;';
+          }
+          tr.appendChild(cell);
+        });
+        tbl.appendChild(tr);
+      });
+      body.appendChild(tbl);
+    });
+
+    // Attachments
+    attachments.forEach(function(att) {
+      var attDiv = document.createElement('div');
+      attDiv.style.cssText = 'border:1px solid #e0e0e0;border-radius:4px;margin-top:6px;overflow:hidden;';
+      var attName = document.createElement('div');
+      attName.style.cssText = 'font-size:7pt;font-weight:700;color:#555;background:#f5f5f5;padding:3px 8px;border-bottom:1px solid #e0e0e0;';
+      attName.textContent = att.name;
+      attDiv.appendChild(attName);
+      att.srcs.forEach(function(s) {
+        var img = document.createElement('img');
+        img.src = s.src;
+        img.style.cssText = 'max-width:' + s.w + ';width:' + s.w + ';height:auto;display:block;margin:0 auto 4px;';
+        attDiv.appendChild(img);
+      });
+      body.appendChild(attDiv);
+    });
+
+    sec.appendChild(body);
+    wrap.appendChild(sec);
+  });
+
+  // Place off-screen
+  wrap.style.position = 'absolute';
+  wrap.style.left = '-9999px';
+  wrap.style.top = '0';
+  document.body.appendChild(wrap);
+
+  // File name
+  var safeTitle = title.replace(/[^a-z0-9 _-]/gi, '').trim().replace(/ +/g, '_') || 'DLC_Notes';
+  var today = new Date().toISOString().slice(0,10);
+  var fileName = safeTitle + '_' + today + '.pdf';
+
+  var pdfBtnRef = pdfBtn;
+  var resetBtn = function() {
+    if (pdfBtnRef) {
+      pdfBtnRef.disabled = false;
+      pdfBtnRef.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"></path></svg> Download PDF';
+    }
+  };
 
   html2pdf()
     .set({
-      margin:       [0.55, 0.5, 0.55, 0.5],
-      filename:     fileName,
-      image:        { type: 'jpeg', quality: 0.97 },
-      html2canvas:  { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff' },
-      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' },
-      pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+      margin:      [0.5, 0.45, 0.5, 0.45],
+      filename:    fileName,
+      image:       { type: 'jpeg', quality: 0.95 },
+      html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff', removeContainer: true },
+      jsPDF:       { unit: 'in', format: 'letter', orientation: 'portrait' }
     })
-    .from(container)
+    .from(wrap)
     .save()
-    .then(() => {
-      document.body.removeChild(container);
-      if (pdfBtn) { pdfBtn.disabled = false; pdfBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"></path></svg> Download PDF'; }
-      showToast('\u2705 PDF downloaded: ' + fileName);
+    .then(function() {
+      document.body.removeChild(wrap);
+      resetBtn();
+      showToast('PDF downloaded: ' + fileName);
     })
-    .catch(err => {
-      document.body.removeChild(container);
-      if (pdfBtn) { pdfBtn.disabled = false; pdfBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"></path></svg> Download PDF'; }
+    .catch(function(err) {
+      try { document.body.removeChild(wrap); } catch(e) {}
+      resetBtn();
       showToast('PDF error: ' + err.message, 'error');
       console.error('html2pdf error:', err);
     });
