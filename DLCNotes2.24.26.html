@@ -2116,268 +2116,291 @@ function addCustomSection() {
 }
 
 /* ══════════════════════════════════════════════════════════
-   DOWNLOAD PDF
-   Builds a clean off-screen div and uses html2pdf.js to render
-   it directly to a .pdf file — no browser print dialog at all.
+   DOWNLOAD PDF — Pure jsPDF text renderer
+   Draws text, rectangles and images directly via jsPDF API.
+   No html2canvas, no iframes, no cross-origin calls.
+   Works 100% on file:// protocol.
 ══════════════════════════════════════════════════════════ */
 function downloadPDF() {
-  if (typeof html2canvas === 'undefined' || typeof jspdf === 'undefined') {
+  if (typeof jspdf === 'undefined') {
     showToast('PDF library not loaded yet — please wait a moment and try again', 'error');
     return;
   }
 
-  // Snapshot canvas elements to img data-URLs before building PDF
-  document.querySelectorAll('.file-item-content canvas').forEach(canvas => {
-    try { canvas.dataset.printSrc = canvas.toDataURL('image/png'); } catch(e) {}
-  });
+  // ── Collect all data from the page ──────────────────────────
+  var docTitleEl = document.querySelector('.header-banner h2');
+  var docTitle = docTitleEl ? docTitleEl.innerText.trim() : 'DLC Notes';
 
-  const docTitle = document.querySelector('.header-banner h2');
-  const title = docTitle ? docTitle.innerText.trim() : 'DLC Notes';
-
-  // Header meta fields
-  let metaHtml = '';
-  document.querySelectorAll('.header-sub .field-group').forEach(fg => {
-    const lbl = fg.querySelector('label');
-    const val = fg.querySelector('.editable-field');
-    if (lbl && val) {
-      metaHtml += `<div class="meta-item"><span class="meta-label">${lbl.innerText.trim()}</span><span class="meta-val">${val.innerText.trim()}</span></div>`;
-    }
-  });
-
-  // ── Build each section as DOM nodes with full inline styles ──
-  // (html2canvas ignores stylesheet rules; everything must be inline)
-
-  // Disable button while generating
-  const pdfBtn = document.getElementById('pdfBtn');
-  if (pdfBtn) { pdfBtn.disabled = true; pdfBtn.textContent = 'Generating...'; }
-  showToast('Generating PDF - please wait...', 'info');
-
-  // Outer wrapper
-  const wrap = document.createElement('div');
-  wrap.style.cssText = 'width:720px;font-family:Segoe UI,Arial,sans-serif;font-size:10pt;color:#1a1a2e;background:#fff;padding:0;margin:0;';
-
-  // ---- Header ----
-  const hdr = document.createElement('div');
-  hdr.style.cssText = 'background:#e07b00;padding:12px 18px 10px;width:100%;';
-  const hdrH1 = document.createElement('h1');
-  hdrH1.style.cssText = 'font-size:16pt;font-weight:800;color:#fff;margin:0;font-family:Segoe UI,Arial,sans-serif;';
-  hdrH1.textContent = title;
-  hdr.appendChild(hdrH1);
-  wrap.appendChild(hdr);
-
-  // ---- Meta bar ----
-  const metaBar = document.createElement('div');
-  metaBar.style.cssText = 'background:#fff8ee;border-left:5px solid #f5a623;padding:7px 18px;display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin-bottom:4px;';
+  // Meta fields
+  var metaItems = [];
   document.querySelectorAll('.header-sub .field-group').forEach(function(fg) {
     var lbl = fg.querySelector('label');
     var val = fg.querySelector('.editable-field');
     if (lbl && val && val.innerText.trim()) {
-      var item = document.createElement('div');
-      item.style.cssText = 'display:flex;align-items:center;gap:5px;';
-      var labelEl = document.createElement('span');
-      labelEl.style.cssText = 'font-size:7pt;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.4px;';
-      labelEl.textContent = lbl.innerText.trim();
-      var valEl = document.createElement('span');
-      valEl.style.cssText = 'font-size:10pt;font-weight:600;color:#333;';
-      valEl.textContent = val.innerText.trim();
-      item.appendChild(labelEl);
-      item.appendChild(valEl);
-      metaBar.appendChild(item);
+      metaItems.push(lbl.innerText.trim() + ': ' + val.innerText.trim());
     }
   });
-  wrap.appendChild(metaBar);
 
-  // ---- Sections ----
+  // Sections
+  var sections = [];
   document.querySelectorAll('.section-card').forEach(function(card) {
     var headTitleEl = card.querySelector('.section-head-title');
     if (!headTitleEl) return;
-    var sectionTitle = headTitleEl.innerText.trim();
+    var sTitle = headTitleEl.innerText.trim();
 
-    // Collect bullet items
     var bullets = [];
     card.querySelectorAll('.bullet-list .item-text').forEach(function(item) {
-      var txt = item.innerText.trim();
-      if (txt) bullets.push(txt);
+      var t = item.innerText.trim();
+      if (t) bullets.push(t);
     });
 
-    // Collect table rows
-    var tables = card.querySelectorAll('.data-table');
+    var tableData = [];
+    card.querySelectorAll('.data-table').forEach(function(tbl) {
+      var rows = [];
+      tbl.querySelectorAll('tr').forEach(function(row) {
+        var cells = [];
+        var isHdr = row.querySelector('th') !== null;
+        row.querySelectorAll('th,td').forEach(function(cell) {
+          if (!cell.classList.contains('no-print')) cells.push({ text: cell.innerText.trim(), isHdr: isHdr });
+        });
+        if (cells.length) rows.push(cells);
+      });
+      if (rows.length) tableData.push(rows);
+    });
 
-    // Collect attachments
-    var attachments = [];
+    var images = [];
+    card.querySelectorAll('.file-item-content canvas').forEach(function(c) {
+      try { c.dataset.printSrc = c.toDataURL('image/png'); } catch(e) {}
+    });
     card.querySelectorAll('.file-item').forEach(function(item) {
       var nameEl = item.querySelector('.file-item-name');
       var name = nameEl ? nameEl.innerText.trim() : 'Attachment';
-      var srcs = [];
       item.querySelectorAll('.file-item-content img').forEach(function(img) {
         var src = img.dataset.printSrc || img.src;
-        if (src) srcs.push({ src: src, w: img.style.width || '100%' });
+        if (src && src.startsWith('data:')) images.push({ name: name, src: src });
       });
-      item.querySelectorAll('.file-item-content canvas').forEach(function(canvas) {
-        if (canvas.dataset.printSrc) srcs.push({ src: canvas.dataset.printSrc, w: '100%' });
+      item.querySelectorAll('.file-item-content canvas').forEach(function(c) {
+        if (c.dataset.printSrc) images.push({ name: name, src: c.dataset.printSrc });
       });
-      if (srcs.length) attachments.push({ name: name, srcs: srcs });
     });
 
-    if (!bullets.length && !tables.length && !attachments.length && !sectionTitle) return;
-
-    // Section card
-    var sec = document.createElement('div');
-    sec.style.cssText = 'border:1px solid #d0d0d8;border-radius:5px;margin:8px 0;overflow:hidden;';
-
-    // Section header
-    var secHead = document.createElement('div');
-    secHead.style.cssText = 'display:flex;align-items:center;background:#1e1e3f;min-height:26px;';
-    var accent = document.createElement('div');
-    accent.style.cssText = 'width:4px;min-height:26px;background:#f5a623;flex-shrink:0;margin-right:10px;';
-    var secTitle = document.createElement('div');
-    secTitle.style.cssText = 'font-size:8pt;font-weight:700;color:#f0f0ff;text-transform:uppercase;letter-spacing:1px;padding:5px 6px;font-family:Segoe UI,Arial,sans-serif;';
-    secTitle.textContent = sectionTitle;
-    secHead.appendChild(accent);
-    secHead.appendChild(secTitle);
-    sec.appendChild(secHead);
-
-    // Section body
-    var body = document.createElement('div');
-    body.style.cssText = 'padding:7px 12px 6px;';
-
-    // Bullet list
-    if (bullets.length) {
-      var ul = document.createElement('ul');
-      ul.style.cssText = 'list-style:none;padding:0;margin:0 0 4px;';
-      bullets.forEach(function(txt) {
-        var li = document.createElement('li');
-        li.style.cssText = 'display:flex;align-items:flex-start;gap:7px;margin-bottom:3px;padding:2px 4px;';
-        var bullet = document.createElement('span');
-        bullet.style.cssText = 'color:#f5a623;font-size:1rem;line-height:1.5;flex-shrink:0;';
-        bullet.textContent = '\u2022';
-        var text = document.createElement('span');
-        text.innerHTML = txt;
-        li.appendChild(bullet);
-        li.appendChild(text);
-        ul.appendChild(li);
-      });
-      body.appendChild(ul);
-    }
-
-    // Tables
-    tables.forEach(function(srcTbl) {
-      var tbl = document.createElement('table');
-      tbl.style.cssText = 'width:100%;border-collapse:collapse;font-size:8pt;margin-top:5px;table-layout:fixed;';
-      srcTbl.querySelectorAll('tr').forEach(function(srcRow) {
-        var tr = document.createElement('tr');
-        var isHeader = srcRow.querySelector('th') !== null;
-        srcRow.querySelectorAll('th,td').forEach(function(srcCell) {
-          if (srcCell.classList.contains('no-print')) return;
-          var cell = document.createElement(srcCell.tagName.toLowerCase());
-          cell.innerHTML = srcCell.innerHTML;
-          if (isHeader) {
-            cell.style.cssText = 'background:#1a1a2e;color:#f5a623;padding:5px 7px;font-size:7pt;text-align:left;border:1px solid #333;word-break:break-word;white-space:normal;';
-          } else {
-            cell.style.cssText = 'padding:4px 7px;border:1px solid #ddd;vertical-align:top;font-size:8pt;word-break:break-word;white-space:normal;';
-          }
-          tr.appendChild(cell);
-        });
-        tbl.appendChild(tr);
-      });
-      body.appendChild(tbl);
-    });
-
-    // Attachments
-    attachments.forEach(function(att) {
-      var attDiv = document.createElement('div');
-      attDiv.style.cssText = 'border:1px solid #e0e0e0;border-radius:4px;margin-top:6px;overflow:hidden;';
-      var attName = document.createElement('div');
-      attName.style.cssText = 'font-size:7pt;font-weight:700;color:#555;background:#f5f5f5;padding:3px 8px;border-bottom:1px solid #e0e0e0;';
-      attName.textContent = att.name;
-      attDiv.appendChild(attName);
-      att.srcs.forEach(function(s) {
-        var img = document.createElement('img');
-        img.src = s.src;
-        img.style.cssText = 'max-width:' + s.w + ';width:' + s.w + ';height:auto;display:block;margin:0 auto 4px;';
-        attDiv.appendChild(img);
-      });
-      body.appendChild(attDiv);
-    });
-
-    sec.appendChild(body);
-    wrap.appendChild(sec);
+    sections.push({ title: sTitle, bullets: bullets, tables: tableData, images: images });
   });
 
-  // Place off-screen
-  wrap.style.position = 'absolute';
-  wrap.style.left = '-9999px';
-  wrap.style.top = '0';
-  document.body.appendChild(wrap);
+  // ── Disable button ───────────────────────────────────────────
+  var pdfBtn = document.getElementById('pdfBtn');
+  if (pdfBtn) { pdfBtn.disabled = true; pdfBtn.textContent = 'Generating...'; }
+  showToast('Generating PDF - please wait...', 'info');
 
-  // File name
-  var safeTitle = title.replace(/[^a-z0-9 _-]/gi, '').trim().replace(/ +/g, '_') || 'DLC_Notes';
-  var today = new Date().toISOString().slice(0,10);
-  var fileName = safeTitle + '_' + today + '.pdf';
-
-  var pdfBtnRef = pdfBtn;
   var resetBtn = function() {
-    if (pdfBtnRef) {
-      pdfBtnRef.disabled = false;
-      pdfBtnRef.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"></path></svg> Download PDF';
+    if (pdfBtn) {
+      pdfBtn.disabled = false;
+      pdfBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"></path></svg> Download PDF';
     }
   };
 
-  // Use html2canvas + jsPDF directly.
-  // allowTaint:true + useCORS:false prevents the "blocked a frame" error on file:// protocol.
-  html2canvas(wrap, {
-    scale: 2,
-    useCORS: false,
-    allowTaint: true,
-    logging: false,
-    backgroundColor: '#ffffff'
-  }).then(function(canvas) {
-    try { document.body.removeChild(wrap); } catch(e) {}
+  try {
+    // ── jsPDF setup ──────────────────────────────────────────────
+    var doc = new jspdf.jsPDF({ unit: 'pt', format: 'letter', orientation: 'portrait' });
+    var PW = 612, PH = 792;   // letter in points
+    var ML = 36, MR = 36, MT = 36, MB = 36;  // margins
+    var CW = PW - ML - MR;    // content width
+    var y = MT;                // current Y cursor
 
-    var imgData = canvas.toDataURL('image/jpeg', 0.95);
-    var pageW = 8.5, pageH = 11;
-    var margin = 0.5;
-    var contentW = pageW - margin * 2;
+    // Colours
+    var COL_HEADER_BG  = [224, 123,   0];  // #e07b00
+    var COL_HEADER_TXT = [255, 255, 255];
+    var COL_ACCENT     = [245, 166,  35];  // #f5a623
+    var COL_SECTION_BG = [ 30,  30,  63];  // #1e1e3f
+    var COL_SECTION_TXT= [240, 240, 255];
+    var COL_META_BG    = [255, 248, 238];
+    var COL_TH_BG      = [ 26,  26,  46];  // #1a1a2e
+    var COL_TH_TXT     = [245, 166,  35];
+    var COL_BODY_TXT   = [ 26,  26,  46];
+    var COL_BORDER     = [208, 208, 216];
+    var COL_ROW_ALT    = [248, 248, 248];
 
-    // Scale canvas to fit page width
-    var canvasW = canvas.width / 2;  // divide by scale
-    var canvasH = canvas.height / 2;
-    var ratio = contentW / (canvasW / 96);  // 96dpi assumption
-    var imgW = contentW;
-    var imgH = (canvasH / 96) * ratio;
+    function rgb(c) { return { r: c[0], g: c[1], b: c[2] }; }
+    function setFill(c)   { doc.setFillColor(c[0], c[1], c[2]); }
+    function setDraw(c)   { doc.setDrawColor(c[0], c[1], c[2]); }
+    function setTxt(c)    { doc.setTextColor(c[0], c[1], c[2]); }
 
-    // Use jsPDF
-    var doc = new jspdf.jsPDF({ unit: 'in', format: 'letter', orientation: 'portrait' });
-    var contentH = pageH - margin * 2;
-    var pagesNeeded = Math.ceil(imgH / contentH);
-
-    for (var i = 0; i < pagesNeeded; i++) {
-      if (i > 0) doc.addPage();
-      // Clip position: each page shows a slice of the full image
-      var srcY = i * contentH;  // in inches
-      var sliceH = Math.min(contentH, imgH - srcY);
-
-      // We need to draw a cropped portion of the canvas for each page
-      var sliceCanvas = document.createElement('canvas');
-      var dpi = 2 * 96;  // scale * 96
-      sliceCanvas.width = canvas.width;
-      sliceCanvas.height = Math.round(sliceH * dpi);
-      var ctx = sliceCanvas.getContext('2d');
-      ctx.drawImage(canvas, 0, -Math.round(srcY * dpi));
-
-      var sliceData = sliceCanvas.toDataURL('image/jpeg', 0.95);
-      doc.addImage(sliceData, 'JPEG', margin, margin, imgW, sliceH);
+    function checkPage(needed) {
+      if (y + needed > PH - MB) { doc.addPage(); y = MT; }
     }
 
+    // Wrap text to fit within maxW points, return array of lines
+    function wrapText(text, maxW, fontSize) {
+      doc.setFontSize(fontSize);
+      return doc.splitTextToSize(String(text), maxW);
+    }
+
+    // Draw a filled rectangle
+    function fillRect(x, ry, w, h, col) {
+      setFill(col); doc.rect(x, ry, w, h, 'F');
+    }
+
+    // Draw text with optional bold
+    function drawText(text, x, ry, opts) {
+      opts = opts || {};
+      doc.setFont('helvetica', opts.bold ? 'bold' : 'normal');
+      doc.setFontSize(opts.size || 10);
+      setTxt(opts.color || COL_BODY_TXT);
+      doc.text(String(text), x, ry);
+    }
+
+    // ── Document header ─────────────────────────────────────────
+    var hdrH = 32;
+    fillRect(0, 0, PW, hdrH, COL_HEADER_BG);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    setTxt(COL_HEADER_TXT);
+    doc.text(docTitle, ML, 22);
+    y = hdrH + 2;
+
+    // ── Meta bar ────────────────────────────────────────────────
+    if (metaItems.length) {
+      var metaH = 20;
+      fillRect(0, y, PW, metaH, COL_META_BG);
+      // Gold left border
+      setFill(COL_ACCENT); doc.rect(0, y, 4, metaH, 'F');
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      setTxt([100, 100, 100]);
+      var mx = ML + 6;
+      metaItems.forEach(function(item) {
+        doc.text(item, mx, y + 13);
+        mx += doc.getTextWidth(item) + 18;
+      });
+      y += metaH + 4;
+    }
+
+    // ── Sections ────────────────────────────────────────────────
+    sections.forEach(function(sec) {
+      checkPage(30);
+
+      // Section header bar
+      var shH = 20;
+      fillRect(ML, y, CW, shH, COL_SECTION_BG);
+      setFill(COL_ACCENT); doc.rect(ML, y, 4, shH, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      setTxt(COL_SECTION_TXT);
+      doc.text(sec.title.toUpperCase(), ML + 10, y + 13);
+      y += shH;
+
+      // Section body padding
+      var bodyX = ML + 6;
+      var bodyW = CW - 12;
+      y += 5;
+
+      // Bullet items
+      sec.bullets.forEach(function(bullet) {
+        var lines = wrapText(bullet, bodyW - 14, 9);
+        var lineH = 12;
+        var blockH = lines.length * lineH + 2;
+        checkPage(blockH + 4);
+        // Bullet dot
+        setFill(COL_ACCENT);
+        doc.circle(bodyX + 3, y + 4, 2, 'F');
+        // Text
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        setTxt(COL_BODY_TXT);
+        lines.forEach(function(line, li) {
+          doc.text(line, bodyX + 10, y + (li * lineH) + 7);
+        });
+        y += blockH + 2;
+      });
+
+      // Tables
+      sec.tables.forEach(function(rows) {
+        if (!rows.length) return;
+        var colCount = rows[0].length;
+        var colW = bodyW / colCount;
+        var rowH = 16;
+
+        rows.forEach(function(cells, ri) {
+          checkPage(rowH + 2);
+          var isHdr = cells[0].isHdr;
+          cells.forEach(function(cell, ci) {
+            var cx = bodyX + ci * colW;
+            // Background
+            if (isHdr) {
+              fillRect(cx, y, colW, rowH, COL_TH_BG);
+            } else if (ri % 2 === 0) {
+              fillRect(cx, y, colW, rowH, COL_ROW_ALT);
+            } else {
+              fillRect(cx, y, colW, rowH, [255,255,255]);
+            }
+            // Border
+            setDraw(COL_BORDER);
+            doc.rect(cx, y, colW, rowH, 'S');
+            // Text
+            doc.setFont('helvetica', isHdr ? 'bold' : 'normal');
+            doc.setFontSize(7);
+            setTxt(isHdr ? COL_TH_TXT : COL_BODY_TXT);
+            var cellText = doc.splitTextToSize(cell.text, colW - 4);
+            doc.text(cellText[0] || '', cx + 3, y + 10);
+          });
+          y += rowH;
+        });
+        y += 6;
+      });
+
+      // Images (data-URLs only — no cross-origin)
+      sec.images.forEach(function(imgObj) {
+        try {
+          // Determine format from data URL
+          var fmt = 'JPEG';
+          if (imgObj.src.indexOf('data:image/png') === 0) fmt = 'PNG';
+
+          // Load into an Image element to get natural dimensions
+          var tmpImg = new Image();
+          tmpImg.src = imgObj.src;
+          var natW = tmpImg.naturalWidth  || 400;
+          var natH = tmpImg.naturalHeight || 300;
+          var aspect = natH / natW;
+          var drawW = Math.min(bodyW, 400);
+          var drawH = drawW * aspect;
+
+          checkPage(drawH + 20);
+
+          // Label
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(7);
+          setTxt([100,100,100]);
+          doc.text(imgObj.name, bodyX, y + 8);
+          y += 12;
+
+          doc.addImage(imgObj.src, fmt, bodyX, y, drawW, drawH);
+          y += drawH + 6;
+        } catch(imgErr) {
+          console.warn('Could not embed image:', imgErr);
+        }
+      });
+
+      // Bottom padding for section
+      y += 6;
+
+      // Section border
+      setDraw(COL_BORDER);
+      doc.rect(ML, y - (sec.bullets.length * 14) - 30, CW, (sec.bullets.length * 14) + 30, 'S');
+    });
+
+    // ── Save ─────────────────────────────────────────────────────
+    var safeTitle = docTitle.replace(/[^a-z0-9 _-]/gi, '').trim().replace(/ +/g, '_') || 'DLC_Notes';
+    var today = new Date().toISOString().slice(0,10);
+    var fileName = safeTitle + '_' + today + '.pdf';
     doc.save(fileName);
     resetBtn();
     showToast('PDF downloaded: ' + fileName);
-  }).catch(function(err) {
-    try { document.body.removeChild(wrap); } catch(e) {}
+
+  } catch(err) {
     resetBtn();
     showToast('PDF error: ' + (err && err.message ? err.message : String(err)), 'error');
     console.error('PDF generation error:', err);
-  });
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
