@@ -7,6 +7,8 @@ import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useScrollAnimation, useCountUp } from "@/hooks/useScrollAnimation";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { getLoginUrl } from "@/const";
 import {
   Rocket, Zap, BarChart3, Users, Shield, Globe, Layers, Brain,
   ChevronDown, ChevronRight, ArrowRight, Star, Check, Play,
@@ -25,6 +27,7 @@ const TEAM_IMG = "https://d2xsxph8kpxj0f.cloudfront.net/310519663079185454/SmGTJ
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
@@ -54,14 +57,24 @@ function Navbar() {
         </div>
 
         <div className="hidden lg:flex items-center gap-3">
-          <Link href="/dashboard">
-            <Button variant="ghost" className="text-foreground/70 hover:text-foreground">Log In</Button>
-          </Link>
-          <Link href="/dashboard">
-            <Button className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white shadow-lg shadow-purple-600/30 px-6">
-              Get Started Free
-            </Button>
-          </Link>
+          {isAuthenticated ? (
+            <Link href="/dashboard">
+              <Button className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white shadow-lg shadow-purple-600/30 px-6">
+                Go to Dashboard
+              </Button>
+            </Link>
+          ) : (
+            <>
+              <a href={getLoginUrl()}>
+                <Button variant="ghost" className="text-foreground/70 hover:text-foreground">Log In</Button>
+              </a>
+              <a href={getLoginUrl()}>
+                <Button className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white shadow-lg shadow-purple-600/30 px-6">
+                  Get Started Free
+                </Button>
+              </a>
+            </>
+          )}
         </div>
 
         {/* Mobile hamburger */}
@@ -80,8 +93,14 @@ function Navbar() {
             <a href="#testimonials" onClick={() => setMobileOpen(false)} className="block py-2 text-foreground/70">Testimonials</a>
             <a href="#faq" onClick={() => setMobileOpen(false)} className="block py-2 text-foreground/70">FAQ</a>
             <div className="pt-3 flex flex-col gap-2">
-              <Link href="/dashboard"><Button variant="outline" className="w-full">Log In</Button></Link>
-              <Link href="/dashboard"><Button className="w-full bg-gradient-to-r from-purple-600 to-purple-500 text-white">Get Started Free</Button></Link>
+              {isAuthenticated ? (
+                <Link href="/dashboard"><Button className="w-full bg-gradient-to-r from-purple-600 to-purple-500 text-white">Go to Dashboard</Button></Link>
+              ) : (
+                <>
+                  <a href={getLoginUrl()}><Button variant="outline" className="w-full">Log In</Button></a>
+                  <a href={getLoginUrl()}><Button className="w-full bg-gradient-to-r from-purple-600 to-purple-500 text-white">Get Started Free</Button></a>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -127,11 +146,11 @@ function HeroSection() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/dashboard">
+              <a href={getLoginUrl()}>
                 <Button size="lg" className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white shadow-xl shadow-purple-600/30 h-14 px-8 text-base w-full sm:w-auto">
                   Start Launching Free <ArrowRight size={18} className="ml-2" />
                 </Button>
-              </Link>
+              </a>
               <Button size="lg" variant="outline" className="h-14 px-8 text-base border-border/50 hover:bg-secondary/50">
                 <Play size={18} className="mr-2" /> Watch Demo
               </Button>
@@ -746,7 +765,7 @@ function PricingSection() {
                   <span className="text-2xl font-heading font-bold">Custom</span>
                 )}
               </div>
-              <Link href="/dashboard">
+              <a href={getLoginUrl()}>
                 <Button
                   className={`w-full mb-6 ${
                     plan.popular
@@ -757,7 +776,7 @@ function PricingSection() {
                 >
                   {plan.cta}
                 </Button>
-              </Link>
+              </a>
               <div className="space-y-3">
                 {plan.features.map((f, j) => (
                   <div key={j} className="flex items-center gap-2.5 text-sm text-foreground/60">
@@ -854,11 +873,11 @@ function CTASection() {
           Join 15,000+ media buyers who launch 10x faster. First launch takes 2 minutes to set up.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/dashboard">
+          <a href={getLoginUrl()}>
             <Button size="lg" className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white shadow-xl shadow-purple-600/30 h-14 px-8 text-base">
               Start Launching Free <ArrowRight size={18} className="ml-2" />
             </Button>
-          </Link>
+          </a>
           <Button size="lg" variant="outline" className="h-14 px-8 text-base border-border/50">
             Book a Demo
           </Button>

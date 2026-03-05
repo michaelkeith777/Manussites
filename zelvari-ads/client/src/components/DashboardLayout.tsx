@@ -4,6 +4,8 @@
  */
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { getLoginUrl } from "@/const";
 import {
   LayoutDashboard,
   Rocket,
@@ -20,11 +22,17 @@ import {
   Bell,
   Search,
   TableProperties,
+  Sparkles,
+  Image as ImageIcon,
+  CreditCard,
+  Shield,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
   { path: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { path: "/creative-studio", label: "AI Studio", icon: Sparkles },
+  { path: "/gallery", label: "Gallery", icon: ImageIcon },
   { path: "/launch", label: "Ad Launcher", icon: Rocket },
   { path: "/campaigns", label: "Campaigns", icon: Megaphone },
   { path: "/ads-manager", label: "Ads Manager", icon: TableProperties },
@@ -38,6 +46,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [location] = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, isAuthenticated, loading, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    window.location.href = "/";
+  };
+
+  const displayName = user?.name || user?.email || "User";
+  const initials = displayName.slice(0, 2).toUpperCase();
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -107,26 +124,58 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </Link>
             );
           })}
+
+          {/* Admin link */}
+          {user?.role === "admin" && (
+            <>
+              <div className={`px-3 pt-4 pb-1 ${collapsed ? "hidden" : ""}`}>
+                <p className="text-[10px] uppercase tracking-wider text-sidebar-foreground/30 font-semibold">Admin</p>
+              </div>
+              <Link
+                href="/admin"
+                onClick={() => setMobileOpen(false)}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200
+                  ${location === "/admin"
+                    ? "bg-sidebar-primary/15 text-sidebar-primary"
+                    : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent"
+                  }`}
+              >
+                <Shield size={20} />
+                {!collapsed && <span className="text-sm font-medium">Admin Panel</span>}
+              </Link>
+            </>
+          )}
         </nav>
 
         {/* Bottom section */}
         <div className="p-3 border-t border-sidebar-border">
-          <div className={`flex items-center gap-3 ${collapsed ? "justify-center" : ""}`}>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white text-xs font-bold shrink-0">
-              JD
-            </div>
-            {!collapsed && (
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-sidebar-foreground truncate">John Doe</p>
-                <p className="text-xs text-sidebar-foreground/50 truncate">john@agency.com</p>
+          {isAuthenticated && user ? (
+            <div className={`flex items-center gap-3 ${collapsed ? "justify-center" : ""}`}>
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                {initials}
               </div>
-            )}
-            {!collapsed && (
-              <button className="text-sidebar-foreground/40 hover:text-sidebar-foreground transition-colors">
-                <LogOut size={16} />
-              </button>
-            )}
-          </div>
+              {!collapsed && (
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-sidebar-foreground truncate">{displayName}</p>
+                  <p className="text-xs text-sidebar-foreground/50 truncate capitalize">{user.plan || "free"} plan</p>
+                </div>
+              )}
+              {!collapsed && (
+                <button
+                  onClick={handleLogout}
+                  className="text-sidebar-foreground/40 hover:text-sidebar-foreground transition-colors"
+                >
+                  <LogOut size={16} />
+                </button>
+              )}
+            </div>
+          ) : (
+            <a href={getLoginUrl()}>
+              <Button className="w-full bg-gradient-to-r from-purple-600 to-purple-500 text-white text-sm">
+                {collapsed ? "→" : "Sign In"}
+              </Button>
+            </a>
+          )}
         </div>
       </aside>
 
@@ -157,9 +206,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Bell size={18} />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-amber-400" />
             </Button>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white text-xs font-bold lg:hidden">
-              JD
-            </div>
+            {isAuthenticated && user && (
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white text-xs font-bold lg:hidden">
+                {initials}
+              </div>
+            )}
           </div>
         </header>
 
