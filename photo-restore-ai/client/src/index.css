@@ -1,0 +1,266 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --color-amber: oklch(0.78 0.13 75);
+  --color-amber-light: oklch(0.85 0.1 75);
+  --color-amber-dark: oklch(0.65 0.15 75);
+  --color-teal: oklch(0.75 0.12 185);
+  --color-teal-light: oklch(0.82 0.1 185);
+}
+
+:root {
+  --radius: 0.75rem;
+  --background: oklch(0.12 0.01 260);
+  --foreground: oklch(0.93 0.01 75);
+  --card: oklch(0.16 0.01 260);
+  --card-foreground: oklch(0.93 0.01 75);
+  --popover: oklch(0.16 0.01 260);
+  --popover-foreground: oklch(0.93 0.01 75);
+  --primary: oklch(0.78 0.13 75);
+  --primary-foreground: oklch(0.15 0.02 75);
+  --secondary: oklch(0.2 0.01 260);
+  --secondary-foreground: oklch(0.85 0.01 75);
+  --muted: oklch(0.2 0.01 260);
+  --muted-foreground: oklch(0.6 0.02 260);
+  --accent: oklch(0.22 0.015 260);
+  --accent-foreground: oklch(0.93 0.01 75);
+  --destructive: oklch(0.6 0.22 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.25 0.015 260);
+  --input: oklch(0.22 0.015 260);
+  --ring: oklch(0.78 0.13 75);
+  --chart-1: oklch(0.78 0.13 75);
+  --chart-2: oklch(0.75 0.12 185);
+  --chart-3: oklch(0.65 0.15 75);
+  --chart-4: oklch(0.7 0.1 260);
+  --chart-5: oklch(0.6 0.08 300);
+  --sidebar: oklch(0.14 0.01 260);
+  --sidebar-foreground: oklch(0.93 0.01 75);
+  --sidebar-primary: oklch(0.78 0.13 75);
+  --sidebar-primary-foreground: oklch(0.15 0.02 75);
+  --sidebar-accent: oklch(0.22 0.015 260);
+  --sidebar-accent-foreground: oklch(0.93 0.01 75);
+  --sidebar-border: oklch(0.25 0.015 260);
+  --sidebar-ring: oklch(0.78 0.13 75);
+}
+
+.light {
+  --background: oklch(0.97 0.005 75);
+  --foreground: oklch(0.15 0.02 260);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.02 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.02 260);
+  --primary: oklch(0.55 0.15 75);
+  --primary-foreground: oklch(0.98 0.01 75);
+  --secondary: oklch(0.94 0.01 75);
+  --secondary-foreground: oklch(0.3 0.02 260);
+  --muted: oklch(0.94 0.005 260);
+  --muted-foreground: oklch(0.5 0.02 260);
+  --accent: oklch(0.94 0.01 75);
+  --accent-foreground: oklch(0.15 0.02 260);
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.88 0.01 260);
+  --input: oklch(0.88 0.01 260);
+  --ring: oklch(0.55 0.15 75);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'DM Sans', system-ui, sans-serif;
+  }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+      max-width: 1280px;
+    }
+  }
+
+  /* Film grain overlay */
+  .film-grain::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.03;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 256px 256px;
+  }
+
+  /* Glass morphism card */
+  .glass-card {
+    background: oklch(0.16 0.01 260 / 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid oklch(0.3 0.015 260 / 0.4);
+    box-shadow: 0 8px 32px oklch(0 0 0 / 0.3), inset 0 1px 0 oklch(1 0 0 / 0.05);
+  }
+
+  .light .glass-card {
+    background: oklch(1 0 0 / 0.8);
+    border: 1px solid oklch(0.88 0.01 260 / 0.6);
+    box-shadow: 0 8px 32px oklch(0 0 0 / 0.08), inset 0 1px 0 oklch(1 0 0 / 0.5);
+  }
+
+  .light .text-gradient-amber {
+    background: linear-gradient(135deg, oklch(0.65 0.15 75), oklch(0.55 0.15 75), oklch(0.5 0.16 75));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Amber glow effect */
+  .amber-glow {
+    box-shadow: 0 0 20px oklch(0.78 0.13 75 / 0.2), 0 0 60px oklch(0.78 0.13 75 / 0.1);
+  }
+
+  .amber-glow-strong {
+    box-shadow: 0 0 30px oklch(0.78 0.13 75 / 0.35), 0 0 80px oklch(0.78 0.13 75 / 0.15);
+  }
+
+  /* Gradient text */
+  .text-gradient-amber {
+    background: linear-gradient(135deg, oklch(0.85 0.1 75), oklch(0.78 0.13 75), oklch(0.65 0.15 75));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-teal {
+    background: linear-gradient(135deg, oklch(0.82 0.1 185), oklch(0.75 0.12 185));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: oklch(0.14 0.01 260);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: oklch(0.3 0.015 260);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.4 0.02 260);
+  }
+
+  .light ::-webkit-scrollbar-track {
+    background: oklch(0.95 0.005 260);
+  }
+  .light ::-webkit-scrollbar-thumb {
+    background: oklch(0.8 0.01 260);
+  }
+}
+
+/* Custom animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-amber {
+  0%, 100% { box-shadow: 0 0 20px oklch(0.78 0.13 75 / 0.2); }
+  50% { box-shadow: 0 0 40px oklch(0.78 0.13 75 / 0.4); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+.animate-pulse-amber {
+  animation: pulse-amber 3s ease-in-out infinite;
+}
