@@ -129,7 +129,7 @@
       border: none;
       border-bottom: 1.5px solid var(--purple);
       width: 100%;
-      height: 22px;
+      height: 28px;
       font-size: 12px;
       background: transparent;
       outline: none;
@@ -183,14 +183,14 @@
 
     tbody td {
       border: 1px solid var(--border);
-      height: 30px;
+      height: 46px;
       padding: 0;
       vertical-align: middle;
     }
 
     tbody td.num {
       text-align: center;
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 700;
       color: var(--purple);
       background: #EDE0FF;
@@ -358,7 +358,7 @@
     </div>
     <div class="info-cell">
       <label>Date</label>
-      <input class="write-line" type="text" placeholder="MM / DD / YYYY" />
+      <input class="write-line" type="text" />
     </div>
   </div>
 
@@ -441,13 +441,13 @@
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td class="num">${i}</td>
-      <td><input type="text" placeholder="MM/DD/YY" /></td>
-      <td><input type="text" placeholder="Store #" /></td>
-      <td><input type="text" placeholder="EPRO #" /></td>
-      <td><input type="text" placeholder="Item Description" /></td>
-      <td><input type="text" placeholder="0" style="text-align:center;" /></td>
-      <td><input type="text" placeholder="Name" /></td>
-      <td><input type="text" placeholder="Notes..." /></td>
+      <td><input type="text" /></td>
+      <td><input type="text" /></td>
+      <td><input type="text" /></td>
+      <td><input type="text" /></td>
+      <td><input type="text" style="text-align:center;" /></td>
+      <td><input type="text" /></td>
+      <td><input type="text" /></td>
     `;
     tbody.appendChild(tr);
   }
