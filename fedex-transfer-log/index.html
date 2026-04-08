@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FedEx Office — Inventory Transfer Log</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap');
+
+    :root {
+      --fedex-purple: #4D148C;
+      --fedex-orange: #FF6200;
+      --fedex-light-purple: #6B2FAA;
+      --fedex-dark: #1A0033;
+      --fedex-gray: #F5F5F5;
+      --fedex-mid-gray: #E0E0E0;
+      --fedex-dark-gray: #555;
+      --fedex-text: #222;
+      --row-alt: #F9F4FF;
+      --row-white: #FFFFFF;
+      --border: #C8B8E0;
+    }
+
+    body {
+      font-family: 'Open Sans', Arial, sans-serif;
+      background: #ECECEC;
+      color: var(--fedex-text);
+      padding: 20px;
+    }
+
+    /* ── Page Wrapper ── */
+    .page {
+      width: 1100px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 4px 24px rgba(77,20,140,0.18);
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: var(--fedex-purple);
+      padding: 0;
+      display: flex;
+      align-items: stretch;
+    }
+
+    .header-logo-block {
+      background: var(--fedex-dark);
+      padding: 22px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 220px;
+    }
+
+    .fedex-logo {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+    .fedex-logo .fe { color: #FFFFFF; }
+    .fedex-logo .d  { color: var(--fedex-orange); }
+    .fedex-logo .ex { color: var(--fedex-orange); }
+    .fedex-logo .office {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: #CCAAFF;
+      margin-top: 2px;
+      text-transform: uppercase;
+    }
+
+    .header-title-block {
+      flex: 1;
+      padding: 22px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .header-title-block h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .header-title-block p {
+      font-size: 13px;
+      color: #CCAAFF;
+      margin-top: 4px;
+      letter-spacing: 1px;
+    }
+
+    .header-fy-block {
+      background: var(--fedex-orange);
+      padding: 22px 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-fy-block .fy-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .header-fy-block .fy-value {
+      font-size: 30px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.1;
+    }
+
+    /* ── Orange accent bar ── */
+    .accent-bar {
+      height: 5px;
+      background: linear-gradient(90deg, var(--fedex-orange) 0%, var(--fedex-purple) 100%);
+    }
+
+    /* ── Section containers ── */
+    .section {
+      padding: 20px 32px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--fedex-purple);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--fedex-orange);
+      display: inline-block;
+    }
+
+    /* ── Info Grid (top fields) ── */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 0;
+    }
+
+    .info-grid-wide {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--fedex-purple);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+    }
+
+    .field-line {
+      border: none;
+      border-bottom: 1.5px solid var(--fedex-purple);
+      height: 26px;
+      width: 100%;
+      background: transparent;
+      font-size: 13px;
+      color: var(--fedex-text);
+      padding: 2px 4px;
+      outline: none;
+    }
+
+    .field-line:focus {
+      border-bottom-color: var(--fedex-orange);
+      background: #FFF8F0;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: var(--fedex-mid-gray);
+      margin: 0 32px;
+    }
+
+    /* ── Transfer Details Banner ── */
+    .transfer-banner {
+      background: linear-gradient(90deg, var(--fedex-purple) 0%, var(--fedex-light-purple) 100%);
+      padding: 10px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .transfer-banner .banner-icon {
+      font-size: 20px;
+      color: var(--fedex-orange);
+    }
+
+    .transfer-banner h2 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .transfer-banner .banner-note {
+      font-size: 11px;
+      color: #CCAAFF;
+      margin-left: auto;
+    }
+
+    /* ── Items Table ── */
+    .table-wrapper {
+      padding: 0 32px 20px;
+      overflow-x: auto;
+    }
+
+    table.items-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    table.items-table thead tr {
+      background: var(--fedex-purple);
+    }
+
+    table.items-table thead th {
+      color: #fff;
+      font-weight: 700;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 10px 8px;
+      text-align: left;
+      border: 1px solid var(--fedex-light-purple);
+      white-space: nowrap;
+    }
+
+    table.items-table thead th.center { text-align: center; }
+
+    table.items-table tbody tr:nth-child(odd)  { background: var(--row-white); }
+    table.items-table tbody tr:nth-child(even) { background: var(--row-alt); }
+
+    table.items-table tbody tr:hover { background: #EDE0FF; }
+
+    table.items-table tbody td {
+      border: 1px solid var(--border);
+      padding: 0;
+      height: 34px;
+      vertical-align: middle;
+    }
+
+    table.items-table tbody td input[type="text"],
+    table.items-table tbody td input[type="number"],
+    table.items-table tbody td select {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: transparent;
+      font-size: 12px;
+      font-family: inherit;
+      color: var(--fedex-text);
+      padding: 4px 6px;
+      outline: none;
+    }
+
+    table.items-table tbody td input:focus,
+    table.items-table tbody td select:focus {
+      background: #FFF8F0;
+      box-shadow: inset 0 0 0 2px var(--fedex-orange);
+    }
+
+    table.items-table tbody td.row-num {
+      text-align: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--fedex-purple);
+      background: #F0E8FF;
+      width: 32px;
+      padding: 0 4px;
+    }
+
+    /* Column widths */
+    .col-num   { width: 32px; }
+    .col-date  { width: 90px; }
+    .col-store { width: 80px; }
+    .col-epro  { width: 90px; }
+    .col-sku   { width: 100px; }
+    .col-desc  { width: auto; }
+    .col-cat   { width: 110px; }
+    .col-qty   { width: 55px; }
+    .col-unit  { width: 65px; }
+    .col-cond  { width: 80px; }
+    .col-value { width: 75px; }
+    .col-recv  { width: 90px; }
+    .col-notes { width: 130px; }
+
+    /* ── Sub-header rows ── */
+    .sub-header-row td {
+      background: #EDE0FF !important;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--fedex-purple);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 8px !important;
+      border-top: 2px solid var(--fedex-purple) !important;
+    }
+
+    /* ── Summary Section ── */
+    .summary-section {
+      padding: 0 32px 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .summary-box {
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .summary-box-header {
+      background: var(--fedex-purple);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 8px 14px;
+    }
+
+    .summary-box-body {
+      padding: 14px;
+      background: #FAFAFA;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+      border-bottom: 1px solid var(--fedex-mid-gray);
+      font-size: 12px;
+    }
+
+    .summary-row:last-child { border-bottom: none; }
+
+    .summary-row .s-label {
+      color: var(--fedex-dark-gray);
+      font-size: 11px;
+    }
+
+    .summary-row .s-value {
+      border-bottom: 1.5px solid var(--fedex-purple);
+      min-width: 120px;
+      height: 22px;
+      text-align: right;
+      font-size: 12px;
+      padding: 0 4px;
+    }
+
+    /* ── Notes Box ── */
+    .notes-section {
+      padding: 0 32px 20px;
+    }
+
+    .notes-box {
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .notes-box-header {
+      background: var(--fedex-orange);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 8px 14px;
+    }
+
+    .notes-lines {
+      padding: 12px 14px;
+      background: #FAFAFA;
+    }
+
+    .note-line {
+      border-bottom: 1px solid var(--fedex-mid-gray);
+      height: 28px;
+      margin-bottom: 4px;
+    }
+
+    /* ── Signature Section ── */
+    .sig-section {
+      padding: 0 32px 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+    }
+
+    .sig-block {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .sig-block .sig-role {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--fedex-purple);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+    }
+
+    .sig-line {
+      border-bottom: 1.5px solid var(--fedex-purple);
+      height: 36px;
+      width: 100%;
+    }
+
+    .sig-block .sig-sub {
+      font-size: 10px;
+      color: #999;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* ── Condition Badge ── */
+    .cond-new    { color: #1a7a1a; font-weight: 700; }
+    .cond-good   { color: #2255aa; font-weight: 700; }
+    .cond-fair   { color: #aa7700; font-weight: 700; }
+    .cond-damage { color: #cc2200; font-weight: 700; }
+
+    /* ── Footer ── */
+    .footer {
+      background: var(--fedex-dark);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer .footer-left {
+      font-size: 10px;
+      color: #CCAAFF;
+      letter-spacing: 0.5px;
+    }
+
+    .footer .footer-right {
+      font-size: 10px;
+      color: #CCAAFF;
+      text-align: right;
+    }
+
+    .footer .footer-brand {
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .footer .footer-brand span { color: var(--fedex-orange); }
+
+    /* ── Status badge ── */
+    .status-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .status-pending   { background: #FFF3CD; color: #856404; border: 1px solid #FFDA6A; }
+    .status-approved  { background: #D1E7DD; color: #0A3622; border: 1px solid #A3CFBB; }
+    .status-received  { background: #CFE2FF; color: #084298; border: 1px solid #9EC5FE; }
+
+    /* ── Print styles ── */
+    @media print {
+      @page {
+        size: letter;
+        margin: 0;
+      }
+      body { background: #fff; padding: 0; }
+      .page { box-shadow: none; width: 100%; border-radius: 0; }
+      .no-print { display: none; }
+    }
+
+    /* ── Instruction bar ── */
+    .instruction-bar {
+      background: #FFF3CD;
+      border: 1px solid #FFDA6A;
+      border-radius: 4px;
+      padding: 10px 18px;
+      margin: 0 32px 16px;
+      font-size: 11px;
+      color: #856404;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .instruction-bar strong { color: #5a4000; }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ══════════════════════════════════════════
+       HEADER
+  ══════════════════════════════════════════ -->
+  <div class="header">
+    <div class="header-logo-block">
+      <div class="fedex-logo">
+        <span class="fe">Fe</span><span class="d">d</span><span class="ex">Ex</span>
+        <span class="office">Office</span>
+      </div>
+    </div>
+    <div class="header-title-block">
+      <h1>Inventory Transfer Log</h1>
+      <p>Inter-Store Transfer &amp; Inventory Tracking Record</p>
+    </div>
+    <div class="header-fy-block">
+      <span class="fy-label">Fiscal Year</span>
+      <span class="fy-value">FY25</span>
+    </div>
+  </div>
+
+  <div class="accent-bar"></div>
+
+  <!-- ══════════════════════════════════════════
+       STORE INFORMATION
+  ══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Store Information</div>
+    <div class="info-grid">
+      <div class="field-group">
+        <label class="field-label">Sending Store #</label>
+        <input class="field-line" type="text" placeholder="e.g. 1234" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Receiving Store #</label>
+        <input class="field-line" type="text" placeholder="e.g. 5678" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Store Manager</label>
+        <input class="field-line" type="text" placeholder="Full Name" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Transfer Date</label>
+        <input class="field-line" type="text" placeholder="MM / DD / YYYY" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Sending Store Address</label>
+        <input class="field-line" type="text" placeholder="Street, City, State, ZIP" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Receiving Store Address</label>
+        <input class="field-line" type="text" placeholder="Street, City, State, ZIP" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Transfer Request #</label>
+        <input class="field-line" type="text" placeholder="TR-XXXXXX" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Transfer Status</label>
+        <input class="field-line" type="text" placeholder="Pending / Approved / Received" />
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════════════
+       TRANSFER DETAILS
+  ══════════════════════════════════════════ -->
+  <div class="section" style="padding-bottom:12px;">
+    <div class="section-title">Transfer Details</div>
+    <div class="info-grid-wide">
+      <div class="field-group">
+        <label class="field-label">Reason for Transfer</label>
+        <input class="field-line" type="text" placeholder="e.g. Stock Replenishment, Overstock, Event" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Approved By</label>
+        <input class="field-line" type="text" placeholder="Name / Title" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Expected Arrival Date</label>
+        <input class="field-line" type="text" placeholder="MM / DD / YYYY" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Carrier / Delivery Method</label>
+        <input class="field-line" type="text" placeholder="e.g. FedEx Ground, Hand Delivery" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Tracking Number</label>
+        <input class="field-line" type="text" placeholder="FedEx Tracking #" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Number of Boxes / Packages</label>
+        <input class="field-line" type="text" placeholder="e.g. 3 boxes" />
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══════════════════════════════════════════
+       ITEMS TRANSFER TABLE
+  ══════════════════════════════════════════ -->
+  <div class="transfer-banner">
+    <span class="banner-icon">&#9654;</span>
+    <h2>Item Transfer Log</h2>
+    <span class="banner-note">Complete one row per item or SKU transferred</span>
+  </div>
+
+  <div class="instruction-bar no-print">
+    <strong>&#9432; Instructions:</strong>&nbsp; Fill in all applicable fields for each item being transferred. Use the Condition column to note item quality. Add notes for any discrepancies.
+  </div>
+
+  <div class="table-wrapper">
+    <table class="items-table">
+      <thead>
+        <tr>
+          <th class="col-num center">#</th>
+          <th class="col-date">Date</th>
+          <th class="col-store">From Store</th>
+          <th class="col-store">To Store</th>
+          <th class="col-epro">EPRO #</th>
+          <th class="col-sku">SKU / Item #</th>
+          <th class="col-desc">Item Description</th>
+          <th class="col-cat">Category</th>
+          <th class="col-qty center">Qty</th>
+          <th class="col-unit">Unit</th>
+          <th class="col-cond">Condition</th>
+          <th class="col-value">Unit Value</th>
+          <th class="col-recv">Recv'd By</th>
+          <th class="col-notes">Notes / Discrepancy</th>
+        </tr>
+      </thead>
+      <tbody id="items-body">
+        <!-- Rows generated by JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SUMMARY
+  ══════════════════════════════════════════ -->
+  <div class="summary-section">
+    <div class="summary-box">
+      <div class="summary-box-header">&#9654; Transfer Summary</div>
+      <div class="summary-box-body">
+        <div class="summary-row">
+          <span class="s-label">Total Line Items</span>
+          <span class="s-value"></span>
+        </div>
+        <div class="summary-row">
+          <span class="s-label">Total Units Transferred</span>
+          <span class="s-value"></span>
+        </div>
+        <div class="summary-row">
+          <span class="s-label">Total Estimated Value ($)</span>
+          <span class="s-value"></span>
+        </div>
+        <div class="summary-row">
+          <span class="s-label">Items Received in Good Condition</span>
+          <span class="s-value"></span>
+        </div>
+        <div class="summary-row">
+          <span class="s-label">Items with Discrepancies / Damage</span>
+          <span class="s-value"></span>
+        </div>
+        <div class="summary-row">
+          <span class="s-label">Date Received at Destination</span>
+          <span class="s-value"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-box-header">&#9654; Verification Checklist</div>
+      <div class="summary-box-body">
+        <div class="summary-row">
+          <span class="s-label">&#9744;&nbsp; All items counted and verified</span>
+          <span class="s-value" style="min-width:60px; text-align:center;">Yes / No</span>
+        </div>
+        <div class="summary-row">
+          <span class="s-label">&#9744;&nbsp; EPRO numbers confirmed in system</span>
+          <span class="s-value" style="min-width:60px; text-align:center;">Yes / No</span>
+        </div>
+        <div class="summary-row">
+          <span class="s-label">&#9744;&nbsp; Items packaged securely</span>
+          <span class="s-value" style="min-width:60px; text-align:center;">Yes / No</span>
+        </div>
+        <div class="summary-row">
+          <span class="s-label">&#9744;&nbsp; Receiving store notified</span>
+          <span class="s-value" style="min-width:60px; text-align:center;">Yes / No</span>
+        </div>
+        <div class="summary-row">
+          <span class="s-label">&#9744;&nbsp; Transfer entered in system</span>
+          <span class="s-value" style="min-width:60px; text-align:center;">Yes / No</span>
+        </div>
+        <div class="summary-row">
+          <span class="s-label">&#9744;&nbsp; Copy retained by sending store</span>
+          <span class="s-value" style="min-width:60px; text-align:center;">Yes / No</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       NOTES
+  ══════════════════════════════════════════ -->
+  <div class="notes-section">
+    <div class="notes-box">
+      <div class="notes-box-header">&#9654; Additional Notes &amp; Comments</div>
+      <div class="notes-lines">
+        <div class="note-line"></div>
+        <div class="note-line"></div>
+        <div class="note-line"></div>
+        <div class="note-line"></div>
+        <div class="note-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SIGNATURES
+  ══════════════════════════════════════════ -->
+  <div class="section" style="padding-bottom:8px;">
+    <div class="section-title">Authorizations &amp; Signatures</div>
+  </div>
+
+  <div class="sig-section">
+    <div class="sig-block">
+      <span class="sig-role">&#9654; Prepared By (Sending Store)</span>
+      <div class="sig-line"></div>
+      <div class="sig-sub">
+        <span>Signature</span>
+        <span>Date: ___________</span>
+      </div>
+      <div style="margin-top:8px;">
+        <div class="field-label" style="font-size:9px;">Printed Name</div>
+        <div class="sig-line" style="height:22px; margin-top:4px;"></div>
+      </div>
+      <div style="margin-top:8px;">
+        <div class="field-label" style="font-size:9px;">Title / Role</div>
+        <div class="sig-line" style="height:22px; margin-top:4px;"></div>
+      </div>
+    </div>
+
+    <div class="sig-block">
+      <span class="sig-role">&#9654; Approved By (Manager)</span>
+      <div class="sig-line"></div>
+      <div class="sig-sub">
+        <span>Signature</span>
+        <span>Date: ___________</span>
+      </div>
+      <div style="margin-top:8px;">
+        <div class="field-label" style="font-size:9px;">Printed Name</div>
+        <div class="sig-line" style="height:22px; margin-top:4px;"></div>
+      </div>
+      <div style="margin-top:8px;">
+        <div class="field-label" style="font-size:9px;">Title / Role</div>
+        <div class="sig-line" style="height:22px; margin-top:4px;"></div>
+      </div>
+    </div>
+
+    <div class="sig-block">
+      <span class="sig-role">&#9654; Received By (Receiving Store)</span>
+      <div class="sig-line"></div>
+      <div class="sig-sub">
+        <span>Signature</span>
+        <span>Date: ___________</span>
+      </div>
+      <div style="margin-top:8px;">
+        <div class="field-label" style="font-size:9px;">Printed Name</div>
+        <div class="sig-line" style="height:22px; margin-top:4px;"></div>
+      </div>
+      <div style="margin-top:8px;">
+        <div class="field-label" style="font-size:9px;">Title / Role</div>
+        <div class="sig-line" style="height:22px; margin-top:4px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════ -->
+  <div class="footer">
+    <div class="footer-left">
+      <div class="footer-brand">Fe<span>d</span>Ex <span>Office</span></div>
+      <div style="margin-top:3px;">Confidential — For Internal Use Only</div>
+      <div>Retain completed form for a minimum of 12 months per store policy.</div>
+    </div>
+    <div class="footer-right">
+      <div>Form: FXOFF-ITL-FY25</div>
+      <div>Rev. 1.0 &nbsp;|&nbsp; April 2025</div>
+      <div style="margin-top:4px;">Page 1 of 1</div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+  // Generate 30 item rows
+  const tbody = document.getElementById('items-body');
+  const categories = ['Print Supplies','Paper/Media','Ink/Toner','Equipment','Packaging','Office Supplies','Promo/Display','Other'];
+  const conditions = ['New','Good','Fair','Damaged'];
+
+  for (let i = 1; i <= 30; i++) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="row-num">${i}</td>
+      <td><input type="text" placeholder="MM/DD/YY" /></td>
+      <td><input type="text" placeholder="Store #" /></td>
+      <td><input type="text" placeholder="Store #" /></td>
+      <td><input type="text" placeholder="EPRO #" /></td>
+      <td><input type="text" placeholder="SKU / Item #" /></td>
+      <td><input type="text" placeholder="Item Description" /></td>
+      <td>
+        <select>
+          <option value="">— Select —</option>
+          ${categories.map(c => `<option>${c}</option>`).join('')}
+        </select>
+      </td>
+      <td><input type="number" min="0" placeholder="0" style="text-align:center;" /></td>
+      <td><input type="text" placeholder="EA / BX / CS" /></td>
+      <td>
+        <select>
+          <option value="">— Select —</option>
+          ${conditions.map(c => `<option>${c}</option>`).join('')}
+        </select>
+      </td>
+      <td><input type="text" placeholder="$0.00" /></td>
+      <td><input type="text" placeholder="Name" /></td>
+      <td><input type="text" placeholder="Notes..." /></td>
+    `;
+    tbody.appendChild(tr);
+  }
+</script>
+
+</body>
+</html>
