@@ -183,9 +183,10 @@
 
     tbody td {
       border: 1px solid var(--border);
-      height: 46px;
+      height: 72px;
       padding: 0;
-      vertical-align: middle;
+      vertical-align: top;
+      padding-top: 6px;
     }
 
     tbody td.num {
@@ -195,6 +196,8 @@
       color: var(--purple);
       background: #EDE0FF;
       width: 28px;
+      vertical-align: top;
+      padding-top: 10px;
     }
 
     tbody td input {
@@ -202,11 +205,12 @@
       height: 100%;
       border: none;
       background: transparent;
-      font-size: 11px;
+      font-size: 12px;
       font-family: Arial, sans-serif;
       color: var(--text);
-      padding: 0 6px;
+      padding: 4px 6px;
       outline: none;
+      vertical-align: top;
     }
     tbody td input:focus { background: #FFF8F0; box-shadow: inset 0 0 0 2px var(--orange); }
 
@@ -437,7 +441,7 @@
 
 <script>
   const tbody = document.getElementById('rows');
-  for (let i = 1; i <= 25; i++) {
+  for (let i = 1; i <= 20; i++) {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td class="num">${i}</td>
